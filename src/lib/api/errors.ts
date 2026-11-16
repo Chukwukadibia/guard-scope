@@ -6,6 +6,11 @@ export type ApiErrorCode =
   | 'rate_limited'
   | 'not_authenticated'
   | 'validation'
+  | 'not_found'
+  | 'already_confirmed'
+  | 'empty_scope'
+  | 'project_archived'
+  | 'scope_locked'
   | 'network'
   | 'unknown';
 
@@ -51,6 +56,12 @@ export const errorMessages: Record<ApiErrorCode, string> = {
   rate_limited: 'Too many attempts. Please wait a minute and try again.',
   not_authenticated: 'Your session has ended. Please sign in again.',
   validation: 'Some details are not valid. Please check the highlighted fields.',
+  not_found: "We couldn't find that. It may have been removed, or you may not have access.",
+  already_confirmed:
+    'This scope was already confirmed. Refresh the page to see the latest version.',
+  empty_scope: 'Add at least one deliverable before confirming the scope.',
+  project_archived: 'This project is archived. Reopen it to make changes.',
+  scope_locked: 'Confirmed scope cannot be changed. Edit the draft instead.',
   network: "Can't reach GuardScope. Check your connection and try again.",
   unknown: 'Something went wrong. Please try again.',
 };

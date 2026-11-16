@@ -15,6 +15,7 @@ import {
 import { useOnline } from '../../hooks/useOnline';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { useAuth } from '../auth/AuthProvider';
+import { DeleteAccount } from './DeleteAccount';
 
 const FIELD_IDS = {
   display_name: 'settings-display-name',
@@ -166,6 +167,7 @@ export function SettingsPage() {
           </form>
         )}
       </section>
+      <DeleteAccount />
     </div>
   );
 }

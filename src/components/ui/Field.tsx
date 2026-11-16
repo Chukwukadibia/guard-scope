@@ -1,4 +1,10 @@
-import { useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from 'react';
+import {
+  useId,
+  type InputHTMLAttributes,
+  type ReactNode,
+  type SelectHTMLAttributes,
+  type TextareaHTMLAttributes,
+} from 'react';
 
 type Common = { label: string; error?: string; hint?: ReactNode; optional?: boolean };
 
@@ -10,7 +16,7 @@ function Label({ id, label, optional }: { id: string; label: string; optional?: 
   return (
     <label htmlFor={id} className="block text-sm font-medium text-slate-800">
       {label}
-      {optional && <span className="ml-1 font-normal text-slate-500">(optional)</span>}
+      {optional && <span className="font-normal text-slate-500"> (optional)</span>}
     </label>
   );
 }
@@ -99,6 +105,35 @@ export function SelectField({
       >
         {children}
       </select>
+      <Messages hintId={hintId} errId={errId} hint={hint} error={error} />
+    </div>
+  );
+}
+
+export function TextAreaField({
+  label,
+  error,
+  hint,
+  optional,
+  id: idProp,
+  rows = 4,
+  ...rest
+}: Common & TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const generatedId = useId();
+  const id = idProp ?? generatedId;
+  const hintId = `${id}-hint`;
+  const errId = `${id}-err`;
+  return (
+    <div>
+      <Label id={id} label={label} optional={optional} />
+      <textarea
+        {...rest}
+        id={id}
+        rows={rows}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy(hintId, errId, hint, error)}
+        className={`mt-1 block w-full rounded-md border bg-white px-3 py-2 text-base text-slate-900 shadow-sm ${error ? 'border-red-600' : 'border-slate-300'}`}
+      />
       <Messages hintId={hintId} errId={errId} hint={hint} error={error} />
     </div>
   );

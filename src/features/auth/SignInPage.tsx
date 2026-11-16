@@ -23,6 +23,7 @@ export function SignInPage() {
     ended?: boolean;
     signedOut?: boolean;
     passwordReset?: boolean;
+    accountDeleted?: boolean;
   };
 
   const [email, setEmail] = useState('');
@@ -32,14 +33,16 @@ export function SignInPage() {
   const [busy, setBusy] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
-  const notice = state.signedOut
-    ? "You've signed out."
-    : state.passwordReset
-      ? 'Your password was changed. Please sign in.'
-      : params.get('confirmed')
-        ? 'Your email is confirmed. You can sign in now.'
-        : null;
-  const ended = !state.signedOut && (state.ended || sessionEnded);
+  const notice = state.accountDeleted
+    ? 'Your account and all its data have been deleted.'
+    : state.signedOut
+      ? "You've signed out."
+      : state.passwordReset
+        ? 'Your password was changed. Please sign in.'
+        : params.get('confirmed')
+          ? 'Your email is confirmed. You can sign in now.'
+          : null;
+  const ended = !state.signedOut && !state.accountDeleted && (state.ended || sessionEnded);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
