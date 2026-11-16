@@ -20,7 +20,7 @@ export const classificationLabel: Record<Classification, string> = {
 export const classificationExplainer: Record<Exclude<Classification, 'unclassified'>, string> = {
   included: 'You marked this as covered by the agreement or the remaining revisions.',
   additional:
-    'You marked this as outside the agreement. It can become a change proposal once change orders are available.',
+    'You marked this as outside the agreement. You can turn it into a change proposal for your client.',
   needs_clarification: 'You need more information before deciding.',
 };
 

@@ -76,3 +76,12 @@ test('classification wording is not a legal conclusion (BR-6)', () => {
     expect(text).not.toMatch(/legal|binding|breach|entitled/i);
   }
 });
+
+test('Additional explainer does not claim change proposals are unavailable (ISS-018)', () => {
+  for (const text of Object.values(classificationExplainer)) {
+    expect(text).not.toMatch(
+      /once .* available|not (yet )?available|coming soon|next release|later release/i,
+    );
+  }
+  expect(classificationExplainer.additional).toMatch(/change proposal/);
+});

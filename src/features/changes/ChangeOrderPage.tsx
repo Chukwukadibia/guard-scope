@@ -6,10 +6,10 @@ import { getProject, type Project } from '../../lib/api/projects';
 import {
   cancelProposalVersion,
   getChangeOrder,
-  latestVersion,
   newProposalVersion,
   type ChangeOrder,
 } from '../../lib/api/changeOrders';
+import { headerVersion, versionCountLabel } from '../../lib/domain/changeOrder';
 import { listEntityEvents, type ActivityEvent } from '../../lib/api/activity';
 import { errorMessages, toApiError, type ApiErrorCode } from '../../lib/api/errors';
 import { formatDateTime } from '../../lib/domain/format';
@@ -31,7 +31,8 @@ export function ChangeOrderPage() {
   const [notice, setNotice] = useState<{ tone: 'success' | 'error'; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [cancelling, setCancelling] = useState<string | null>(null);
-  const latest = co ? latestVersion(co) : undefined;
+  // On a closed project the draft is hidden, so the header describes the newest sent version (ISS-019).
+  const latest = co && project ? headerVersion(co, project.status === 'active') : undefined;
   useDocumentTitle(latest ? latest.title : 'Change proposal');
 
   const reload = useCallback(async () => {
@@ -107,7 +108,7 @@ export function ChangeOrderPage() {
           <div className="min-w-0">
             <h1 className="text-2xl font-semibold text-slate-900 wrap-anywhere">{latest.title}</h1>
             <p className="text-slate-600">
-              Change proposal · {co.versions.length} version{co.versions.length === 1 ? '' : 's'}
+              Change proposal · {versionCountLabel(co.versions, active)}
               {co.request && (
                 <>
                   {' · from request '}

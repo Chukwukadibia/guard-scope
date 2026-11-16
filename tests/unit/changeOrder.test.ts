@@ -2,11 +2,14 @@ import { describe, expect, test } from 'vitest';
 import {
   formatPriceImpact,
   formatTimeImpact,
+  headerVersion,
   proposalStatusLabel,
   toProposalInput,
   validateProposalDraft,
   validateProposalForSend,
+  versionCountLabel,
   type ProposalFormValues,
+  type ProposalStatus,
 } from '../../src/lib/domain/changeOrder';
 
 const base: ProposalFormValues = {
@@ -120,5 +123,39 @@ describe('ISS-017: API numerics arrive as JSON numbers', () => {
     expect(v.time_impact_value).toBe('3');
     expect(() => validateProposalForSend(v, today)).not.toThrow();
     expect(() => toProposalInput(v)).not.toThrow();
+  });
+});
+
+describe('proposal page header on closed projects (ISS-019)', () => {
+  const v = (version_no: number, status: ProposalStatus) => ({
+    version_no,
+    status,
+    title: `Title ${version_no}`,
+  });
+  const sentThenDraft = { versions: [v(1, 'pending'), v(2, 'draft')] };
+  const draftOnly = { versions: [v(1, 'draft')] };
+
+  test('active project: header shows the newest version, including the draft', () => {
+    expect(headerVersion(sentThenDraft, true)?.version_no).toBe(2);
+    expect(versionCountLabel(sentThenDraft.versions, true)).toBe('2 versions');
+  });
+
+  test('closed project: header never describes the hidden draft when a sent version exists', () => {
+    const h = headerVersion(sentThenDraft, false);
+    expect(h?.version_no).toBe(1);
+    expect(h?.status).not.toBe('draft');
+    expect(versionCountLabel(sentThenDraft.versions, false)).toBe('1 sent version');
+    const many = [v(1, 'cancelled'), v(2, 'pending'), v(3, 'draft')];
+    expect(headerVersion({ versions: many }, false)?.version_no).toBe(2);
+    expect(versionCountLabel(many, false)).toBe('2 sent versions');
+  });
+
+  test('closed project with a never-sent draft: shows the draft, labelled as not sent', () => {
+    expect(headerVersion(draftOnly, false)?.status).toBe('draft');
+    expect(versionCountLabel(draftOnly.versions, false)).toBe('Draft only, not sent');
+  });
+
+  test('no versions: undefined', () => {
+    expect(headerVersion({ versions: [] }, false)).toBeUndefined();
   });
 });

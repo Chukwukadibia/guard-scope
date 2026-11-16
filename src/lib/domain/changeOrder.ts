@@ -151,3 +151,29 @@ export function proposalToFormValues(v: {
     client_terms: v.client_terms ?? '',
   };
 }
+
+/**
+ * The version the proposal page header describes (title, badge, document title).
+ * Active project: the newest version, which may be the editable draft.
+ * Completed/archived project: the draft editor is hidden, so the header uses the newest
+ * sent version; only a never-sent proposal falls back to its draft (badge "Draft (not sent)").
+ */
+export function headerVersion<V extends { status: ProposalStatus }>(
+  co: { versions: V[] },
+  projectActive: boolean,
+): V | undefined {
+  const newest = co.versions.at(-1);
+  if (projectActive) return newest;
+  return co.versions.filter((v) => v.status !== 'draft').at(-1) ?? newest;
+}
+
+/** Header version count. On a closed project only sent versions are shown, so only they are counted. */
+export function versionCountLabel(
+  versions: { status: ProposalStatus }[],
+  projectActive: boolean,
+): string {
+  const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+  if (projectActive) return plural(versions.length, 'version');
+  const sent = versions.filter((v) => v.status !== 'draft').length;
+  return sent > 0 ? plural(sent, 'sent version') : 'Draft only, not sent';
+}
