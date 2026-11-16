@@ -13,6 +13,8 @@ Records technical and process decisions, plus recommendations for PRD §20 open 
 | DEC-005 | 2026-11-16 | Approval token travels in the URL fragment and is sent to the RPC in the POST body | Keeps the token out of host logs and Referer (PRD §10.3) | Accepted (HA-002) |
 | DEC-006 | 2026-11-16 | Add `revision_usages` and `public_link_attempts` tables, which are not listed in PRD §9 | Needed for PRD §7.2 (record revision consumption) and PRD §10.3 (rate limiting). This is a **data-model addition** and needs explicit approval | Accepted (HA-002) |
 | DEC-007 | 2026-11-16 | Add `unclassified` as the initial request classification | PRD §5.2 records a request *before* classifying it. This avoids forcing an early choice | Accepted (HA-002) |
+| DEC-009 | 2026-11-16 | Dev/test users are created already confirmed via SQL fixture (`tests/db/fixtures/create_test_users.sql`), **dev project only** | Default SMTP can't email non-team addresses (OD-13); within approved Phase 1 testing scope | Accepted (Team Lead, within HA-002 test scope) |
+| DEC-010 | 2026-11-16 | Sign-out scope is `local` (this browser), not `global` (all devices) | Signing out on a phone shouldn't end a laptop session; spec AC-2 concerns this browser | Accepted (Team Lead, within spec) |
 | DEC-008 | 2026-11-16 | Migration rollback uses forward-fix migrations | Supabase CLI has no down-migrations; DDL is transactional | Accepted (HA-002) |
 
 ## PRD §20 open decisions — recommendations only
