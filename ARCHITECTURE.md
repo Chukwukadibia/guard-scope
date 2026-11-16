@@ -65,7 +65,7 @@ All column names, enums (e.g. project `status`, `time_impact_unit`) and lengths 
 | **change_orders** | `project_id FK`, `request_id FK requests`, `current_version_id FK null`, `status text` (mirrors the current version) | Insert only allowed when the request is `additional` (CO-001, REQ-005), enforced in RPC/trigger |
 | **change_order_versions** | `change_order_id FK`, `version_no int`, `description ≤5000`, `price_impact numeric(14,2) not null default 0 check ≥0`, `currency char(3)`, `time_impact_value numeric(8,2) null check ≥0`, `time_impact_unit text check in ('hours','days','weeks') null`, `proposed_deadline date null`, `assumptions ≤5000`, `exclusions ≤5000`, `client_terms ≤5000`, `status text check in ('draft','pending','approved','declined','clarification_requested','cancelled','superseded')`, `sent_at null`, `status_changed_at` | `unique(change_order_id, version_no)`; check that the value and unit are both null or both set; check `price_impact > 0 or time_impact_value > 0` on send (CO-003). **Trigger: once `sent_at` is set, content columns are immutable. Only `status`/`status_changed_at` may change, and only via §4 functions on allowed transitions** |
 | **approval_links** | `version_id FK change_order_versions`, `token_hash bytea unique not null`, `expires_at timestamptz null` (⚠ OD-4), `revoked_at null`, `created_at` | Partial unique index `(version_id) where revoked_at is null`: at most one active link per version. The raw token is never stored. No access metadata is stored (minimisation; PRD §9 "only justified") |
-| **client_decisions** | `version_id FK`, `link_id FK`, `decision text check in ('approved','declined','clarification_requested')`, `comment ≤2000 null`, `idempotency_key uuid not null`, `decided_at timestamptz default now()` | **`unique(version_id)`**: one decision per version (CO-009). `unique(link_id, idempotency_key)`. Trigger: no UPDATE/DELETE (HIST-002). ⚠ OD-6 (see §4.4) |
+| **client_decisions** | `version_id FK`, `link_id FK`, `decision text check in ('approved','declined','clarification_requested')`, `comment ≤2000 null`, `idempotency_key uuid not null`, `decided_at timestamptz default now()` | **`unique(version_id)`**: one decision per version (CO-009). `unique(link_id, idempotency_key)`. Trigger: no UPDATE/DELETE (HIST-002). OD-6 decided (HA-006, §4.4) |
 | **activity_events** | `project_id FK`, `actor_type text check in ('freelancer','client','system')`, `actor_id uuid null`, `event_type text`, `entity_type text`, `entity_id uuid`, `entity_version int null`, `summary ≤300`, `metadata jsonb ≤2KB`, `created_at` | Append-only (trigger). Written only by triggers or §4 functions, never directly by the client |
 | **account_entitlements** | `owner_id PK FK profiles`, `plan_code text check in ('free','solo','pro')`, `status text`, `period_end timestamptz null`, `source text check in ('default','admin','provider')`, `provider_ref null` | **Readable by owner, writable only by service role / admin SQL** (BILL-006, BILL-008). Missing row = `free` |
 | **public_link_attempts** | `ip_hash bytea`, `window_start timestamptz`, `failures int` | Abuse throttle (§5.5). `ip_hash` = sha256(ip ‖ server salt); no raw IPs |
@@ -128,11 +128,11 @@ The row lock serialises concurrent submissions. The unique constraint turns any 
 
 ### 4.3 State machine (PRD §7.3) — enforced in the functions, plus a trigger that rejects other transitions
 
-`draft → pending` (send) · `pending → approved | declined | clarification_requested` (client) · `pending → cancelled` (freelancer) · `pending → superseded` (new version sent). Approved, declined, cancelled and superseded are terminal for that version. `clarification_requested` is terminal **only under the OD-6 recommendation** (§4.4).
+`draft → pending` (send) · `pending → approved | declined | clarification_requested` (client) · `pending → cancelled` (freelancer) · `pending → superseded` (new version sent). Approved, declined, cancelled and superseded are terminal for that version. `clarification_requested` is terminal too (OD-6 decided, HA-006, §4.4).
 
-### 4.4 ⚠ OD-6 Clarification workflow — recommendation, not yet decided
+### 4.4 OD-6 Clarification workflow — decided (HA-006): Option A, close & resend
 
-**Recommended:** `clarification_requested` is terminal for that version. The freelancer answers outside the app and sends a new version, which gets a new link. This keeps "one decision per version", the simplest audit meaning, and needs no reopen path. The alternative (reopen the same version as pending) would require relaxing `unique(version_id)` to a decision sequence. `unique(version_id)` in §3.1 reflects the recommendation. These tables are not created until Phases 4–5, so the alternative can be adopted at no migration cost if OD-6 is decided before Phase 4. It does not block Phase 1.
+**Decided:** `clarification_requested` is terminal for that version. The freelancer answers outside the app and sends a new version, which gets a new link. This keeps "one decision per version" (`unique(version_id)` in §3.1), the simplest audit meaning, and needs no reopen path. The rejected alternatives were reopening the same version (needs a decision sequence) and a one-click "resend unchanged" (could be added later as a UI convenience without changing these rules).
 
 ## 5. Security
 
@@ -209,7 +209,7 @@ Business rules live in `lib/domain`, not in components (PRD §12). Money is form
 
 ## 8. Open decisions referenced here
 
-OD-3 auth method · OD-4 link expiry · OD-6 clarification flow · OD-7 "active" definitions · OD-9 currencies/default · OD-10 retention · OD-12 region/provider. See `docs/decisions/DECISION_LOG.md` for each recommendation and status.
+OD-3 auth method · OD-4 link expiry · OD-6 clarification flow (decided, HA-006) · OD-7 "active" definitions · OD-9 currencies/default · OD-10 retention · OD-12 region/provider. See `docs/decisions/DECISION_LOG.md` for each recommendation and status.
 
 ## 9. Vendor facts verified (16 Nov 2026, official docs)
 

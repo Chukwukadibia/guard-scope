@@ -27,9 +27,9 @@
 | 4–8 | Not started |
 
 ## Open items needing the supervisor
-1. Approve Phase 4 (change orders), and decide OD-6 (clarification workflow; recommendation in the Phase 3 completion report).
+1. Approve Phase 4 (change orders). OD-6 is decided (HA-006: clarification closes the version; send a new version).
 2. OD-13 SMTP provider account; ISS-008 leaked-password protection.
 3. When to merge feature branches into `main` (via PR on request).
 
 ## Next safe action
-Wait for Phase 4 approval and the OD-6 decision.
+Wait for Phase 4 approval.
