@@ -346,14 +346,44 @@ test.describe('T-09 / AC-9 no money; Phase 4 hint; BR-6 wording', () => {
     expect(await page.locator('main').innerText()).not.toMatch(money);
     await shot3(page, testInfo, 'T09-included');
 
+    // Phase 4 (HA-007, ISS-018): change proposals now exist. Intent kept: the Additional request
+    // shows truthful guidance and no dead action. The guidance must not claim the feature is
+    // unavailable, and the one change-proposal action offered must work.
     await openRequest(page, pid, add);
     const decision = page.getByRole('region', { name: 'Your decision' });
     await expect(decision).toContainText('You marked this as outside the agreement.');
-    await expect(decision).toContainText(/change proposal once change orders are available/);
-    expect(await page.locator('main').innerText()).not.toMatch(money);
-    await expect(page.getByRole('button', { name: /change (order|proposal)/i })).toHaveCount(0);
+    await expect(decision).toContainText('You can turn it into a change proposal for your client.');
+    await expect(decision).not.toContainText(
+      /once .* available|not (yet )?available|coming soon|next release|later release/i,
+    );
+    // The panel loads asynchronously: wait for it so the checks below see the final page.
+    const panel = page.getByRole('region', { name: 'Change proposal', exact: true });
+    const create = panel.getByRole('button', { name: 'Create change proposal' });
+    await expect(create).toBeVisible();
+    await expect(create).toBeEnabled();
+    await expect(page.getByRole('button', { name: /change (order|proposal)/i })).toHaveCount(1);
     await expect(page.getByRole('link', { name: /change (order|proposal)/i })).toHaveCount(0);
+    // No money: the whole page except the panel's fixed explanation sentence, which describes a
+    // proposal ("priced and/or timed") and holds no amount or currency; that sentence is checked
+    // separately against everything except the word "priced".
+    const panelSentence = 'Turn this request into a priced and/or timed proposal for your client.';
+    await expect(panel).toContainText(panelSentence);
+    const mainText = await page.locator('main').innerText();
+    expect(mainText.split(panelSentence).join('')).not.toMatch(money);
+    expect(panelSentence.replace('priced', '')).not.toMatch(money);
     await shot3(page, testInfo, 'T09-additional');
+    // No dead action: the button creates the proposal and opens it.
+    await create.click();
+    await expect(page).toHaveURL(new RegExp(`/projects/${pid}/changes/[0-9a-f-]{36}$`));
+    await expect(page.getByRole('heading', { level: 1, name: 'Additional one' })).toBeVisible();
+    const created = await rest(
+      page,
+      token,
+      'GET',
+      `/rest/v1/change_orders?select=id,request_id&request_id=eq.${add}`,
+    );
+    expect(created.status).toBe(200);
+    expect(created.body as unknown[]).toHaveLength(1);
 
     await openRequest(page, pid, clar);
     await expect(page.getByText('You need more information before deciding.')).toBeVisible();

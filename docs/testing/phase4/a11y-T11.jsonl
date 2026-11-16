@@ -46,3 +46,27 @@
 {"project":"mobile","label":"project-with-proposals","data":{"violations":[],"overflow":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}}
 {"project":"mobile","label":"proposal-archived","data":{"violations":[],"overflow":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}}
 {"project":"mobile","label":"keyboard focus style on Discard","data":"solid 3px none"}
+{"project":"desktop","label":"project-empty-proposals","data":{"violations":[],"overflow":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]}}}
+{"project":"desktop","label":"request-create-panel","data":{"violations":[],"overflow":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]}}}
+{"project":"desktop","label":"proposal-draft","data":{"violations":[],"overflow":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]}}}
+{"project":"desktop","label":"proposal-draft-preview-confirm","data":{"violations":[],"overflow":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]}}}
+{"project":"desktop","label":"proposal-draft-errors","data":{"violations":[{"id":"empty-heading","impact":"minor","help":"Headings should not be empty","nodes":["h4"]}],"overflow":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]}}}
+{"project":"desktop","label":"proposal-sent","data":{"violations":[],"overflow":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]}}}
+{"project":"desktop","label":"proposal-cancel-confirm","data":{"violations":[],"overflow":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]}}}
+{"project":"desktop","label":"proposal-multi-version","data":{"violations":[],"overflow":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]}}}
+{"project":"desktop","label":"request-with-proposal","data":{"violations":[],"overflow":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]}}}
+{"project":"desktop","label":"project-with-proposals","data":{"violations":[],"overflow":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]}}}
+{"project":"desktop","label":"proposal-archived","data":{"violations":[],"overflow":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]}}}
+{"project":"desktop","label":"keyboard focus style on Discard","data":"solid 3px none"}
+{"project":"mobile","label":"project-empty-proposals","data":{"violations":[],"overflow":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}}
+{"project":"mobile","label":"request-create-panel","data":{"violations":[],"overflow":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}}
+{"project":"mobile","label":"proposal-draft","data":{"violations":[],"overflow":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}}
+{"project":"mobile","label":"proposal-draft-preview-confirm","data":{"violations":[],"overflow":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}}
+{"project":"mobile","label":"proposal-draft-errors","data":{"violations":[{"id":"empty-heading","impact":"minor","help":"Headings should not be empty","nodes":["h4"]}],"overflow":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}}
+{"project":"mobile","label":"proposal-sent","data":{"violations":[],"overflow":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}}
+{"project":"mobile","label":"proposal-cancel-confirm","data":{"violations":[],"overflow":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}}
+{"project":"mobile","label":"proposal-multi-version","data":{"violations":[],"overflow":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}}
+{"project":"mobile","label":"request-with-proposal","data":{"violations":[],"overflow":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}}
+{"project":"mobile","label":"project-with-proposals","data":{"violations":[],"overflow":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}}
+{"project":"mobile","label":"proposal-archived","data":{"violations":[],"overflow":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}}
+{"project":"mobile","label":"keyboard focus style on Discard","data":"solid 3px none"}

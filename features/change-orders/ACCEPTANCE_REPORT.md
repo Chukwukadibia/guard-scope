@@ -116,3 +116,16 @@ The retest will re-run AC-12 and the D-1/D-2 checks.
 - The full regression overwrote Phase 1–3 evidence files (screenshots, axe JSON, jsonl). They were restored from git with `git checkout -- docs/testing/phase1 docs/testing/phase2 docs/testing/phase3`. Copies of the failing artifacts are kept in `docs/testing/phase4/regression-failures/`.
 - Final cleanup used the prescribed test-only SQL (`docs/testing/phase4/sql-cleanup.log`): a@ and b@ have 0 projects and null profile fields. The DB holds 0 projects, requests, change orders, versions and events. No users were deleted, and the signup/recover endpoints were not used.
 - New test files: `tests/db/change_orders_tester.test.sql`, `tests/e2e/p4-helpers.ts`, `p4-api.spec.ts`, `p4-concurrency.spec.ts`, `p4-proposals.spec.ts`, `p4-iss017.spec.ts`, `p4-a11y.spec.ts` (eslint and prettier clean). `src/` and `supabase/` were not modified. Nothing was committed.
+
+---
+
+## Retest 1 (commit dde2091)
+
+> Status: IN PROGRESS (regression runs, pgTAP and advisor pending). Verified so far: `npm run check`, D-1, D-2, ISS-020 test changes.
+
+**Tester run mode:** separate general-purpose subagent, fresh context (Tester Specialist). · **Commit tested:** `dde2091` (`feature/p4-change-orders`); product diff vs `0bc06fe`: `src/lib/domain/request.ts` (copy), `src/lib/domain/changeOrder.ts` (`headerVersion`, `versionCountLabel`), `src/features/changes/ChangeOrderPage.tsx`, two unit-test files. No `supabase/` change. · **Date:** 2026-11-16 · **Backend:** Supabase `guardscope-dev` (`eqozjuaaajstrewygqxr`).
+
+### Verified so far
+- `npm run check`: exit 0, format + lint + typecheck + **141/141 unit** (13 files; 136 before + 5 new) + build + secrets check (`docs/testing/phase4/retest1-check.log`).
+- D-2: copy verified in source and in the UI (active and completed project), see below.
+- D-1: verified in the UI on completed and archived projects for both scenarios (`tests/e2e/p4-retest1.spec.ts`, 6/6, `e2e-retest1-D1-D2.log`, `retest1-D1.jsonl`).

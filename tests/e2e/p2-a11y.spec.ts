@@ -39,6 +39,16 @@ test('T-11 axe + overflow on every Phase 2 page and state', async ({
   const results: Record<string, number> = {};
   const overflow: Record<string, unknown> = {};
   const check = async (name: string) => {
+    // ISS-020: let CSS transitions finish before axe samples colours. Buttons use
+    // `transition-colors` (150 ms), so a scan right after a state change can read a mid-fade
+    // background (e.g. busy slate-400 fading back to brand-600) and report a false contrast
+    // failure. Infinite animations (spinners) are skipped. The axe rules are unchanged.
+    await page.evaluate(async () => {
+      const finite = document
+        .getAnimations()
+        .filter((a) => a.effect?.getComputedTiming().endTime !== Infinity);
+      await Promise.all(finite.map((a) => a.finished.catch(() => undefined)));
+    });
     const o = await noOverflow(page, true);
     if (o.scrollWidth > o.clientWidth) overflow[name] = o;
     const v = await axeScan(page, testInfo, name);
@@ -132,6 +142,11 @@ test('T-11 axe + overflow on every Phase 2 page and state', async ({
   await check('confirm-dialog');
   await page.getByRole('button', { name: 'Yes, confirm' }).click();
   await expect(page.getByRole('group').getByRole('alert')).toBeVisible();
+  // The error state is the settled one: the button is no longer busy, so axe judges its real colours.
+  await expect(page.getByRole('button', { name: 'Yes, confirm' })).not.toHaveAttribute(
+    'aria-busy',
+    'true',
+  );
   await check('confirm-dialog-error');
 
   await openProject(page, pid);

@@ -136,27 +136,77 @@ test.describe('T-16 / AC-12 empty states, no dead actions', () => {
       page,
       sessionA,
     }, testInfo) => {
-      test.setTimeout(180_000);
+      test.setTimeout(300_000);
       // Precondition: an empty state needs user A to have no active projects. In a full-suite run
-      // Phase 2 specs (which archive their projects after each test) may still be running in the
-      // other worker, so wait for the precondition instead of racing it.
-      await expect
-        .poll(
-          async () => {
-            const r = await rest(
-              page,
-              sessionA.access_token as string,
-              'GET',
-              '/rest/v1/projects?select=id&status=eq.active',
-            );
-            return r.status === 200 ? (r.body as unknown[]).length : -1;
-          },
-          { timeout: 120_000, message: 'user A still has active projects' },
-        )
-        .toBe(0);
-      await page.goto(path);
+      // other workers create (and later archive) projects for user A, so a check made before the
+      // page loads can go stale while it loads (ISS-020: the poll saw 0, then the page rendered a
+      // project created in between). The precondition is therefore checked both before and after
+      // the page loads, and the page is reloaded only when another test changed the data in that
+      // window. If the precondition held throughout but the page still shows no empty state, the
+      // test fails at once: that would be a product defect, not a race.
+      const token = sessionA.access_token as string;
+      const activeCount = async () => {
+        const r = await rest(page, token, 'GET', '/rest/v1/projects?select=id&status=eq.active');
+        expect(r.status).toBe(200);
+        return (r.body as unknown[]).length;
+      };
+      const emptyHeading = page.getByRole('heading', { level: 2, name: emptyTitle });
+      // Loaded = the empty state, or a link to a project (filter tabs and "New project" excluded).
+      const projectLink = page.locator('main a[href^="/projects/"]:not([href="/projects/new"])');
+      const loaded = emptyHeading.or(projectLink).first();
+      const deadline = Date.now() + 240_000;
+      const attempts: string[] = [];
+      let busy = 0;
+      for (;;) {
+        expect(
+          Date.now(),
+          `user A kept active projects (busy polls ${busy}); attempts: ${attempts.join(', ')}`,
+        ).toBeLessThan(deadline);
+        if ((await activeCount()) !== 0) {
+          busy += 1;
+          await page.waitForTimeout(250);
+          continue;
+        }
+        const checkedAt = Date.now() - 2_000; // 2 s clock-skew margin
+        await page.goto(path);
+        await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
+        await expect(loaded).toBeVisible();
+        if (await emptyHeading.isVisible()) {
+          if ((await activeCount()) === 0) {
+            attempts.push('ok');
+            break;
+          }
+          attempts.push('raced:empty'); // a project appeared after the empty page rendered
+          continue;
+        }
+        // The page listed projects although none was active before it loaded. That is a race
+        // only if every listed project was created by another test after the check; listing an
+        // older (e.g. archived) project would be a product defect, so the test fails on it.
+        const ids = await projectLink.evaluateAll((els) =>
+          els
+            .map((e) => /^\/projects\/([0-9a-f-]{36})$/.exec(e.getAttribute('href') ?? '')?.[1])
+            .filter((x): x is string => !!x),
+        );
+        expect(ids.length, 'a listed project link').toBeGreaterThan(0);
+        const listed = await rest(
+          page,
+          token,
+          'GET',
+          `/rest/v1/projects?select=id,created_at&id=in.(${ids.join(',')})`,
+        );
+        expect(listed.status).toBe(200);
+        const old = (listed.body as { id: string; created_at: string }[]).filter(
+          (p) => Date.parse(p.created_at) < checkedAt,
+        );
+        expect(old, 'listed projects that existed before the precondition check').toEqual([]);
+        attempts.push('raced:list');
+      }
+      testInfo.annotations.push({
+        type: 'precondition attempts',
+        description: `busy polls ${busy}; ${attempts.join(', ')}`,
+      });
       await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
-      await expect(page.getByRole('heading', { level: 2, name: emptyTitle })).toBeVisible();
+      await expect(emptyHeading).toBeVisible();
       const main = page.locator('main');
       await expect(main.getByRole('button')).toHaveCount(0);
       const hrefs = await main

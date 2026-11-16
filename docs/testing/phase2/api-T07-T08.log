@@ -34,4 +34,4 @@ A data after all attempts: identical to before (deep-equal of versions + items)
 PATCH archived draft summary: HTTP 200 []
 POST item to archived draft: HTTP 403 {"code":"42501","details":null,"hint":null,"message":"new row violates row-level security policy for table \"scope_items\""}
 RPC confirm archived draft: HTTP 400 {"code":"P0001","details":null,"hint":null,"message":"project_archived"}
-PATCH archived project title (observation: allowed; BR-6 is UI-only): HTTP 200 [{"id":"1f34cc51-9222-4128-8d4e-55763bc48b50","owner_id":"d79005b2-c3c3-4e52-ae27-ca6342043e42","title":"P2T edited while archived","client_name":"C","client_co
+PATCH archived project title (observation: allowed; BR-6 is UI-only): HTTP 200 [{"id":"f1f48bfd-fd21-41dd-8b16-59ef76af548a","owner_id":"d79005b2-c3c3-4e52-ae27-ca6342043e42","title":"P2T edited while archived","client_name":"C","client_co

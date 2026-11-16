@@ -1,0 +1,347 @@
+
+> guardscope@0.0.0 test:e2e
+> playwright test --trace off --workers=2 --reporter=list
+
+
+Running 270 tests using 2 workers
+
+  ✓    2 [desktop] › tests/e2e/auth-guard.spec.ts:29:5 › T-04 / AC-3 route guard › signed out, / redirects to /sign-in?next=… with no protected DOM (318ms)
+  ✓    1 [desktop] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /sign-in: summary lists linked errors, takes focus, link focuses the field (573ms)
+  ✓    3 [desktop] › tests/e2e/auth-guard.spec.ts:29:5 › T-04 / AC-3 route guard › signed out, /projects redirects to /sign-in?next=… with no protected DOM (360ms)
+  ✓    5 [desktop] › tests/e2e/auth-guard.spec.ts:29:5 › T-04 / AC-3 route guard › signed out, /settings redirects to /sign-in?next=… with no protected DOM (323ms)
+  ✓    4 [desktop] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /register: summary lists linked errors, takes focus, link focuses the field (495ms)
+  ✓    7 [desktop] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /forgot-password: summary lists linked errors, takes focus, link focuses the field (443ms)
+  ✓    6 [desktop] › tests/e2e/auth-guard.spec.ts:43:3 › T-04 / AC-3 route guard › T-04: after sign-in the user reaches next=/projects (1.2s)
+  ✓    8 [desktop] › tests/e2e/debug-d1-d2-regression.spec.ts:37:5 › D-1 §6 error summary on failed submit › settings › 121-char name: summary links to the name field; nothing is sent (1.6s)
+  ✓    9 [desktop] › tests/e2e/auth-guard.spec.ts:52:3 › T-04 / AC-3 route guard › AC-3: off-site next (//evil.example) is ignored after sign-in (1.1s)
+  ✓   10 [desktop] › tests/e2e/debug-d1-d2-regression.spec.ts:61:3 › D-2 session-ended marker › first-time visitor sees no "session has ended" message (344ms)
+  ✓   12 [desktop] › tests/e2e/debug-d1-d2-regression.spec.ts:70:5 › D-2 session-ended marker › signed in › marker is the constant "1" (no token/PII); message is not repeated on a later fresh visit (1.3s)
+  ✓   11 [desktop] › tests/e2e/auth-guard.spec.ts:65:3 › T-03 / AC-2 sign out › sign out, then /settings redirects to /sign-in (1.8s)
+  ✓   14 [desktop] › tests/e2e/auth-guard.spec.ts:84:3 › T-06 / AC-4 invalid or expired session › tampered access token → sign-in with "session has ended" (3.1s)
+  ✓   15 [desktop] › tests/e2e/auth-guard.spec.ts:100:3 › T-06 / AC-4 invalid or expired session › expired access token with invalid refresh token → "session has ended" (1.4s)
+  ✓   16 [desktop] › tests/e2e/auth-guard.spec.ts:116:3 › T-06 / AC-4 invalid or expired session › stored token removed, then reload → sign-in with "session has ended" (AC-4 wording) (1.2s)
+  ✓   17 [desktop] › tests/e2e/layout-a11y.spec.ts:55:5 › signed out pages › T-13/T-14 /sign-in: no overflow, 0 serious/critical axe, labelled inputs, heading order (764ms)
+  ✓   18 [desktop] › tests/e2e/layout-a11y.spec.ts:55:5 › signed out pages › T-13/T-14 /register: no overflow, 0 serious/critical axe, labelled inputs, heading order (745ms)
+  ✓   19 [desktop] › tests/e2e/layout-a11y.spec.ts:55:5 › signed out pages › T-13/T-14 /forgot-password: no overflow, 0 serious/critical axe, labelled inputs, heading order (674ms)
+  ✓   20 [desktop] › tests/e2e/layout-a11y.spec.ts:55:5 › signed out pages › T-13/T-14 /reset-password: no overflow, 0 serious/critical axe, labelled inputs, heading order (771ms)
+  ✓   21 [desktop] › tests/e2e/layout-a11y.spec.ts:55:5 › signed out pages › T-13/T-14 /p: no overflow, 0 serious/critical axe, labelled inputs, heading order (671ms)
+  ✓   22 [desktop] › tests/e2e/layout-a11y.spec.ts:55:5 › signed out pages › T-13/T-14 /no-such-page: no overflow, 0 serious/critical axe, labelled inputs, heading order (696ms)
+  ✓   23 [desktop] › tests/e2e/layout-a11y.spec.ts:78:5 › signed in pages › T-13/T-14 /: no overflow, 0 serious/critical axe, heading order (1.6s)
+  ✓   24 [desktop] › tests/e2e/layout-a11y.spec.ts:78:5 › signed in pages › T-13/T-14 /projects: no overflow, 0 serious/critical axe, heading order (1.6s)
+  ✓   13 [desktop] › tests/e2e/debug-p2-regression.spec.ts:20:1 › D-2: long unbroken text wraps on list, detail (draft + confirmed) and dashboard (14.0s)
+  ✓   25 [desktop] › tests/e2e/layout-a11y.spec.ts:78:5 › signed in pages › T-13/T-14 /settings: no overflow, 0 serious/critical axe, heading order (2.6s)
+  ✓   27 [desktop] › tests/e2e/layout-a11y.spec.ts:99:3 › signed in pages › T-13 / AC-9: main navigation is keyboard-operable, with visible focus (AC-10) (2.1s)
+  ✓   28 [desktop] › tests/e2e/layout-a11y.spec.ts:165:3 › signed in pages › AC-9: mobile nav reachable, desktop nav visible (1.2s)
+  ✓   26 [desktop] › tests/e2e/debug-p2-regression.spec.ts:80:1 › D-3: overview shows the original scope revision allowance (6.3s)
+  ✓   30 [desktop] › tests/e2e/debug-p2-regression.spec.ts:112:1 › D-1: "Project not found" for a random id and a malformed id (1.3s)
+  ✓   31 [desktop] › tests/e2e/debug-p2-regression.spec.ts:119:1 › D-4: "Project created." shows once, not after reload; back still works (4.0s)
+  ✓   32 [desktop] › tests/e2e/debug-p2-regression.spec.ts:150:1 › D-1: empty-scope, stale confirm and archived edit show their specific messages (5.8s)
+  -   33 [desktop] › tests/e2e/p2-account-deletion.spec.ts:12:1 › T-10 delete account: empty and wrong password blocked; correct deletes, signs out, cannot sign in
+  ✓   34 [desktop] › tests/e2e/p2-projects.spec.ts:32:3 › T-01 / AC-1 create and persist › required fields only: saves, defaults shown as "Not specified"/"Not set", persists on reload (4.0s)
+  ✓   35 [desktop] › tests/e2e/p2-projects.spec.ts:54:3 › T-01 / AC-1 create and persist › all fields: values save and reload exactly in detail and edit form (4.0s)
+  ✓   36 [desktop] › tests/e2e/p2-projects.spec.ts:88:3 › T-01 / AC-1 create and persist › default currency from Settings is pre-selected (then reset) (3.0s)
+  ✓   37 [desktop] › tests/e2e/p2-projects.spec.ts:113:3 › T-02 / AC-2 validation › UI: missing required fields -> field errors + summary, nothing sent (1.8s)
+  ✓   38 [desktop] › tests/e2e/p2-projects.spec.ts:134:3 › T-02 / AC-2 validation › UI: over-length, negative price, deadline before start -> field errors + summary, nothing sent (1.9s)
+missing title: HTTP 400 23502
+blank title: HTTP 400 23514
+missing client: HTTP 400 23502
+missing currency: HTTP 400 23502
+title 201: HTTP 400 23514
+client 201: HTTP 400 23514
+contact 321: HTTP 400 23514
+description 5001: HTTP 400 23514
+negative price: HTTP 400 23514
+lowercase currency: HTTP 400 23514
+deadline before start: HTTP 400 23514
+owner_id spoof: HTTP 403 42501
+status on insert: HTTP 403 42501
+3-decimal price 10.555: HTTP 201 [{"id":"79906d9f-581c-4e5a-9f49-2f3b93205479","agreed_price":10.56}]
+  ✓   39 [desktop] › tests/e2e/p2-projects.spec.ts:166:3 › T-02 / AC-2 validation › API: the same invalid payloads are rejected by the server (4.7s)
+axe serious/critical per page (desktop): {"dashboard":0,"projects-list":0,"projects-archived":0,"projects-completed":0,"project-form":0,"project-form-errors":0,"project-edit":0,"detail-draft-editor":0,"confirm-dialog":0,"confirm-dialog-error":0,"detail-baseline-current-draft-long-text":0,"detail-archived":0,"project-not-found":0,"settings-delete-open-error":0}
+overflow (desktop): {}
+  ✓   29 [desktop] › tests/e2e/p2-a11y.spec.ts:33:1 › T-11 axe + overflow on every Phase 2 page and state (42.9s)
+  ✓   40 [desktop] › tests/e2e/p2-projects.spec.ts:208:3 › T-03 / AC-3 edit, complete, archive, reopen › lifecycle with list filters and read-only archived view (11.4s)
+  ✓   42 [desktop] › tests/e2e/p2-projects.spec.ts:287:3 › §6 not found / not yours › random id and another user's project show the same "Project not found" page (4.6s)
+  ✓   43 [desktop] › tests/e2e/p2-projects.spec.ts:322:3 › §6 not found / not yours › malformed id also shows "Project not found" (1.1s)
+  ✓   41 [desktop] › tests/e2e/p2-a11y.spec.ts:180:1 › T-11 keyboard: add item with Enter, remove via keyboard, confirm via keyboard (6.2s)
+realistic long text (desktop): {"list":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]},"detail":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]}}
+  ✓   45 [desktop] › tests/e2e/p2-a11y.spec.ts:229:1 › §6 realistic long text: spaced words wrap; a long URL in client contact / description (3.9s)
+  ✓   46 [desktop] › tests/e2e/p2-retest1.spec.ts:60:3 › Retest 1 / D-1 stale-tab writes › after the draft was confirmed elsewhere: add item and save draft show "scope locked"; nothing written (4.0s)
+  ✓   44 [desktop] › tests/e2e/p2-projects.spec.ts:331:3 › T-09 / AC-9 dashboard › active count before/after create, completed and archived excluded; New project action; max 5 listed (8.6s)
+  ✓   47 [desktop] › tests/e2e/p2-retest1.spec.ts:90:3 › Retest 1 / D-1 stale-tab writes › after the project was archived elsewhere: add item is refused (42501) and shows the safe not-found text (3.3s)
+  ✓   49 [desktop] › tests/e2e/p2-retest1.spec.ts:137:3 › Retest 1 / D-1 §6 ids › malformed id: "Project not found" and no Supabase request for that id (1.3s)
+  ✓   50 [desktop] › tests/e2e/p2-retest1.spec.ts:160:5 › Retest 1 / D-3 overview allowance › overview shows the baseline allowance: 2 revisions included (3.4s)
+  ✓   51 [desktop] › tests/e2e/p2-retest1.spec.ts:160:5 › Retest 1 / D-3 overview allowance › overview shows the baseline allowance: 1 revision included (3.3s)
+  ✓   52 [desktop] › tests/e2e/p2-retest1.spec.ts:160:5 › Retest 1 / D-3 overview allowance › overview shows the baseline allowance: No revisions included (3.5s)
+  ✓   48 [desktop] › tests/e2e/p2-scope.spec.ts:67:3 › T-04 / AC-4 draft editing › add, edit, reorder, remove items; three allowance modes; summary/notes persist (15.4s)
+  ✓   54 [desktop] › tests/e2e/p2-scope.spec.ts:160:3 › T-05 / AC-5 confirm › UI: confirming with no deliverable is rejected with the empty-scope message (2.4s)
+  ✓   53 [desktop] › tests/e2e/p2-retest1.spec.ts:160:5 › Retest 1 / D-3 overview allowance › overview shows the baseline allowance: Not specified (3.8s)
+  ✓   55 [desktop] › tests/e2e/p2-scope.spec.ts:184:3 › T-05 / AC-5 confirm › UI: valid confirm shows date, baseline label, "Not specified" revisions; API flags baseline (4.1s)
+  ✓   56 [desktop] › tests/e2e/p2-retest1.spec.ts:199:3 › Retest 1 / D-4 one-shot notices › "Project updated." shows once; not after reload, confirm + reload, or back/forward (6.3s)
+  ✓   57 [desktop] › tests/e2e/p2-scope.spec.ts:231:3 › T-05 / AC-5 confirm › UI: stale tab confirming an already-confirmed draft gets the safe "already confirmed" message (7.7s)
+  ✓   59 [desktop] › tests/e2e/p2-scope.spec.ts:261:3 › T-05 / AC-5 confirm › API: double confirm (sequential and concurrent) -> exactly one confirmation, other already_confirmed (3.6s)
+  ✓   60 [desktop] › tests/e2e/p2-scope.spec.ts:335:3 › T-06 / AC-6 baseline unchanged after later edits › edit price/deadline + scope, confirm v2; baseline identical; UI shows original/current/draft (11.9s)
+  ✓   58 [desktop] › tests/e2e/p3-a11y.spec.ts:39:1 › T-10 axe + overflow on every Phase 3 page and state (22.9s)
+  ✓   62 [desktop] › tests/e2e/p3-a11y.spec.ts:148:1 › T-10 keyboard: capture and classify without a mouse (6.4s)
+  ✓   61 [desktop] › tests/e2e/p2-scope.spec.ts:426:3 › T-07 / T-08 API (AC-7, AC-8) › owner cannot change confirmed versions/items; B and anon cannot touch A; archived draft locked (9.8s)
+  -   64 [desktop] › tests/e2e/p3-d2-evidence.spec.ts:6:1 › D-2 evidence screenshot
+  ✓   63 [desktop] › tests/e2e/p3-classification.spec.ts:49:3 › T-03 / AC-3 classify and history › each option updates the label and appends one history entry; same value adds none (9.3s)
+  ✓   65 [desktop] › tests/e2e/p3-requests.spec.ts:34:3 › T-01 / AC-1 capture › quick add with title only, full add, reload, list order, filter (10.3s)
+  ✓   66 [desktop] › tests/e2e/p3-classification.spec.ts:147:3 › T-03 / AC-3 classify and history › API: same value twice adds no event; history cannot be edited or deleted (5.5s)
+  ✓   67 [desktop] › tests/e2e/p3-requests.spec.ts:148:3 › T-01 / AC-1 capture › edit a request persists after reload (6.2s)
+  ✓   68 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (5.4s)
+  ✓   69 [desktop] › tests/e2e/p3-requests.spec.ts:167:3 › T-02 / AC-2 validation › UI: field errors + focused summary, nothing sent (3.7s)
+  ✓   71 [desktop] › tests/e2e/p3-requests.spec.ts:231:3 › T-02 / AC-2 validation › API: the same invalid data is rejected by the server (5.5s)
+  ✓   70 [desktop] › tests/e2e/p3-classification.spec.ts:328:3 › T-09 / AC-9 no money; Phase 4 hint; BR-6 wording › Included shows no value; Additional shows the hint without a dead action (10.6s)
+  ✓   72 [desktop] › tests/e2e/p3-requests.spec.ts:285:3 › T-05 / AC-5 private notes › private label on the request; notes nowhere else in the UI or history (7.0s)
+  ✓   73 [desktop] › tests/e2e/p3-retest1.spec.ts:29:1 › O-a: project and request pages never fetch internal_notes in list queries; history read by seq (5.2s)
+  ✓   75 [desktop] › tests/e2e/p3-revisions.spec.ts:49:3 › T-06 / AC-6 revision usage › no recording before a scope is confirmed (3.1s)
+  ✓   74 [desktop] › tests/e2e/p3-requests.spec.ts:350:3 › T-07 / AC-7 archived project › requests visible; every write blocked in UI and API (8.3s)
+  ✓   76 [desktop] › tests/e2e/p3-revisions.spec.ts:70:3 › T-06 / AC-6 revision usage › numeric allowance 2: record, over-use without negatives, undo (8.1s)
+  ✓   77 [desktop] › tests/e2e/p3-requests.spec.ts:434:3 › T-08 / AC-8 isolation › B and anon cannot touch A’s requests, events, usages or the RPC (9.3s)
+  ✓   78 [desktop] › tests/e2e/p3-revisions.spec.ts:132:3 › T-06 / AC-6 revision usage › allowance "none" and "not specified": used shown, no remaining figure (6.8s)
+  ✓   80 [desktop] › tests/e2e/p3-revisions.spec.ts:155:3 › T-06 / AC-6 revision usage › allowance comes from the latest confirmed scope, not the draft (5.4s)
+  ✓   79 [desktop] › tests/e2e/p3-requests.spec.ts:533:3 › §6 not found › missing, foreign, malformed and wrong-project request ids look the same (10.4s)
+  ✓   81 [desktop] › tests/e2e/p3-revisions.spec.ts:177:3 › T-06 / AC-6 revision usage › request page: record a revision linked to an Included request (4.7s)
+  ✓   83 [desktop] › tests/e2e/p3-revisions.spec.ts:211:3 › T-06 / AC-6 revision usage › API: a usage cannot link to a request from another project (BR-4) (5.1s)
+  ✓   84 [desktop] › tests/e2e/p4-api.spec.ts:34:1 › T-01 API: create from Additional only, pre-filled, no private notes, one per request (4.7s)
+  ✓   85 [desktop] › tests/e2e/p4-api.spec.ts:95:1 › T-02 API: every field persists; every rule rejected via REST (5.5s)
+  ✓   82 [desktop] › tests/e2e/p4-a11y.spec.ts:46:1 › T-11 axe + overflow: proposal page (draft, preview, confirm, sent, multi-version), request page, project page (21.6s)
+  ✓   86 [desktop] › tests/e2e/p4-api.spec.ts:154:1 › T-03 API: send-time rules; valid send sets pending + server time (4.9s)
+  ✓   87 [desktop] › tests/e2e/p4-a11y.spec.ts:125:1 › T-11 keyboard: create, fill, preview, send and create a new version without a mouse (4.9s)
+  ✓   88 [desktop] › tests/e2e/p4-api.spec.ts:202:1 › T-04 API: a sent version cannot be changed or deleted by the owner via REST (5.8s)
+  ✓   90 [desktop] › tests/e2e/p4-api.spec.ts:246:1 › T-08 API: completed and archived projects block every proposal write (5.8s)
+  ✓   91 [desktop] › tests/e2e/p4-api.spec.ts:295:1 › T-09 API: user B and anon have no access to A's proposals (7.8s)
+  ✓   92 [desktop] › tests/e2e/p4-api.spec.ts:364:1 › T-07 API: history order with version numbers for a full lifecycle (3.9s)
+  ✓   93 [desktop] › tests/e2e/p4-iss017.spec.ts:49:3 › ISS-017 (a) proposal editor: save and send after reload with existing integer price and time (6.2s)
+  ✓   89 [desktop] › tests/e2e/p4-concurrency.spec.ts:93:1 › T-05 concurrency: create/send/new-version/send-vs-cancel races x12 (26.8s)
+  ✓   94 [desktop] › tests/e2e/p4-iss017.spec.ts:49:3 › ISS-017 (a) proposal editor: save and send after reload with existing decimal price and time (6.0s)
+  ✓   96 [desktop] › tests/e2e/p4-iss017.spec.ts:109:3 › ISS-017 (b) Phase 2 project edit form saves with an untouched integer agreed price (3.0s)
+  ✓   95 [desktop] › tests/e2e/p4-proposals.spec.ts:57:1 › T-01 UI: create from an Additional request, pre-filled, no private notes; other classifications offer nothing (7.8s)
+  ✓   97 [desktop] › tests/e2e/p4-iss017.spec.ts:109:3 › ISS-017 (b) Phase 2 project edit form saves with an untouched decimal agreed price (3.2s)
+  ✓   98 [desktop] › tests/e2e/p4-proposals.spec.ts:124:1 › T-02 UI: edit and save every field; validation shows field messages and a summary (5.2s)
+  ✓   99 [desktop] › tests/e2e/p4-retest1.spec.ts:81:1 › D-1 (a): closed project with sent versions and a hidden draft: header describes the latest sent version (14.2s)
+  ✓  100 [desktop] › tests/e2e/p4-proposals.spec.ts:203:1 › T-03/T-05/T-06/T-07/T-10 UI: preview, send confirmation, v2 supersedes v1, cancel, discard vN, history, wording (13.1s)
+  ✓  101 [desktop] › tests/e2e/p4-retest1.spec.ts:157:1 › D-1 (b): closed project with a never-sent draft only: draft header, labelled not sent, read-only (5.2s)
+  ✓  102 [desktop] › tests/e2e/p4-proposals.spec.ts:364:1 › T-06 UI: discarding an unsent v1 removes the whole proposal (4.9s)
+  ✓  103 [desktop] › tests/e2e/p4-retest1.spec.ts:189:1 › D-2: Additional explainer on active and closed projects is truthful and matches the panel (4.6s)
+  ✓  105 [desktop] › tests/e2e/retest1-error-summary-a11y.spec.ts:89:5 › signed out forms with the error summary visible › /sign-in: summary is focused, linked, keyboard-operable; axe 0 violations (960ms)
+  ✓  106 [desktop] › tests/e2e/retest1-error-summary-a11y.spec.ts:89:5 › signed out forms with the error summary visible › /register: summary is focused, linked, keyboard-operable; axe 0 violations (945ms)
+  ✓  107 [desktop] › tests/e2e/retest1-error-summary-a11y.spec.ts:89:5 › signed out forms with the error summary visible › /forgot-password: summary is focused, linked, keyboard-operable; axe 0 violations (840ms)
+  ✓  104 [desktop] › tests/e2e/p4-proposals.spec.ts:391:1 › T-08 UI: completed and archived projects show proposals read-only (6.7s)
+  ✓  108 [desktop] › tests/e2e/retest1-error-summary-a11y.spec.ts:98:3 › signed out forms with the error summary visible › /register: invalid email and 7-char password give two summary entries in form order (412ms)
+  ✓  110 [desktop] › tests/e2e/retest1-error-summary-a11y.spec.ts:112:3 › signed out forms with the error summary visible › summary is removed once the errors are fixed and the form is resubmitted (448ms)
+  ✓  111 [desktop] › tests/e2e/retest1-error-summary-a11y.spec.ts:134:3 › signed in forms with the error summary visible › /settings: 121-char name, summary focused, linked, keyboard-operable; axe 0 violations (2.4s)
+  ✓  112 [desktop] › tests/e2e/retest1-error-summary-a11y.spec.ts:148:3 › signed in forms with the error summary visible › /reset-password (form shown with a session): short password, summary; axe 0 violations (1.8s)
+  ✓  113 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:111:3 › D-5 mocked server answers: register › every server answer gives the same UI as a 200, for registered and unregistered emails (1.7s)
+  ✓  114 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:128:3 › D-5 mocked server answers: register › weak_password and transport failure are surfaced (independent of the address) (788ms)
+  ✓  115 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:163:3 › D-5 mocked server answers: forgot password › every server answer gives the same neutral message as a 200, for both emails (1.7s)
+  ✓  116 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:180:3 › D-5 mocked server answers: forgot password › transport failure shows the connection error for both emails (627ms)
+  -  117 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:195:3 › D-5 live (dev project) › register and forgot-password: real server status vs UI outcome
+  ✓  118 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:24:3 › T-17 / §6 offline › sign-in page offline: banner shown, submit disabled; back online re-enables (338ms)
+  ✓  119 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:39:3 › T-17 / §6 offline › register and forgot-password offline: auth actions disabled (351ms)
+  ✓  120 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:54:5 › T-17 / §6 offline › signed in › app shell offline: banner shown, Save settings disabled (1.6s)
+  ✓  121 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:66:3 › T-18 / §6 double submit › double-clicking Sign in sends exactly one password-grant request (1.9s)
+  ✓  109 [desktop] › tests/e2e/p4-proposals.spec.ts:440:1 › §6 UI: not-found and foreign ids look the same; stale tab gets a safe message (15.3s)
+  ✓  122 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:89:3 › T-19 / §6 multiple tabs › signing out in one tab sends the other tab to sign-in (1.9s)
+  ✓  124 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:112:3 › T-15 / AC-11 / BR-5 no enumeration in the UI › wrong password for existing vs non-existing email shows the identical generic message (1.5s)
+  ✓  123 [desktop] › tests/e2e/settings-and-empty-states.spec.ts:30:3 › T-11 / AC-8 settings persist (BR-4) › currency starts "Not set"; name + EUR persist after reload; then reset (5.3s)
+  ✓  126 [desktop] › tests/e2e/settings-and-empty-states.spec.ts:68:3 › T-12 / AC-8 settings validation › 121-character name gives a field error linked via aria-describedby; nothing is sent (1.8s)
+  ✓  127 [desktop] › tests/e2e/settings-and-empty-states.spec.ts:90:3 › T-12 / AC-8 settings validation › currency not in the list gives a field error linked via aria-describedby (1.7s)
+  ✓  128 [desktop] › tests/e2e/settings-and-empty-states.spec.ts:112:3 › T-12 / AC-8 settings validation › §6: validation errors are summarised on submit (1.6s)
+  ✓  129 [desktop] › tests/e2e/settings-and-empty-states.spec.ts:135:5 › T-16 / AC-12 empty states, no dead actions › / shows "No projects yet" and no non-functional actions (1.5s)
+  ✓  130 [desktop] › tests/e2e/settings-and-empty-states.spec.ts:135:5 › T-16 / AC-12 empty states, no dead actions › /projects shows "No active projects" and no non-functional actions (2.8s)
+  ✓  131 [desktop] › tests/e2e/smoke.spec.ts:3:1 › public link placeholder renders without horizontal overflow (252ms)
+  ✓  132 [mobile] › tests/e2e/auth-guard.spec.ts:29:5 › T-04 / AC-3 route guard › signed out, / redirects to /sign-in?next=… with no protected DOM (267ms)
+  ✓  133 [mobile] › tests/e2e/auth-guard.spec.ts:29:5 › T-04 / AC-3 route guard › signed out, /projects redirects to /sign-in?next=… with no protected DOM (255ms)
+  ✓  134 [mobile] › tests/e2e/auth-guard.spec.ts:29:5 › T-04 / AC-3 route guard › signed out, /settings redirects to /sign-in?next=… with no protected DOM (231ms)
+  -  135 [mobile] › tests/e2e/auth-guard.spec.ts:43:3 › T-04 / AC-3 route guard › T-04: after sign-in the user reaches next=/projects
+  -  136 [mobile] › tests/e2e/auth-guard.spec.ts:52:3 › T-04 / AC-3 route guard › AC-3: off-site next (//evil.example) is ignored after sign-in
+  ✓  137 [mobile] › tests/e2e/auth-guard.spec.ts:65:3 › T-03 / AC-2 sign out › sign out, then /settings redirects to /sign-in (1.5s)
+  ✓  138 [mobile] › tests/e2e/auth-guard.spec.ts:84:3 › T-06 / AC-4 invalid or expired session › tampered access token → sign-in with "session has ended" (2.0s)
+  ✓  139 [mobile] › tests/e2e/auth-guard.spec.ts:100:3 › T-06 / AC-4 invalid or expired session › expired access token with invalid refresh token → "session has ended" (1.4s)
+  ✓  140 [mobile] › tests/e2e/auth-guard.spec.ts:116:3 › T-06 / AC-4 invalid or expired session › stored token removed, then reload → sign-in with "session has ended" (AC-4 wording) (1.2s)
+  ✓  141 [mobile] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /sign-in: summary lists linked errors, takes focus, link focuses the field (312ms)
+  ✓  142 [mobile] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /register: summary lists linked errors, takes focus, link focuses the field (290ms)
+  ✓  143 [mobile] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /forgot-password: summary lists linked errors, takes focus, link focuses the field (323ms)
+  ✓  144 [mobile] › tests/e2e/debug-d1-d2-regression.spec.ts:37:5 › D-1 §6 error summary on failed submit › settings › 121-char name: summary links to the name field; nothing is sent (2.1s)
+  ✓  145 [mobile] › tests/e2e/debug-d1-d2-regression.spec.ts:61:3 › D-2 session-ended marker › first-time visitor sees no "session has ended" message (240ms)
+  ✓  146 [mobile] › tests/e2e/debug-d1-d2-regression.spec.ts:70:5 › D-2 session-ended marker › signed in › marker is the constant "1" (no token/PII); message is not repeated on a later fresh visit (1.2s)
+  ✓  147 [mobile] › tests/e2e/debug-p2-regression.spec.ts:20:1 › D-2: long unbroken text wraps on list, detail (draft + confirmed) and dashboard (8.1s)
+  ✓  148 [mobile] › tests/e2e/debug-p2-regression.spec.ts:80:1 › D-3: overview shows the original scope revision allowance (3.0s)
+  ✓  149 [mobile] › tests/e2e/debug-p2-regression.spec.ts:112:1 › D-1: "Project not found" for a random id and a malformed id (1.9s)
+  ✓  150 [mobile] › tests/e2e/debug-p2-regression.spec.ts:119:1 › D-4: "Project created." shows once, not after reload; back still works (3.4s)
+  ✓  151 [mobile] › tests/e2e/debug-p2-regression.spec.ts:150:1 › D-1: empty-scope, stale confirm and archived edit show their specific messages (5.7s)
+  ✓  152 [mobile] › tests/e2e/layout-a11y.spec.ts:55:5 › signed out pages › T-13/T-14 /sign-in: no overflow, 0 serious/critical axe, labelled inputs, heading order (793ms)
+  ✓  153 [mobile] › tests/e2e/layout-a11y.spec.ts:55:5 › signed out pages › T-13/T-14 /register: no overflow, 0 serious/critical axe, labelled inputs, heading order (775ms)
+  ✓  154 [mobile] › tests/e2e/layout-a11y.spec.ts:55:5 › signed out pages › T-13/T-14 /forgot-password: no overflow, 0 serious/critical axe, labelled inputs, heading order (732ms)
+  ✓  155 [mobile] › tests/e2e/layout-a11y.spec.ts:55:5 › signed out pages › T-13/T-14 /reset-password: no overflow, 0 serious/critical axe, labelled inputs, heading order (734ms)
+  ✓  156 [mobile] › tests/e2e/layout-a11y.spec.ts:55:5 › signed out pages › T-13/T-14 /p: no overflow, 0 serious/critical axe, labelled inputs, heading order (665ms)
+  ✓  157 [mobile] › tests/e2e/layout-a11y.spec.ts:55:5 › signed out pages › T-13/T-14 /no-such-page: no overflow, 0 serious/critical axe, labelled inputs, heading order (720ms)
+  ✓  158 [mobile] › tests/e2e/layout-a11y.spec.ts:78:5 › signed in pages › T-13/T-14 /: no overflow, 0 serious/critical axe, heading order (2.0s)
+  ✓  159 [mobile] › tests/e2e/layout-a11y.spec.ts:78:5 › signed in pages › T-13/T-14 /projects: no overflow, 0 serious/critical axe, heading order (2.0s)
+  ✓  160 [mobile] › tests/e2e/layout-a11y.spec.ts:78:5 › signed in pages › T-13/T-14 /settings: no overflow, 0 serious/critical axe, heading order (2.7s)
+  ✓  161 [mobile] › tests/e2e/layout-a11y.spec.ts:99:3 › signed in pages › T-13 / AC-9: main navigation is keyboard-operable, with visible focus (AC-10) (2.1s)
+register outcomes: ["Check your email | GuardScope\n\nKnow what's included. Charge for what's extra.\n\nCheck your email\n\nSuccess:\nIf this email can be registered, we've sent a link to confirm your account. Open it, then sign in.\n\nGo to sign in","Check your email | GuardScope\n\nKnow what's included. Charge for what's extra.\n\nCheck your email\n\nSuccess:\nIf this email can be registered, we've sent a link to confirm your account. Open it, then sign in.\n\nGo to sign in"]
+  ✓  125 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:129:3 › T-15 / AC-11 / BR-5 no enumeration in the UI › registering an already-registered email shows the same outcome as a new email (T-01 UI part) (1.0m)
+  ✓  163 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:160:3 › BR-1 client-side password rule › register with a 7-character password shows a field error and sends nothing (335ms)
+  -  164 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:185:3 › T-02 / BR-2 unconfirmed user (UI) › unconfirmed user with the correct password is blocked with the confirm-email message
+  ✓  162 [mobile] › tests/e2e/layout-a11y.spec.ts:165:3 › signed in pages › AC-9: mobile nav reachable, desktop nav visible (1.2s)
+axe serious/critical per page (mobile): {"dashboard":0,"projects-list":0,"projects-archived":0,"projects-completed":0,"project-form":0,"project-form-errors":0,"project-edit":0,"detail-draft-editor":0,"confirm-dialog":0,"confirm-dialog-error":0,"detail-baseline-current-draft-long-text":0,"detail-archived":0,"project-not-found":0,"settings-delete-open-error":0}
+overflow (mobile): {}
+  ✓  166 [mobile] › tests/e2e/p2-a11y.spec.ts:33:1 › T-11 axe + overflow on every Phase 2 page and state (40.9s)
+  ✓  167 [mobile] › tests/e2e/p2-a11y.spec.ts:180:1 › T-11 keyboard: add item with Enter, remove via keyboard, confirm via keyboard (6.6s)
+realistic long text (mobile): {"list":{"scrollWidth":375,"clientWidth":375,"offenders":[]},"detail":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}
+  ✓  168 [mobile] › tests/e2e/p2-a11y.spec.ts:229:1 › §6 realistic long text: spaced words wrap; a long URL in client contact / description (2.7s)
+  -  169 [mobile] › tests/e2e/p2-account-deletion.spec.ts:12:1 › T-10 delete account: empty and wrong password blocked; correct deletes, signs out, cannot sign in
+  ✓  170 [mobile] › tests/e2e/p2-projects.spec.ts:32:3 › T-01 / AC-1 create and persist › required fields only: saves, defaults shown as "Not specified"/"Not set", persists on reload (3.8s)
+  ✓  171 [mobile] › tests/e2e/p2-projects.spec.ts:54:3 › T-01 / AC-1 create and persist › all fields: values save and reload exactly in detail and edit form (4.0s)
+  -  172 [mobile] › tests/e2e/p2-projects.spec.ts:88:3 › T-01 / AC-1 create and persist › default currency from Settings is pre-selected (then reset)
+  ✓  173 [mobile] › tests/e2e/p2-projects.spec.ts:113:3 › T-02 / AC-2 validation › UI: missing required fields -> field errors + summary, nothing sent (1.2s)
+  ✓  174 [mobile] › tests/e2e/p2-projects.spec.ts:134:3 › T-02 / AC-2 validation › UI: over-length, negative price, deadline before start -> field errors + summary, nothing sent (1.3s)
+forgot-password outcomes: ["Success:\nIf an account exists for that email, we've sent a link to reset the password.","Success:\nIf an account exists for that email, we've sent a link to reset the password."]
+  ✓  165 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:208:3 › T-20 / AC-13 password reset request (UI part) › forgot-password shows the same neutral confirmation for registered and unknown emails (1.0m)
+  ✓  176 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:233:3 › T-20 / AC-13 password reset request (UI part) › /reset-password without a recovery session shows "Reset link not valid" (194ms)
+missing title: HTTP 400 23502
+blank title: HTTP 400 23514
+missing client: HTTP 400 23502
+missing currency: HTTP 400 23502
+title 201: HTTP 400 23514
+client 201: HTTP 400 23514
+contact 321: HTTP 400 23514
+description 5001: HTTP 400 23514
+negative price: HTTP 400 23514
+lowercase currency: HTTP 400 23514
+deadline before start: HTTP 400 23514
+owner_id spoof: HTTP 403 42501
+status on insert: HTTP 403 42501
+3-decimal price 10.555: HTTP 201 [{"id":"3272ac5f-d6c1-46b5-8b07-474575545772","agreed_price":10.56}]
+  ✓  175 [mobile] › tests/e2e/p2-projects.spec.ts:166:3 › T-02 / AC-2 validation › API: the same invalid payloads are rejected by the server (3.3s)
+  ✓  177 [mobile] › tests/e2e/p2-retest1.spec.ts:60:3 › Retest 1 / D-1 stale-tab writes › after the draft was confirmed elsewhere: add item and save draft show "scope locked"; nothing written (5.0s)
+  ✓  179 [mobile] › tests/e2e/p2-retest1.spec.ts:90:3 › Retest 1 / D-1 stale-tab writes › after the project was archived elsewhere: add item is refused (42501) and shows the safe not-found text (3.2s)
+  ✓  180 [mobile] › tests/e2e/p2-retest1.spec.ts:137:3 › Retest 1 / D-1 §6 ids › malformed id: "Project not found" and no Supabase request for that id (2.0s)
+  ✓  178 [mobile] › tests/e2e/p2-projects.spec.ts:208:3 › T-03 / AC-3 edit, complete, archive, reopen › lifecycle with list filters and read-only archived view (11.4s)
+  ✓  181 [mobile] › tests/e2e/p2-retest1.spec.ts:160:5 › Retest 1 / D-3 overview allowance › overview shows the baseline allowance: 2 revisions included (3.5s)
+  ✓  182 [mobile] › tests/e2e/p2-projects.spec.ts:287:3 › §6 not found / not yours › random id and another user's project show the same "Project not found" page (4.0s)
+  ✓  184 [mobile] › tests/e2e/p2-projects.spec.ts:322:3 › §6 not found / not yours › malformed id also shows "Project not found" (1.1s)
+  -  185 [mobile] › tests/e2e/p2-projects.spec.ts:331:3 › T-09 / AC-9 dashboard › active count before/after create, completed and archived excluded; New project action; max 5 listed
+  ✓  183 [mobile] › tests/e2e/p2-retest1.spec.ts:160:5 › Retest 1 / D-3 overview allowance › overview shows the baseline allowance: 1 revision included (4.7s)
+  ✓  187 [mobile] › tests/e2e/p2-retest1.spec.ts:160:5 › Retest 1 / D-3 overview allowance › overview shows the baseline allowance: No revisions included (3.9s)
+  ✓  188 [mobile] › tests/e2e/p2-retest1.spec.ts:160:5 › Retest 1 / D-3 overview allowance › overview shows the baseline allowance: Not specified (3.6s)
+  ✓  189 [mobile] › tests/e2e/p2-retest1.spec.ts:199:3 › Retest 1 / D-4 one-shot notices › "Project updated." shows once; not after reload, confirm + reload, or back/forward (5.7s)
+  ✓  186 [mobile] › tests/e2e/p2-scope.spec.ts:67:3 › T-04 / AC-4 draft editing › add, edit, reorder, remove items; three allowance modes; summary/notes persist (16.5s)
+  ✓  191 [mobile] › tests/e2e/p2-scope.spec.ts:160:3 › T-05 / AC-5 confirm › UI: confirming with no deliverable is rejected with the empty-scope message (3.6s)
+  ✓  192 [mobile] › tests/e2e/p2-scope.spec.ts:184:3 › T-05 / AC-5 confirm › UI: valid confirm shows date, baseline label, "Not specified" revisions; API flags baseline (4.0s)
+  ✓  193 [mobile] › tests/e2e/p2-scope.spec.ts:231:3 › T-05 / AC-5 confirm › UI: stale tab confirming an already-confirmed draft gets the safe "already confirmed" message (7.9s)
+  -  194 [mobile] › tests/e2e/p2-scope.spec.ts:261:3 › T-05 / AC-5 confirm › API: double confirm (sequential and concurrent) -> exactly one confirmation, other already_confirmed
+  ✓  190 [mobile] › tests/e2e/p3-a11y.spec.ts:39:1 › T-10 axe + overflow on every Phase 3 page and state (22.7s)
+  ✓  196 [mobile] › tests/e2e/p3-a11y.spec.ts:148:1 › T-10 keyboard: capture and classify without a mouse (5.0s)
+  ✓  195 [mobile] › tests/e2e/p2-scope.spec.ts:335:3 › T-06 / AC-6 baseline unchanged after later edits › edit price/deadline + scope, confirm v2; baseline identical; UI shows original/current/draft (10.2s)
+  -  198 [mobile] › tests/e2e/p2-scope.spec.ts:426:3 › T-07 / T-08 API (AC-7, AC-8) › owner cannot change confirmed versions/items; B and anon cannot touch A; archived draft locked
+  -  199 [mobile] › tests/e2e/p3-d2-evidence.spec.ts:6:1 › D-2 evidence screenshot
+  ✓  197 [mobile] › tests/e2e/p3-classification.spec.ts:49:3 › T-03 / AC-3 classify and history › each option updates the label and appends one history entry; same value adds none (8.6s)
+  -  201 [mobile] › tests/e2e/p3-classification.spec.ts:147:3 › T-03 / AC-3 classify and history › API: same value twice adds no event; history cannot be edited or deleted
+  -  202 [mobile] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history
+  ✓  200 [mobile] › tests/e2e/p3-requests.spec.ts:34:3 › T-01 / AC-1 capture › quick add with title only, full add, reload, list order, filter (10.5s)
+  ✓  204 [mobile] › tests/e2e/p3-requests.spec.ts:148:3 › T-01 / AC-1 capture › edit a request persists after reload (4.7s)
+  ✓  203 [mobile] › tests/e2e/p3-classification.spec.ts:328:3 › T-09 / AC-9 no money; Phase 4 hint; BR-6 wording › Included shows no value; Additional shows the hint without a dead action (10.3s)
+  -  206 [mobile] › tests/e2e/p3-retest1.spec.ts:29:1 › O-a: project and request pages never fetch internal_notes in list queries; history read by seq
+  ✓  205 [mobile] › tests/e2e/p3-requests.spec.ts:167:3 › T-02 / AC-2 validation › UI: field errors + focused summary, nothing sent (3.8s)
+  -  208 [mobile] › tests/e2e/p3-requests.spec.ts:231:3 › T-02 / AC-2 validation › API: the same invalid data is rejected by the server
+  ✓  207 [mobile] › tests/e2e/p3-revisions.spec.ts:49:3 › T-06 / AC-6 revision usage › no recording before a scope is confirmed (2.2s)
+  ✓  209 [mobile] › tests/e2e/p3-requests.spec.ts:285:3 › T-05 / AC-5 private notes › private label on the request; notes nowhere else in the UI or history (5.5s)
+  ✓  210 [mobile] › tests/e2e/p3-revisions.spec.ts:70:3 › T-06 / AC-6 revision usage › numeric allowance 2: record, over-use without negatives, undo (7.0s)
+  ✓  211 [mobile] › tests/e2e/p3-requests.spec.ts:350:3 › T-07 / AC-7 archived project › requests visible; every write blocked in UI and API (4.9s)
+  -  213 [mobile] › tests/e2e/p3-requests.spec.ts:434:3 › T-08 / AC-8 isolation › B and anon cannot touch A’s requests, events, usages or the RPC
+  ✓  212 [mobile] › tests/e2e/p3-revisions.spec.ts:132:3 › T-06 / AC-6 revision usage › allowance "none" and "not specified": used shown, no remaining figure (6.8s)
+  ✓  215 [mobile] › tests/e2e/p3-revisions.spec.ts:155:3 › T-06 / AC-6 revision usage › allowance comes from the latest confirmed scope, not the draft (4.4s)
+  ✓  214 [mobile] › tests/e2e/p3-requests.spec.ts:533:3 › §6 not found › missing, foreign, malformed and wrong-project request ids look the same (9.7s)
+  ✓  216 [mobile] › tests/e2e/p3-revisions.spec.ts:177:3 › T-06 / AC-6 revision usage › request page: record a revision linked to an Included request (4.5s)
+  -  218 [mobile] › tests/e2e/p3-revisions.spec.ts:211:3 › T-06 / AC-6 revision usage › API: a usage cannot link to a request from another project (BR-4)
+  -  219 [mobile] › tests/e2e/p4-api.spec.ts:34:1 › T-01 API: create from Additional only, pre-filled, no private notes, one per request
+  -  220 [mobile] › tests/e2e/p4-api.spec.ts:95:1 › T-02 API: every field persists; every rule rejected via REST
+  -  221 [mobile] › tests/e2e/p4-api.spec.ts:154:1 › T-03 API: send-time rules; valid send sets pending + server time
+  -  222 [mobile] › tests/e2e/p4-api.spec.ts:202:1 › T-04 API: a sent version cannot be changed or deleted by the owner via REST
+  -  223 [mobile] › tests/e2e/p4-api.spec.ts:246:1 › T-08 API: completed and archived projects block every proposal write
+  -  224 [mobile] › tests/e2e/p4-api.spec.ts:295:1 › T-09 API: user B and anon have no access to A's proposals
+  -  225 [mobile] › tests/e2e/p4-api.spec.ts:364:1 › T-07 API: history order with version numbers for a full lifecycle
+  -  226 [mobile] › tests/e2e/p4-concurrency.spec.ts:93:1 › T-05 concurrency: create/send/new-version/send-vs-cancel races x12
+  ✓  227 [mobile] › tests/e2e/p4-iss017.spec.ts:49:3 › ISS-017 (a) proposal editor: save and send after reload with existing integer price and time (6.0s)
+  ✓  228 [mobile] › tests/e2e/p4-iss017.spec.ts:49:3 › ISS-017 (a) proposal editor: save and send after reload with existing decimal price and time (6.4s)
+  ✓  217 [mobile] › tests/e2e/p4-a11y.spec.ts:46:1 › T-11 axe + overflow: proposal page (draft, preview, confirm, sent, multi-version), request page, project page (21.1s)
+  ✓  229 [mobile] › tests/e2e/p4-iss017.spec.ts:109:3 › ISS-017 (b) Phase 2 project edit form saves with an untouched integer agreed price (3.4s)
+  ✓  231 [mobile] › tests/e2e/p4-iss017.spec.ts:109:3 › ISS-017 (b) Phase 2 project edit form saves with an untouched decimal agreed price (3.1s)
+  ✓  230 [mobile] › tests/e2e/p4-a11y.spec.ts:125:1 › T-11 keyboard: create, fill, preview, send and create a new version without a mouse (4.9s)
+  ✓  232 [mobile] › tests/e2e/p4-proposals.spec.ts:57:1 › T-01 UI: create from an Additional request, pre-filled, no private notes; other classifications offer nothing (9.3s)
+  ✓  234 [mobile] › tests/e2e/p4-proposals.spec.ts:124:1 › T-02 UI: edit and save every field; validation shows field messages and a summary (5.8s)
+  ✓  233 [mobile] › tests/e2e/p4-retest1.spec.ts:81:1 › D-1 (a): closed project with sent versions and a hidden draft: header describes the latest sent version (15.6s)
+  ✓  236 [mobile] › tests/e2e/p4-retest1.spec.ts:157:1 › D-1 (b): closed project with a never-sent draft only: draft header, labelled not sent, read-only (6.0s)
+  ✓  237 [mobile] › tests/e2e/p4-retest1.spec.ts:189:1 › D-2: Additional explainer on active and closed projects is truthful and matches the panel (4.8s)
+  ✓  238 [mobile] › tests/e2e/retest1-error-summary-a11y.spec.ts:89:5 › signed out forms with the error summary visible › /sign-in: summary is focused, linked, keyboard-operable; axe 0 violations (990ms)
+  ✓  235 [mobile] › tests/e2e/p4-proposals.spec.ts:203:1 › T-03/T-05/T-06/T-07/T-10 UI: preview, send confirmation, v2 supersedes v1, cancel, discard vN, history, wording (13.7s)
+  ✓  239 [mobile] › tests/e2e/retest1-error-summary-a11y.spec.ts:89:5 › signed out forms with the error summary visible › /register: summary is focused, linked, keyboard-operable; axe 0 violations (976ms)
+  ✓  241 [mobile] › tests/e2e/retest1-error-summary-a11y.spec.ts:89:5 › signed out forms with the error summary visible › /forgot-password: summary is focused, linked, keyboard-operable; axe 0 violations (876ms)
+  ✓  242 [mobile] › tests/e2e/retest1-error-summary-a11y.spec.ts:98:3 › signed out forms with the error summary visible › /register: invalid email and 7-char password give two summary entries in form order (307ms)
+  ✓  243 [mobile] › tests/e2e/retest1-error-summary-a11y.spec.ts:112:3 › signed out forms with the error summary visible › summary is removed once the errors are fixed and the form is resubmitted (364ms)
+  ✓  244 [mobile] › tests/e2e/retest1-error-summary-a11y.spec.ts:134:3 › signed in forms with the error summary visible › /settings: 121-char name, summary focused, linked, keyboard-operable; axe 0 violations (2.0s)
+  ✓  245 [mobile] › tests/e2e/retest1-error-summary-a11y.spec.ts:148:3 › signed in forms with the error summary visible › /reset-password (form shown with a session): short password, summary; axe 0 violations (1.8s)
+  ✓  240 [mobile] › tests/e2e/p4-proposals.spec.ts:364:1 › T-06 UI: discarding an unsent v1 removes the whole proposal (7.4s)
+  ✓  246 [mobile] › tests/e2e/retest2-d5-enumeration.spec.ts:111:3 › D-5 mocked server answers: register › every server answer gives the same UI as a 200, for registered and unregistered emails (2.0s)
+  ✓  248 [mobile] › tests/e2e/retest2-d5-enumeration.spec.ts:128:3 › D-5 mocked server answers: register › weak_password and transport failure are surfaced (independent of the address) (764ms)
+  ✓  249 [mobile] › tests/e2e/retest2-d5-enumeration.spec.ts:163:3 › D-5 mocked server answers: forgot password › every server answer gives the same neutral message as a 200, for both emails (1.7s)
+  ✓  250 [mobile] › tests/e2e/retest2-d5-enumeration.spec.ts:180:3 › D-5 mocked server answers: forgot password › transport failure shows the connection error for both emails (453ms)
+  -  251 [mobile] › tests/e2e/retest2-d5-enumeration.spec.ts:195:3 › D-5 live (dev project) › register and forgot-password: real server status vs UI outcome
+  ✓  252 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:24:3 › T-17 / §6 offline › sign-in page offline: banner shown, submit disabled; back online re-enables (282ms)
+  ✓  253 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:39:3 › T-17 / §6 offline › register and forgot-password offline: auth actions disabled (305ms)
+  ✓  254 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:54:5 › T-17 / §6 offline › signed in › app shell offline: banner shown, Save settings disabled (1.6s)
+  -  255 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:66:3 › T-18 / §6 double submit › double-clicking Sign in sends exactly one password-grant request
+  -  256 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:89:3 › T-19 / §6 multiple tabs › signing out in one tab sends the other tab to sign-in
+  -  257 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:112:3 › T-15 / AC-11 / BR-5 no enumeration in the UI › wrong password for existing vs non-existing email shows the identical generic message
+  -  258 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:129:3 › T-15 / AC-11 / BR-5 no enumeration in the UI › registering an already-registered email shows the same outcome as a new email (T-01 UI part)
+  ✓  259 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:160:3 › BR-1 client-side password rule › register with a 7-character password shows a field error and sends nothing (324ms)
+  -  260 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:185:3 › T-02 / BR-2 unconfirmed user (UI) › unconfirmed user with the correct password is blocked with the confirm-email message
+  -  261 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:208:3 › T-20 / AC-13 password reset request (UI part) › forgot-password shows the same neutral confirmation for registered and unknown emails
+  ✓  262 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:233:3 › T-20 / AC-13 password reset request (UI part) › /reset-password without a recovery session shows "Reset link not valid" (218ms)
+  -  263 [mobile] › tests/e2e/settings-and-empty-states.spec.ts:30:3 › T-11 / AC-8 settings persist (BR-4) › currency starts "Not set"; name + EUR persist after reload; then reset
+  ✓  264 [mobile] › tests/e2e/settings-and-empty-states.spec.ts:68:3 › T-12 / AC-8 settings validation › 121-character name gives a field error linked via aria-describedby; nothing is sent (2.8s)
+  ✓  265 [mobile] › tests/e2e/settings-and-empty-states.spec.ts:90:3 › T-12 / AC-8 settings validation › currency not in the list gives a field error linked via aria-describedby (2.8s)
+  ✓  266 [mobile] › tests/e2e/settings-and-empty-states.spec.ts:112:3 › T-12 / AC-8 settings validation › §6: validation errors are summarised on submit (2.2s)
+  ✓  247 [mobile] › tests/e2e/p4-proposals.spec.ts:391:1 › T-08 UI: completed and archived projects show proposals read-only (16.5s)
+  ✓  267 [mobile] › tests/e2e/settings-and-empty-states.spec.ts:135:5 › T-16 / AC-12 empty states, no dead actions › / shows "No projects yet" and no non-functional actions (2.3s)
+  ✘  268 [mobile] › tests/e2e/p4-proposals.spec.ts:440:1 › §6 UI: not-found and foreign ids look the same; stale tab gets a safe message (30.9s)
+  ✓  270 [mobile] › tests/e2e/smoke.spec.ts:3:1 › public link placeholder renders without horizontal overflow (325ms)
+  ✓  269 [mobile] › tests/e2e/settings-and-empty-states.spec.ts:135:5 › T-16 / AC-12 empty states, no dead actions › /projects shows "No active projects" and no non-functional actions (31.9s)
+
+
+  1) [mobile] › tests/e2e/p4-proposals.spec.ts:440:1 › §6 UI: not-found and foreign ids look the same; stale tab gets a safe message 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { level: 1 })
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { level: 1 }) with timeout 5000ms
+      - waiting for getByRole('heading', { level: 1 })
+      - Test timeout of 30000ms exceeded.
+
+
+      479 |   ] as const) {
+      480 |     await page.goto(url);
+    > 481 |     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+          |                                                           ^
+      482 |     texts[label] = (await page.locator('main').innerText()).replace(/\s+/g, ' ');
+      483 |   }
+      484 |   logEvidence4('e2e-S6-notfound.jsonl', testInfo, 'not found texts', texts);
+        at /home/user/guard-scope/tests/e2e/p4-proposals.spec.ts:481:59
+
+    Error Context: test-results/p4-proposals-§6-UI-not-fou-a719b-ale-tab-gets-a-safe-message-mobile/error-context.md
+
+  1 failed
+    [mobile] › tests/e2e/p4-proposals.spec.ts:440:1 › §6 UI: not-found and foreign ids look the same; stale tab gets a safe message 
+  34 skipped
+  235 passed (10.9m)
+exit=1

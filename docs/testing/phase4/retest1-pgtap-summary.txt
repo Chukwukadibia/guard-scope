@@ -1,0 +1,7 @@
+profiles_rls: 1..12 all ok (12/12)
+profiles_rls_tester: 1..22 all ok (22/22)
+event_ordering: 1..11 all ok (11/11)
+projects_scope: 1..32 all ok (32/32)
+requests: 1..32 all ok (32/32)
+change_orders (developer): 1..39 all ok (39/39) [first attempt aborted with 21000 'more than one row' because it ran while E2E run 1 had live change orders in the DB (superuser subquery assumes an empty table); rerun on the cleaned DB]
+projects_scope_tester: 1..80 all ok (80/80)

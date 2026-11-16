@@ -443,6 +443,9 @@ test('§6 UI: not-found and foreign ids look the same; stale tab gets a safe mes
   browser,
   context,
 }, testInfo) => {
+  // Two tabs, a second user's session and four navigations: ~15 s unloaded, so the 30 s default
+  // budget ran out under full-suite load (retest 1, run 1). Timing only; assertions unchanged.
+  test.setTimeout(90_000);
   const tokenA = tokenOf(sessionA);
   const { projectId, coId, v1Id } = await apiSendableCO(page, tokenA, uniq4(testInfo, 'ui-stale'));
 
