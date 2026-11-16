@@ -45,4 +45,4 @@ Also a gate condition: before ARCHITECTURE.md is marked *final*, the Team Lead v
 Unit (Vitest), DB/RLS (pgTAP, two users plus anon), E2E with axe (Playwright, 375 px and 1280 px). Run by an independent Tester subagent. Evidence goes to `docs/testing/phase1/` and `ACCEPTANCE_REPORT.md`.
 
 ## 9. Approval requested
-Please confirm or adjust items 1–5 and approve the architecture, protocol and Phase 1 documents. These will be recorded as **HA-002**. Phase 1 implementation will not start until then.
+Please confirm or adjust items 1–7 and approve the architecture, protocol and Phase 1 documents. These will be recorded as **HA-002**. Phase 1 implementation will not start until then.
