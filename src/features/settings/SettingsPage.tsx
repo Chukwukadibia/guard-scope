@@ -102,7 +102,7 @@ export function SettingsPage() {
         </h2>
         <dl className="mt-3 text-sm">
           <dt className="text-slate-600">Signed in as</dt>
-          <dd className="mt-0.5 break-all font-medium">{session?.user.email}</dd>
+          <dd className="mt-0.5 wrap-anywhere font-medium">{session?.user.email}</dd>
         </dl>
       </section>
 

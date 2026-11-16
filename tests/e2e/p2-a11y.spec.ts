@@ -1,13 +1,27 @@
 import { test, expect } from './helpers';
-import { apiAddItem, apiCreateProject, apiDraftId, axeScan, noOverflow, openProject, rest, shot, uniq } from './p2-helpers';
+import {
+  apiAddItem,
+  apiCreateProject,
+  apiDraftId,
+  axeScan,
+  noOverflow,
+  openProject,
+  rest,
+  shot,
+  uniq,
+} from './p2-helpers';
 
 /** Phase 2 Tester — T-11 / AC-11: axe (0 serious/critical), keyboard, no overflow at 375/1280. */
 test.use({ signedInAs: 'A' });
 
 const tokenOf = (s: Record<string, unknown>) => s.access_token as string;
-const serious = (v: { impact?: string | null }[]) => v.filter((x) => x.impact === 'serious' || x.impact === 'critical');
+const serious = (v: { impact?: string | null }[]) =>
+  v.filter((x) => x.impact === 'serious' || x.impact === 'critical');
 
-test('T-11 axe + overflow on every Phase 2 page and state', async ({ page, sessionA }, testInfo) => {
+test('T-11 axe + overflow on every Phase 2 page and state', async ({
+  page,
+  sessionA,
+}, testInfo) => {
   test.setTimeout(120_000);
   const token = tokenOf(sessionA);
   const results: Record<string, number> = {};
@@ -36,15 +50,40 @@ test('T-11 axe + overflow on every Phase 2 page and state', async ({ page, sessi
   await apiAddItem(page, token, v1, 'deliverable', 'D'.repeat(1000));
   await apiAddItem(page, token, v1, 'exclusion', 'E'.repeat(1000));
   await apiAddItem(page, token, v1, 'assumption', 'A'.repeat(1000));
-  expect((await rest(page, token, 'PATCH', `/rest/v1/scope_versions?id=eq.${v1}`, { summary: 'S'.repeat(5000), notes: 'N'.repeat(5000) })).status).toBe(200);
-  expect((await rest(page, token, 'POST', '/rest/v1/rpc/confirm_scope', { p_version_id: v1 })).status).toBe(200);
+  expect(
+    (
+      await rest(page, token, 'PATCH', `/rest/v1/scope_versions?id=eq.${v1}`, {
+        summary: 'S'.repeat(5000),
+        notes: 'N'.repeat(5000),
+      })
+    ).status,
+  ).toBe(200);
+  expect(
+    (await rest(page, token, 'POST', '/rest/v1/rpc/confirm_scope', { p_version_id: v1 })).status,
+  ).toBe(200);
   const v2 = await apiDraftId(page, token, pid);
-  expect((await rest(page, token, 'POST', '/rest/v1/rpc/confirm_scope', { p_version_id: v2 })).status).toBe(200);
-  expect((await rest(page, token, 'PATCH', `/rest/v1/projects?id=eq.${pid}`, { agreed_price: 5 })).status).toBe(200);
+  expect(
+    (await rest(page, token, 'POST', '/rest/v1/rpc/confirm_scope', { p_version_id: v2 })).status,
+  ).toBe(200);
+  expect(
+    (await rest(page, token, 'PATCH', `/rest/v1/projects?id=eq.${pid}`, { agreed_price: 5 }))
+      .status,
+  ).toBe(200);
 
-  const draftPid = await apiCreateProject(page, token, { title: uniq(testInfo, 'a11y-draft'), client_name: 'C', currency: 'EUR' });
-  const archPid = await apiCreateProject(page, token, { title: uniq(testInfo, 'a11y-arch'), client_name: 'C', currency: 'EUR' });
-  expect((await rest(page, token, 'PATCH', `/rest/v1/projects?id=eq.${archPid}`, { status: 'archived' })).status).toBe(200);
+  const draftPid = await apiCreateProject(page, token, {
+    title: uniq(testInfo, 'a11y-draft'),
+    client_name: 'C',
+    currency: 'EUR',
+  });
+  const archPid = await apiCreateProject(page, token, {
+    title: uniq(testInfo, 'a11y-arch'),
+    client_name: 'C',
+    currency: 'EUR',
+  });
+  expect(
+    (await rest(page, token, 'PATCH', `/rest/v1/projects?id=eq.${archPid}`, { status: 'archived' }))
+      .status,
+  ).toBe(200);
 
   await page.goto('/');
   await expect(page.getByTestId('active-project-count')).toBeVisible();
@@ -101,14 +140,26 @@ test('T-11 axe + overflow on every Phase 2 page and state', async ({ page, sessi
   await expect(page.getByRole('alert').filter({ hasText: 'There is a problem' })).toBeVisible();
   await check('settings-delete-open-error');
 
-  console.log(`axe serious/critical per page (${testInfo.project.name}): ${JSON.stringify(results)}`);
+  console.log(
+    `axe serious/critical per page (${testInfo.project.name}): ${JSON.stringify(results)}`,
+  );
   console.log(`overflow (${testInfo.project.name}): ${JSON.stringify(overflow, null, 1)}`);
-  expect(Object.values(results).every((n) => n === 0), JSON.stringify(results)).toBe(true);
+  expect(
+    Object.values(results).every((n) => n === 0),
+    JSON.stringify(results),
+  ).toBe(true);
 });
 
-test('T-11 keyboard: add item with Enter, remove via keyboard, confirm via keyboard', async ({ page, sessionA }, testInfo) => {
+test('T-11 keyboard: add item with Enter, remove via keyboard, confirm via keyboard', async ({
+  page,
+  sessionA,
+}, testInfo) => {
   const token = tokenOf(sessionA);
-  const pid = await apiCreateProject(page, token, { title: uniq(testInfo, 'kbd'), client_name: 'C', currency: 'EUR' });
+  const pid = await apiCreateProject(page, token, {
+    title: uniq(testInfo, 'kbd'),
+    client_name: 'C',
+    currency: 'EUR',
+  });
   await openProject(page, pid);
   const del = page.getByRole('region', { name: 'Deliverables' });
   await del.getByLabel('Add a deliverable').focus();
@@ -122,7 +173,9 @@ test('T-11 keyboard: add item with Enter, remove via keyboard, confirm via keybo
   // reach "Remove" for "Second" via Tab from the first item's controls
   await del.getByRole('button', { name: 'Move "Keyboard item" down' }).focus();
   await page.keyboard.press('Enter');
-  await expect.poll(() => del.getByRole('listitem').allInnerTexts()).toEqual(['Second', 'Keyboard item']);
+  await expect
+    .poll(() => del.getByRole('listitem').allInnerTexts())
+    .toEqual(['Second', 'Keyboard item']);
   await del.getByRole('button', { name: 'Remove "Second"' }).focus();
   await expect(del.getByRole('button', { name: 'Remove "Second"' })).toBeFocused();
   await page.keyboard.press('Enter');
@@ -146,9 +199,14 @@ test('T-11 keyboard: add item with Enter, remove via keyboard, confirm via keybo
   await shot(page, testInfo, 'T11-keyboard-confirmed');
 });
 
-test('§6 realistic long text: spaced words wrap; a long URL in client contact / description', async ({ page, sessionA }, testInfo) => {
+test('§6 realistic long text: spaced words wrap; a long URL in client contact / description', async ({
+  page,
+  sessionA,
+}, testInfo) => {
   const token = tokenOf(sessionA);
-  const words = Array.from({ length: 40 }, (_, i) => `word${i}`).join(' ').slice(0, 200);
+  const words = Array.from({ length: 40 }, (_, i) => `word${i}`)
+    .join(' ')
+    .slice(0, 200);
   const url = `https://example.test/${'path-segment/'.repeat(20)}file.pdf`;
   const pid = await apiCreateProject(page, token, {
     title: words,

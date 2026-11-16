@@ -1,5 +1,6 @@
 import { supabase } from '../supabase';
 import { toApiError } from './errors';
+import { assertProjectId } from './projects';
 
 export type ScopeItemKind = 'deliverable' | 'exclusion' | 'assumption';
 export type RevisionAllowanceType = 'none' | 'number' | 'not_specified';
@@ -51,6 +52,7 @@ function sortItems(v: ScopeVersion): ScopeVersion {
 }
 
 export async function getProjectScope(projectId: string): Promise<ProjectScope> {
+  assertProjectId(projectId);
   const { data, error } = await supabase
     .from('scope_versions')
     .select(columns)

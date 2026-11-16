@@ -69,10 +69,10 @@ export function DashboardPage() {
                       className="flex flex-wrap items-center justify-between gap-2 p-4 hover:bg-slate-50"
                     >
                       <span className="min-w-0">
-                        <span className="block break-words font-medium text-slate-900">
+                        <span className="block wrap-anywhere font-medium text-slate-900">
                           {p.title}
                         </span>
-                        <span className="block break-words text-sm text-slate-600">
+                        <span className="block wrap-anywhere text-sm text-slate-600">
                           {p.client_name}
                         </span>
                       </span>

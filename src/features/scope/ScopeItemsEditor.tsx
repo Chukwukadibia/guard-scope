@@ -135,7 +135,9 @@ export function ScopeItemsEditor({
                 </div>
               ) : (
                 <div className="flex items-start gap-2">
-                  <p className="min-w-0 flex-1 break-words py-2 pl-1 text-sm">{item.description}</p>
+                  <p className="min-w-0 flex-1 wrap-anywhere py-2 pl-1 text-sm">
+                    {item.description}
+                  </p>
                   <div className="flex shrink-0 flex-wrap justify-end">
                     <button
                       type="button"

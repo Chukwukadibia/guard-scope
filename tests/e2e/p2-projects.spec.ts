@@ -33,7 +33,9 @@ test.describe('T-01 / AC-1 create and persist', () => {
     await shot(page, testInfo, 'T01-required-only');
   });
 
-  test('all fields: values save and reload exactly in detail and edit form', async ({ page }, testInfo) => {
+  test('all fields: values save and reload exactly in detail and edit form', async ({
+    page,
+  }, testInfo) => {
     const title = uniq(testInfo, 'all');
     await page.goto('/projects/new');
     await page.getByLabel('Project title').fill(title);
@@ -65,7 +67,10 @@ test.describe('T-01 / AC-1 create and persist', () => {
     await shot(page, testInfo, 'T01-all-fields-edit');
   });
 
-  test('default currency from Settings is pre-selected (then reset)', async ({ page, sessionA }, testInfo) => {
+  test('default currency from Settings is pre-selected (then reset)', async ({
+    page,
+    sessionA,
+  }, testInfo) => {
     test.skip(isMobile(testInfo), 'mutates user A profile; desktop only');
     const token = tokenOf(sessionA);
     const uid = userIdOf(sessionA);
@@ -87,7 +92,9 @@ test.describe('T-01 / AC-1 create and persist', () => {
 });
 
 test.describe('T-02 / AC-2 validation', () => {
-  test('UI: missing required fields -> field errors + summary, nothing sent', async ({ page }, testInfo) => {
+  test('UI: missing required fields -> field errors + summary, nothing sent', async ({
+    page,
+  }, testInfo) => {
     let posts = 0;
     page.on('request', (r) => {
       if (r.url().includes('/rest/v1/projects') && r.method() === 'POST') posts++;
@@ -152,7 +159,11 @@ test.describe('T-02 / AC-2 validation', () => {
       ['description 5001', { ...base, description: 'd'.repeat(5001) }, '23514'],
       ['negative price', { ...base, agreed_price: -1 }, '23514'],
       ['lowercase currency', { ...base, currency: 'eur' }, '23514'],
-      ['deadline before start', { ...base, start_date: '2026-12-01', deadline: '2026-11-01' }, '23514'],
+      [
+        'deadline before start',
+        { ...base, start_date: '2026-12-01', deadline: '2026-11-01' },
+        '23514',
+      ],
       ['owner_id spoof', { ...base, owner_id: '00000000-0000-0000-0000-000000000000' }, '42501'],
       ['status on insert', { ...base, status: 'archived' }, '42501'],
     ];
@@ -211,11 +222,16 @@ test.describe('T-03 / AC-3 edit, complete, archive, reopen', () => {
     await page.getByRole('button', { name: 'Reopen' }).click();
     await expect(page.getByText('Project reopened.')).toBeVisible();
     await page.getByRole('button', { name: 'Archive' }).click();
-    await expect(page.getByText('Project archived. It is read-only until you reopen it.')).toBeVisible();
+    await expect(
+      page.getByText('Project archived. It is read-only until you reopen it.'),
+    ).toBeVisible();
 
     // archived: hidden from default list, visible under Archived filter
     await page.goto('/projects');
-    await expect(page.getByRole('link', { name: 'Active', exact: true })).toHaveAttribute('aria-current', 'page');
+    await expect(page.getByRole('link', { name: 'Active', exact: true })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
     await expect(page.getByRole('link', { name: new RegExp(`${title} edited`) })).toHaveCount(0);
     await page.getByRole('link', { name: 'Archived', exact: true }).click();
     await expect(page.getByRole('link', { name: new RegExp(`${title} edited`) })).toBeVisible();
@@ -234,7 +250,9 @@ test.describe('T-03 / AC-3 edit, complete, archive, reopen', () => {
     await page.goto(`/projects/${id}/edit`);
     await expect(page.getByRole('main').getByRole('alert').first()).toBeVisible();
     // soft: a wrong message here is a defect, but the reopen steps below must still run
-    await expect.soft(page.getByText('This project is archived. Reopen it to make changes.')).toBeVisible();
+    await expect
+      .soft(page.getByText('This project is archived. Reopen it to make changes.'))
+      .toBeVisible();
     await expect(page.getByLabel('Project title')).toHaveCount(0);
     await shot(page, testInfo, 'T03-archived-edit-url');
 
@@ -259,7 +277,17 @@ test.describe('§6 not found / not yours', () => {
       currency: 'EUR',
     });
     // keep B's dashboard count unaffected (T-09 runs in parallel): completed projects are not "active"
-    expect((await rest(page, sessionB.access_token as string, 'PATCH', `/rest/v1/projects?id=eq.${bId}`, { status: 'completed' })).status).toBe(200);
+    expect(
+      (
+        await rest(
+          page,
+          sessionB.access_token as string,
+          'PATCH',
+          `/rest/v1/projects?id=eq.${bId}`,
+          { status: 'completed' },
+        )
+      ).status,
+    ).toBe(200);
     const texts: string[] = [];
     for (const id of ['3f1e0c5a-9a7b-4c1d-8e2f-0123456789ab', bId]) {
       await page.goto(`/projects/${id}`);
@@ -285,7 +313,10 @@ test.describe('T-09 / AC-9 dashboard', () => {
   test('active count before/after create, completed and archived excluded; New project action; max 5 listed', async ({
     page,
   }, testInfo) => {
-    test.skip(isMobile(testInfo), 'uses user B exclusively; desktop only to keep counts deterministic');
+    test.skip(
+      isMobile(testInfo),
+      'uses user B exclusively; desktop only to keep counts deterministic',
+    );
     await page.goto('/sign-in');
     // this describe runs signed in as A via storageState; switch to B through the UI
     await page.evaluate(() => localStorage.clear());
@@ -311,8 +342,18 @@ test.describe('T-09 / AC-9 dashboard', () => {
       return JSON.parse(localStorage.getItem(k)!).access_token as string;
     });
     // a completed project must not count
-    const doneId = await apiCreateProject(page, token, { title: 'P2T dash-done', client_name: 'C', currency: 'EUR' });
-    expect((await rest(page, token, 'PATCH', `/rest/v1/projects?id=eq.${doneId}`, { status: 'completed' })).status).toBe(200);
+    const doneId = await apiCreateProject(page, token, {
+      title: 'P2T dash-done',
+      client_name: 'C',
+      currency: 'EUR',
+    });
+    expect(
+      (
+        await rest(page, token, 'PATCH', `/rest/v1/projects?id=eq.${doneId}`, {
+          status: 'completed',
+        })
+      ).status,
+    ).toBe(200);
 
     await page.goto('/');
     await expect(count).toHaveText('1');
@@ -328,10 +369,16 @@ test.describe('T-09 / AC-9 dashboard', () => {
 
     // 6 active -> count 6, 5 listed + "View all"
     for (let i = 1; i <= 6; i++)
-      await apiCreateProject(page, token, { title: `P2T dash-bulk ${i}`, client_name: 'C', currency: 'EUR' });
+      await apiCreateProject(page, token, {
+        title: `P2T dash-bulk ${i}`,
+        client_name: 'C',
+        currency: 'EUR',
+      });
     await page.goto('/');
     await expect(count).toHaveText('6');
-    await expect(page.getByRole('region', { name: 'Recently updated' }).getByRole('listitem')).toHaveCount(5);
+    await expect(
+      page.getByRole('region', { name: 'Recently updated' }).getByRole('listitem'),
+    ).toHaveCount(5);
     await expect(page.getByRole('link', { name: 'View all active projects' })).toBeVisible();
     await shot(page, testInfo, 'T09-dashboard-6');
   });

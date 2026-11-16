@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Pencil } from 'lucide-react';
 import { Alert } from '../../components/ui/Alert';
 import { Button, Spinner } from '../../components/ui/Button';
@@ -11,7 +11,12 @@ import {
 } from '../../lib/api/projects';
 import { getProjectScope, type ProjectScope } from '../../lib/api/scope';
 import { errorMessages, toApiError, type ApiErrorCode } from '../../lib/api/errors';
-import { formatDate, formatDateTime, formatMoney } from '../../lib/domain/format';
+import {
+  formatDate,
+  formatDateTime,
+  formatMoney,
+  revisionAllowanceLabel,
+} from '../../lib/domain/format';
 import { useOnline } from '../../hooks/useOnline';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { StatusBadge } from './StatusBadge';
@@ -55,11 +60,19 @@ export function ProjectDetailPage() {
       : null;
   });
   const [busy, setBusy] = useState(false);
+  const navigate = useNavigate();
   useDocumentTitle(project ? project.title : 'Project');
 
   const reloadScope = useCallback(async () => {
     setScope(await getProjectScope(id));
   }, [id]);
+
+  // The "saved" notice is one-shot: history state survives reloads, so clear it once it has been
+  // read into `notice`. replace keeps the back button pointing at the previous page.
+  const hasSavedState = Boolean((location.state as { saved?: string } | null)?.saved);
+  useEffect(() => {
+    if (hasSavedState) navigate(location.pathname, { replace: true, state: null });
+  }, [hasSavedState, location.pathname, navigate]);
 
   useEffect(() => {
     let active = true;
@@ -120,8 +133,8 @@ export function ProjectDetailPage() {
         </Link>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="break-words text-2xl font-semibold text-slate-900">{project.title}</h1>
-            <p className="break-words text-slate-600">Client: {project.client_name}</p>
+            <h1 className="wrap-anywhere text-2xl font-semibold text-slate-900">{project.title}</h1>
+            <p className="wrap-anywhere text-slate-600">Client: {project.client_name}</p>
           </div>
           <StatusBadge status={project.status} />
         </div>
@@ -162,7 +175,7 @@ export function ProjectDetailPage() {
         <h2 id="overview-heading" className="text-lg font-semibold">
           Overview
         </h2>
-        <dl className="mt-3 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+        <dl className="mt-3 grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-slate-600">Agreed price (current)</dt>
             <dd className="font-medium">{formatMoney(project.agreed_price, project.currency)}</dd>
@@ -181,19 +194,21 @@ export function ProjectDetailPage() {
           </div>
           <div className="sm:col-span-2">
             <dt className="text-slate-600">Client contact</dt>
-            <dd className="break-words font-medium">{project.client_contact ?? 'Not recorded'}</dd>
+            <dd className="wrap-anywhere font-medium">
+              {project.client_contact ?? 'Not recorded'}
+            </dd>
           </div>
           {project.description && (
             <div className="sm:col-span-2">
               <dt className="text-slate-600">Description</dt>
-              <dd className="whitespace-pre-wrap break-words">{project.description}</dd>
+              <dd className="whitespace-pre-wrap wrap-anywhere">{project.description}</dd>
             </div>
           )}
           <div className="sm:col-span-2">
             <dt className="text-slate-600">Original scope</dt>
             <dd className="font-medium">
               {baseline
-                ? `Confirmed ${formatDateTime(baseline.confirmed_at)} · ${countLabel(baseline.scope_items.filter((i) => i.kind === 'deliverable').length, 'deliverable')}, ${countLabel(baseline.scope_items.filter((i) => i.kind === 'exclusion').length, 'exclusion')}`
+                ? `Confirmed ${formatDateTime(baseline.confirmed_at)} · ${countLabel(baseline.scope_items.filter((i) => i.kind === 'deliverable').length, 'deliverable')}, ${countLabel(baseline.scope_items.filter((i) => i.kind === 'exclusion').length, 'exclusion')} · Revisions: ${revisionAllowanceLabel(baseline.revision_allowance_type, baseline.revision_allowance_count)}`
                 : 'Not confirmed yet'}
             </dd>
           </div>

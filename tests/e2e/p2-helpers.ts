@@ -101,7 +101,11 @@ export async function axeScan(page: Page, testInfo: TestInfo, name: string) {
   }));
   writeFileSync(
     `${P2_OUT}/axe/${testInfo.project.name}-${name}.json`,
-    JSON.stringify({ url: page.url(), violations: summary, passes: results.passes.length }, null, 2),
+    JSON.stringify(
+      { url: page.url(), violations: summary, passes: results.passes.length },
+      null,
+      2,
+    ),
   );
   return summary;
 }
@@ -122,7 +126,9 @@ export async function noOverflow(page: Page, soft = false) {
     // innermost elements whose right edge passes the viewport (diagnostics for the report)
     const offenders = Array.from(document.querySelectorAll('main *'))
       .filter((el) => el.getBoundingClientRect().right > vw + 1)
-      .filter((el) => !Array.from(el.children).some((c) => c.getBoundingClientRect().right > vw + 1))
+      .filter(
+        (el) => !Array.from(el.children).some((c) => c.getBoundingClientRect().right > vw + 1),
+      )
       .slice(0, 8)
       .map((el) => {
         const r = el.getBoundingClientRect();

@@ -16,7 +16,7 @@ export function ItemList({ version, kind }: { version: ScopeVersion; kind: Scope
       ) : (
         <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
           {items.map((i) => (
-            <li key={i.id} className="break-words">
+            <li key={i.id} className="wrap-anywhere">
               {i.description}
             </li>
           ))}
@@ -30,7 +30,7 @@ export function ItemList({ version, kind }: { version: ScopeVersion; kind: Scope
 export function ScopeView({ version }: { version: ScopeVersion }) {
   return (
     <div className="space-y-4">
-      <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-3">
+      <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-3">
         <div>
           <dt className="text-slate-600">Agreed price</dt>
           <dd className="font-medium">{formatMoney(version.agreed_price, version.currency)}</dd>
@@ -52,7 +52,7 @@ export function ScopeView({ version }: { version: ScopeVersion }) {
       {version.summary && (
         <div>
           <h4 className="text-sm font-semibold text-slate-800">Summary</h4>
-          <p className="mt-1 whitespace-pre-wrap break-words text-sm">{version.summary}</p>
+          <p className="mt-1 whitespace-pre-wrap wrap-anywhere text-sm">{version.summary}</p>
         </div>
       )}
       <ItemList version={version} kind="deliverable" />
@@ -61,7 +61,7 @@ export function ScopeView({ version }: { version: ScopeVersion }) {
       {version.notes && (
         <div>
           <h4 className="text-sm font-semibold text-slate-800">Notes</h4>
-          <p className="mt-1 whitespace-pre-wrap break-words text-sm">{version.notes}</p>
+          <p className="mt-1 whitespace-pre-wrap wrap-anywhere text-sm">{version.notes}</p>
         </div>
       )}
     </div>

@@ -44,10 +44,27 @@ export function toApiError(err: unknown): ApiError {
   if (code === 'session_not_found' || code === 'PGRST301' || e.status === 401) {
     return new ApiError('not_authenticated');
   }
-  if (code === '23514' || code === '22001' || code === 'validation_failed')
+  // Database functions/triggers raise P0001 with a stable code as the whole message
+  // (supabase/migrations/*_projects_scope.sql). Anything else under P0001 stays 'unknown'.
+  if (code === 'P0001') {
+    return new ApiError(p0001Codes.get((e.message ?? '').trim()) ?? 'unknown');
+  }
+  // PGRST116: .single() matched no rows. 42501: RLS / permission denied. Both are shown as
+  // "not found" so a resource owned by someone else is indistinguishable from a missing one.
+  if (code === 'PGRST116' || code === '42501') return new ApiError('not_found');
+  if (code === '23514' || code === '22001' || code === '23502' || code === 'validation_failed')
     return new ApiError('validation');
   return new ApiError('unknown');
 }
+
+const p0001Codes = new Map<string, ApiErrorCode>([
+  ['not_found', 'not_found'],
+  ['already_confirmed', 'already_confirmed'],
+  ['empty_scope', 'empty_scope'],
+  ['project_archived', 'project_archived'],
+  ['scope_version_immutable', 'scope_locked'],
+  ['not_authenticated', 'not_authenticated'],
+]);
 
 export const errorMessages: Record<ApiErrorCode, string> = {
   invalid_credentials: 'Email or password is incorrect.',
