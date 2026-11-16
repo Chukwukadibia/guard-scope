@@ -27,7 +27,7 @@ Records technical and process decisions, plus recommendations for PRD §20 open 
 | 3 | Auth method | Email + password via Supabase Auth with email confirmation on (no magic-link only: it adds email-deliverability dependence and friction on shared devices). Social login is LATER | **Phase 1** | Accepted (HA-002) |
 | 4 | Link expiry | 30 days from send; the freelancer can reissue; revocation always available. Not user-customisable in MVP | Phase 5 | Open |
 | 5 | Client name/email on decision page | Not required; optional free-text comment only (data minimisation) | Phase 5 | Open |
-| 6 | Clarification workflow | Terminal for the version; the freelancer sends a new version (ARCHITECTURE §4.4) | Phase 4/5 | Open |
+| 6 | Clarification workflow | Terminal for the version; the freelancer sends a new version (ARCHITECTURE §4.4) | Phase 4/5 | **Accepted (HA-006): Option A** |
 | 7 | "Active" definitions | Active project = status `active`. Active change request = change order whose current version is `draft`, `pending` or `clarification_requested` | Phase 7 | Open |
 | 8 | Payment provider | Deferred; Phase 7 uses admin-set entitlements only (BILL-008) | Phase 7+ | Open |
 | 9 | Currencies / default | Offer all ISO 4217 codes via `Intl.supportedValuesOf('currency')`. Optional default currency in Settings, with no pre-filled value. Project currency is required on each project, pre-selected from the default if set, otherwise chosen by the user | **Phase 1** (profile field) | Accepted (HA-002) |
