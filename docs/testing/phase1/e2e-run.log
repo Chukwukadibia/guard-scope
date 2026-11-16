@@ -1,0 +1,200 @@
+
+> guardscope@0.0.0 test:e2e
+> playwright test --trace off --reporter=list --workers=2
+
+
+Running 76 tests using 2 workers
+
+  ✓   1 [desktop] › tests/e2e/auth-guard.spec.ts:28:5 › T-04 / AC-3 route guard › signed out, / redirects to /sign-in?next=… with no protected DOM (504ms)
+  ✓   3 [desktop] › tests/e2e/auth-guard.spec.ts:28:5 › T-04 / AC-3 route guard › signed out, /projects redirects to /sign-in?next=… with no protected DOM (333ms)
+  ✓   4 [desktop] › tests/e2e/auth-guard.spec.ts:28:5 › T-04 / AC-3 route guard › signed out, /settings redirects to /sign-in?next=… with no protected DOM (322ms)
+  ✓   2 [desktop] › tests/e2e/layout-a11y.spec.ts:46:5 › signed out pages › T-13/T-14 /sign-in: no overflow, 0 serious/critical axe, labelled inputs, heading order (1.3s)
+  ✓   6 [desktop] › tests/e2e/layout-a11y.spec.ts:46:5 › signed out pages › T-13/T-14 /register: no overflow, 0 serious/critical axe, labelled inputs, heading order (1.0s)
+  ✓   5 [desktop] › tests/e2e/auth-guard.spec.ts:38:3 › T-04 / AC-3 route guard › T-04: after sign-in the user reaches next=/projects (1.8s)
+  ✓   7 [desktop] › tests/e2e/layout-a11y.spec.ts:46:5 › signed out pages › T-13/T-14 /forgot-password: no overflow, 0 serious/critical axe, labelled inputs, heading order (845ms)
+  ✓   9 [desktop] › tests/e2e/layout-a11y.spec.ts:46:5 › signed out pages › T-13/T-14 /reset-password: no overflow, 0 serious/critical axe, labelled inputs, heading order (910ms)
+  ✓   8 [desktop] › tests/e2e/auth-guard.spec.ts:47:3 › T-04 / AC-3 route guard › AC-3: off-site next (//evil.example) is ignored after sign-in (1.4s)
+  ✓  10 [desktop] › tests/e2e/layout-a11y.spec.ts:46:5 › signed out pages › T-13/T-14 /p: no overflow, 0 serious/critical axe, labelled inputs, heading order (932ms)
+  ✓  12 [desktop] › tests/e2e/layout-a11y.spec.ts:46:5 › signed out pages › T-13/T-14 /no-such-page: no overflow, 0 serious/critical axe, labelled inputs, heading order (790ms)
+  ✓  11 [desktop] › tests/e2e/auth-guard.spec.ts:58:3 › T-03 / AC-2 sign out › sign out, then /settings redirects to /sign-in (2.3s)
+  ✓  13 [desktop] › tests/e2e/layout-a11y.spec.ts:65:5 › signed in pages › T-13/T-14 /: no overflow, 0 serious/critical axe, heading order (1.8s)
+  ✓  14 [desktop] › tests/e2e/auth-guard.spec.ts:77:3 › T-06 / AC-4 invalid or expired session › tampered access token → sign-in with "session has ended" (2.1s)
+  ✓  15 [desktop] › tests/e2e/layout-a11y.spec.ts:65:5 › signed in pages › T-13/T-14 /projects: no overflow, 0 serious/critical axe, heading order (1.9s)
+  ✓  16 [desktop] › tests/e2e/auth-guard.spec.ts:93:3 › T-06 / AC-4 invalid or expired session › expired access token with invalid refresh token → "session has ended" (2.2s)
+  ✓  17 [desktop] › tests/e2e/layout-a11y.spec.ts:65:5 › signed in pages › T-13/T-14 /settings: no overflow, 0 serious/critical axe, heading order (3.6s)
+  ✓  19 [desktop] › tests/e2e/layout-a11y.spec.ts:83:3 › signed in pages › T-13 / AC-9: main navigation is keyboard-operable, with visible focus (AC-10) (2.3s)
+  ✓  20 [desktop] › tests/e2e/layout-a11y.spec.ts:139:3 › signed in pages › AC-9: mobile nav reachable, desktop nav visible (1.3s)
+  ✓  21 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:22:3 › T-17 / §6 offline › sign-in page offline: banner shown, submit disabled; back online re-enables (395ms)
+  ✘  18 [desktop] › tests/e2e/auth-guard.spec.ts:107:3 › T-06 / AC-4 invalid or expired session › stored token removed, then reload → sign-in with "session has ended" (AC-4 wording) (6.3s)
+  ✓  22 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:34:3 › T-17 / §6 offline › register and forgot-password offline: auth actions disabled (454ms)
+  ✓  23 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:49:5 › T-17 / §6 offline › signed in › app shell offline: banner shown, Save settings disabled (2.3s)
+  ✓  25 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:61:3 › T-18 / §6 double submit › double-clicking Sign in sends exactly one password-grant request (2.5s)
+  ✓  26 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:81:3 › T-19 / §6 multiple tabs › signing out in one tab sends the other tab to sign-in (3.0s)
+  ✓  24 [desktop] › tests/e2e/settings-and-empty-states.spec.ts:11:3 › T-11 / AC-8 settings persist (BR-4) › currency starts "Not set"; name + EUR persist after reload; then reset (7.8s)
+  ✓  27 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:104:3 › T-15 / AC-11 / BR-5 no enumeration in the UI › wrong password for existing vs non-existing email shows the identical generic message (2.3s)
+  ✓  28 [desktop] › tests/e2e/settings-and-empty-states.spec.ts:44:3 › T-12 / AC-8 settings validation › 121-character name gives a field error linked via aria-describedby; nothing is sent (2.4s)
+  ✓  30 [desktop] › tests/e2e/settings-and-empty-states.spec.ts:65:3 › T-12 / AC-8 settings validation › currency not in the list gives a field error linked via aria-describedby (1.7s)
+  ✘  31 [desktop] › tests/e2e/settings-and-empty-states.spec.ts:84:3 › T-12 / AC-8 settings validation › §6: validation errors are summarised on submit (3.8s)
+  ✓  32 [desktop] › tests/e2e/settings-and-empty-states.spec.ts:100:5 › T-16 / AC-12 empty states, no dead actions › / shows "No projects yet" and no non-functional actions (1.3s)
+  ✓  33 [desktop] › tests/e2e/settings-and-empty-states.spec.ts:100:5 › T-16 / AC-12 empty states, no dead actions › /projects shows "Projects will appear here" and no non-functional actions (1.3s)
+  ✓  34 [desktop] › tests/e2e/smoke.spec.ts:3:1 › public link placeholder renders without horizontal overflow (352ms)
+  ✓  35 [mobile] › tests/e2e/auth-guard.spec.ts:28:5 › T-04 / AC-3 route guard › signed out, / redirects to /sign-in?next=… with no protected DOM (322ms)
+  ✓  36 [mobile] › tests/e2e/auth-guard.spec.ts:28:5 › T-04 / AC-3 route guard › signed out, /projects redirects to /sign-in?next=… with no protected DOM (301ms)
+  ✓  37 [mobile] › tests/e2e/auth-guard.spec.ts:28:5 › T-04 / AC-3 route guard › signed out, /settings redirects to /sign-in?next=… with no protected DOM (339ms)
+  -  38 [mobile] › tests/e2e/auth-guard.spec.ts:38:3 › T-04 / AC-3 route guard › T-04: after sign-in the user reaches next=/projects
+  -  39 [mobile] › tests/e2e/auth-guard.spec.ts:47:3 › T-04 / AC-3 route guard › AC-3: off-site next (//evil.example) is ignored after sign-in
+  ✓  40 [mobile] › tests/e2e/auth-guard.spec.ts:58:3 › T-03 / AC-2 sign out › sign out, then /settings redirects to /sign-in (1.7s)
+  ✓  41 [mobile] › tests/e2e/auth-guard.spec.ts:77:3 › T-06 / AC-4 invalid or expired session › tampered access token → sign-in with "session has ended" (2.1s)
+  ✓  42 [mobile] › tests/e2e/auth-guard.spec.ts:93:3 › T-06 / AC-4 invalid or expired session › expired access token with invalid refresh token → "session has ended" (1.5s)
+  ✘  43 [mobile] › tests/e2e/auth-guard.spec.ts:107:3 › T-06 / AC-4 invalid or expired session › stored token removed, then reload → sign-in with "session has ended" (AC-4 wording) (6.3s)
+  ✓  44 [mobile] › tests/e2e/layout-a11y.spec.ts:46:5 › signed out pages › T-13/T-14 /sign-in: no overflow, 0 serious/critical axe, labelled inputs, heading order (916ms)
+  ✓  45 [mobile] › tests/e2e/layout-a11y.spec.ts:46:5 › signed out pages › T-13/T-14 /register: no overflow, 0 serious/critical axe, labelled inputs, heading order (933ms)
+  ✓  46 [mobile] › tests/e2e/layout-a11y.spec.ts:46:5 › signed out pages › T-13/T-14 /forgot-password: no overflow, 0 serious/critical axe, labelled inputs, heading order (909ms)
+  ✓  47 [mobile] › tests/e2e/layout-a11y.spec.ts:46:5 › signed out pages › T-13/T-14 /reset-password: no overflow, 0 serious/critical axe, labelled inputs, heading order (969ms)
+  ✓  48 [mobile] › tests/e2e/layout-a11y.spec.ts:46:5 › signed out pages › T-13/T-14 /p: no overflow, 0 serious/critical axe, labelled inputs, heading order (778ms)
+  ✓  49 [mobile] › tests/e2e/layout-a11y.spec.ts:46:5 › signed out pages › T-13/T-14 /no-such-page: no overflow, 0 serious/critical axe, labelled inputs, heading order (825ms)
+  ✓  50 [mobile] › tests/e2e/layout-a11y.spec.ts:65:5 › signed in pages › T-13/T-14 /: no overflow, 0 serious/critical axe, heading order (2.3s)
+  ✓  51 [mobile] › tests/e2e/layout-a11y.spec.ts:65:5 › signed in pages › T-13/T-14 /projects: no overflow, 0 serious/critical axe, heading order (2.3s)
+  ✓  52 [mobile] › tests/e2e/layout-a11y.spec.ts:65:5 › signed in pages › T-13/T-14 /settings: no overflow, 0 serious/critical axe, heading order (3.5s)
+  ✓  53 [mobile] › tests/e2e/layout-a11y.spec.ts:83:3 › signed in pages › T-13 / AC-9: main navigation is keyboard-operable, with visible focus (AC-10) (2.3s)
+  ✓  54 [mobile] › tests/e2e/layout-a11y.spec.ts:139:3 › signed in pages › AC-9: mobile nav reachable, desktop nav visible (1.3s)
+  ✓  55 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:22:3 › T-17 / §6 offline › sign-in page offline: banner shown, submit disabled; back online re-enables (321ms)
+  ✓  56 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:34:3 › T-17 / §6 offline › register and forgot-password offline: auth actions disabled (324ms)
+  ✓  57 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:49:5 › T-17 / §6 offline › signed in › app shell offline: banner shown, Save settings disabled (2.2s)
+  -  58 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:61:3 › T-18 / §6 double submit › double-clicking Sign in sends exactly one password-grant request
+  -  59 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:81:3 › T-19 / §6 multiple tabs › signing out in one tab sends the other tab to sign-in
+  -  60 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:104:3 › T-15 / AC-11 / BR-5 no enumeration in the UI › wrong password for existing vs non-existing email shows the identical generic message
+  -  61 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:119:3 › T-15 / AC-11 / BR-5 no enumeration in the UI › registering an already-registered email shows the same outcome as a new email (T-01 UI part)
+  ✓  62 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:142:3 › BR-1 client-side password rule › register with a 7-character password shows a field error and sends nothing (341ms)
+  -  63 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:161:3 › T-02 / BR-2 unconfirmed user (UI) › unconfirmed user with the correct password is blocked with the confirm-email message
+  -  64 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:180:3 › T-20 / AC-13 password reset request (UI part) › forgot-password shows the same neutral confirmation for registered and unknown emails
+  ✓  65 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:199:3 › T-20 / AC-13 password reset request (UI part) › /reset-password without a recovery session shows "Reset link not valid" (223ms)
+  -  66 [mobile] › tests/e2e/settings-and-empty-states.spec.ts:11:3 › T-11 / AC-8 settings persist (BR-4) › currency starts "Not set"; name + EUR persist after reload; then reset
+  ✓  67 [mobile] › tests/e2e/settings-and-empty-states.spec.ts:44:3 › T-12 / AC-8 settings validation › 121-character name gives a field error linked via aria-describedby; nothing is sent (1.9s)
+  ✓  68 [mobile] › tests/e2e/settings-and-empty-states.spec.ts:65:3 › T-12 / AC-8 settings validation › currency not in the list gives a field error linked via aria-describedby (2.3s)
+  ✘  69 [mobile] › tests/e2e/settings-and-empty-states.spec.ts:84:3 › T-12 / AC-8 settings validation › §6: validation errors are summarised on submit (3.8s)
+  ✓  70 [mobile] › tests/e2e/settings-and-empty-states.spec.ts:100:5 › T-16 / AC-12 empty states, no dead actions › / shows "No projects yet" and no non-functional actions (1.3s)
+  ✓  71 [mobile] › tests/e2e/settings-and-empty-states.spec.ts:100:5 › T-16 / AC-12 empty states, no dead actions › /projects shows "Projects will appear here" and no non-functional actions (1.2s)
+  ✓  72 [mobile] › tests/e2e/smoke.spec.ts:3:1 › public link placeholder renders without horizontal overflow (330ms)
+register outcomes: ["Check your email | GuardScope\n\nKnow what's included. Charge for what's extra.\n\nCheck your email\n\nSuccess:\nIf this email can be registered, we've sent a link to confirm your account. Open it, then sign in.\n\nGo to sign in","Check your email | GuardScope\n\nKnow what's included. Charge for what's extra.\n\nCheck your email\n\nSuccess:\nIf this email can be registered, we've sent a link to confirm your account. Open it, then sign in.\n\nGo to sign in"]
+  ✓  29 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:119:3 › T-15 / AC-11 / BR-5 no enumeration in the UI › registering an already-registered email shows the same outcome as a new email (T-01 UI part) (1.1m)
+  ✓  73 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:142:3 › BR-1 client-side password rule › register with a 7-character password shows a field error and sends nothing (413ms)
+T-02 message: Error:
+Please confirm your email address first. Check your inbox for the link.
+  ✓  74 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:161:3 › T-02 / BR-2 unconfirmed user (UI) › unconfirmed user with the correct password is blocked with the confirm-email message (1.2s)
+forgot-password outcomes: ["Success:\nIf an account exists for that email, we've sent a link to reset the password.","Success:\nIf an account exists for that email, we've sent a link to reset the password."]
+  ✓  75 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:180:3 › T-20 / AC-13 password reset request (UI part) › forgot-password shows the same neutral confirmation for registered and unknown emails (1.1m)
+  ✓  76 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:199:3 › T-20 / AC-13 password reset request (UI part) › /reset-password without a recovery session shows "Reset link not valid" (232ms)
+
+
+  1) [desktop] › tests/e2e/auth-guard.spec.ts:107:3 › T-06 / AC-4 invalid or expired session › stored token removed, then reload → sign-in with "session has ended" (AC-4 wording) 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('Your session has ended. Please sign in again.')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText('Your session has ended. Please sign in again.') with timeout 5000ms
+      - waiting for getByText('Your session has ended. Please sign in again.')
+
+
+      111 |     await page.reload();
+      112 |     await expect(page).toHaveURL(/\/sign-in\?next=%2Fsettings$/);
+    > 113 |     await expect(page.getByText(SESSION_ENDED)).toBeVisible();
+          |                                                 ^
+      114 |   });
+      115 | });
+      116 |
+        at /tmp/claude-0/-home-user-Legit-Predict/6a8ddc8f-b74e-5cc4-a1f8-4c2778fd4e59/scratchpad/guard-scope/tests/e2e/auth-guard.spec.ts:113:49
+
+    Error Context: test-results/auth-guard-T-06-AC-4-inval-68098-ion-has-ended-AC-4-wording--desktop/error-context.md
+
+  2) [desktop] › tests/e2e/settings-and-empty-states.spec.ts:84:3 › T-12 / AC-8 settings validation › §6: validation errors are summarised on submit 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('alert').or(locator('[role="status"]')).filter({ hasText: /120 characters|check|error/i })
+    Expected: 1
+    Received: 0
+    Timeout:  2000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('alert').or(locator('[role="status"]')).filter({ hasText: /120 characters|check|error/i }) with timeout 2000ms
+      - waiting for getByRole('alert').or(locator('[role="status"]')).filter({ hasText: /120 characters|check|error/i })
+        21 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      89 |     // A submit summary is an alert/status region in addition to the inline field message.
+      90 |     const summary = page.getByRole('alert').or(page.locator('[role="status"]')).filter({ hasText: /120 characters|check|error/i });
+    > 91 |     await expect(summary).toHaveCount(1, { timeout: 2000 });
+         |                           ^
+      92 |   });
+      93 | });
+      94 |
+        at /tmp/claude-0/-home-user-Legit-Predict/6a8ddc8f-b74e-5cc4-a1f8-4c2778fd4e59/scratchpad/guard-scope/tests/e2e/settings-and-empty-states.spec.ts:91:27
+
+    Error Context: test-results/settings-and-empty-states--60493-rs-are-summarised-on-submit-desktop/error-context.md
+
+  3) [mobile] › tests/e2e/auth-guard.spec.ts:107:3 › T-06 / AC-4 invalid or expired session › stored token removed, then reload → sign-in with "session has ended" (AC-4 wording) 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('Your session has ended. Please sign in again.')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText('Your session has ended. Please sign in again.') with timeout 5000ms
+      - waiting for getByText('Your session has ended. Please sign in again.')
+
+
+      111 |     await page.reload();
+      112 |     await expect(page).toHaveURL(/\/sign-in\?next=%2Fsettings$/);
+    > 113 |     await expect(page.getByText(SESSION_ENDED)).toBeVisible();
+          |                                                 ^
+      114 |   });
+      115 | });
+      116 |
+        at /tmp/claude-0/-home-user-Legit-Predict/6a8ddc8f-b74e-5cc4-a1f8-4c2778fd4e59/scratchpad/guard-scope/tests/e2e/auth-guard.spec.ts:113:49
+
+    Error Context: test-results/auth-guard-T-06-AC-4-inval-68098-ion-has-ended-AC-4-wording--mobile/error-context.md
+
+  4) [mobile] › tests/e2e/settings-and-empty-states.spec.ts:84:3 › T-12 / AC-8 settings validation › §6: validation errors are summarised on submit 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('alert').or(locator('[role="status"]')).filter({ hasText: /120 characters|check|error/i })
+    Expected: 1
+    Received: 0
+    Timeout:  2000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('alert').or(locator('[role="status"]')).filter({ hasText: /120 characters|check|error/i }) with timeout 2000ms
+      - waiting for getByRole('alert').or(locator('[role="status"]')).filter({ hasText: /120 characters|check|error/i })
+        21 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      89 |     // A submit summary is an alert/status region in addition to the inline field message.
+      90 |     const summary = page.getByRole('alert').or(page.locator('[role="status"]')).filter({ hasText: /120 characters|check|error/i });
+    > 91 |     await expect(summary).toHaveCount(1, { timeout: 2000 });
+         |                           ^
+      92 |   });
+      93 | });
+      94 |
+        at /tmp/claude-0/-home-user-Legit-Predict/6a8ddc8f-b74e-5cc4-a1f8-4c2778fd4e59/scratchpad/guard-scope/tests/e2e/settings-and-empty-states.spec.ts:91:27
+
+    Error Context: test-results/settings-and-empty-states--60493-rs-are-summarised-on-submit-mobile/error-context.md
+
+  4 failed
+    [desktop] › tests/e2e/auth-guard.spec.ts:107:3 › T-06 / AC-4 invalid or expired session › stored token removed, then reload → sign-in with "session has ended" (AC-4 wording) 
+    [desktop] › tests/e2e/settings-and-empty-states.spec.ts:84:3 › T-12 / AC-8 settings validation › §6: validation errors are summarised on submit 
+    [mobile] › tests/e2e/auth-guard.spec.ts:107:3 › T-06 / AC-4 invalid or expired session › stored token removed, then reload → sign-in with "session has ended" (AC-4 wording) 
+    [mobile] › tests/e2e/settings-and-empty-states.spec.ts:84:3 › T-12 / AC-8 settings validation › §6: validation errors are summarised on submit 
+  9 skipped
+  63 passed (2.9m)

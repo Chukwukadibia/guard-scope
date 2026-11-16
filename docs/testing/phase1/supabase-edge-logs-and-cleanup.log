@@ -1,0 +1,23 @@
+# Resumed Tester run, 2026-11-16. Source: mcp__Supabase__query_logs / execute_sql / get_advisors on eqozjuaaajstrewygqxr.
+
+## Edge logs for the e2e signup/recover calls (T-01/T-15/T-20 UI parts)
+2026-11-16T10:22:30Z POST 400 /auth/v1/signup  (new address t-e2e-new@guardscope.test; no auth.users row was created -> default SMTP refuses non-team addresses, OD-13)
+2026-11-16T10:23:32Z POST 200 /auth/v1/signup  (existing address a@guardscope.test; obfuscated response)
+2026-11-16T10:23:35Z POST 200 /auth/v1/recover (unknown address nobody-t20@guardscope.test)
+2026-11-16T10:24:37Z POST 400 /auth/v1/recover (existing address a@guardscope.test; send refused, OD-13)
+UI showed identical neutral messages in each pair (see e2e-run.log "register outcomes" / "forgot-password outcomes").
+
+## Static bundle check (T-10 / AC-7)
+npm run check:secrets -> "check:secrets: no privileged credentials in dist/"
+Only "sb_secret_" match in dist/ is supabase-js's key-prefix check (startsWith("sb_secret_")), not a key.
+
+## Security advisors (get_advisors type=security)
+1 finding: WARN auth_leaked_password_protection "Leaked Password Protection Disabled" (dashboard setting).
+No RLS / security-definer / search_path findings.
+
+## Cleanup
+delete from auth.users where email in ('t-pwlen@guardscope.test','t-unconfirmed@guardscope.test','t-e2e-new@guardscope.test');
+select u.email, p.display_name, p.default_currency from auth.users u left join public.profiles p on p.id=u.id order by u.email;
+ a@guardscope.test | null | null
+ b@guardscope.test | null | null
+Scratch files removed: ../tester.env, ../pw7.json, ../pgtap.sql
