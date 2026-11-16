@@ -153,3 +153,150 @@ None. O-1 needs a spec-owner decision on the +1 day tolerance.
 
 ## Decision
 **Not accepted at `6184f91`.** Fix D-2 (High: ordering of the audit trail) and D-1 (Medium: show from → to), then retest. Every other criterion passes: AC-1, 2, 4–11, and the security and isolation layers (123 tester pgTAP checks). O-1 and O-3 need a spec-owner decision or a small follow-up.
+
+---
+
+# Retest 1 (commit 18b3482)
+
+**Tester run mode:** separate subagent, fresh context. I verified the Debug Specialist's claims independently against FEATURE_SPEC (BR-5 as reworded per DEC-011), not against the fix notes.
+**Commit tested:** `18b3482` (branch `feature/p3-request-capture`). The Tester did not modify `src/` or `supabase/` and committed nothing.
+**Backend:** Supabase `guardscope-dev` (`eqozjuaaajstrewygqxr`). The applied migration `event_ordering` (stored version `20261116181650`) has statements byte-identical to `supabase/migrations/20261116170000_event_ordering.sql`.
+**Date:** 2026-11-16 · **Evidence:** `docs/testing/phase3/` (files named `*retest1*` unless stated)
+
+## How it was run
+| What | Command / method | Result | Evidence |
+|---|---|---|---|
+| Format, lint, typecheck, unit, build, secrets | `npm run check` | exit 0; unit **120/120** (12 files); `check:secrets` clean | console (re-runnable) |
+| pgTAP, all 7 files | `python3 -I scripts/pgtap-wrap.py <file>` → `execute_sql` (ROLLBACK) | event_ordering **11/11**, profiles_rls **12/12**, profiles_rls_tester **22/22**, projects_scope **32/32**, projects_scope_tester **80/80**, requests **32/32**, requests_tester **138/138** (123 + 15 new) → **327/327** | `pgtap-retest1.tap` |
+| Live schema of `activity_events` | catalog queries + new pgTAP O1–O15 | see "Schema" below | `schema-activity_events-retest1.log` |
+| D-2 concurrency, isolated | `npx playwright test tests/e2e/p3-classification.spec.ts -g concurrent --project=desktop --repeat-each=25 --workers=1` | **25/25 passed** | `e2e-p3-concurrency-retest1-repeat25.log`, `api-T03-concurrency-retest1.jsonl` |
+| D-2 DB check after the runs | SQL per request ordered by `seq` | 26/26 requests consistent (see D-2) | `sql-D2-retest1-verification.log` |
+| Full E2E (Phase 1 + 2 + 3) on clean data | `set -a && . ./.env.test.local && set +a && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium npm run test:e2e -- --trace off --workers=2 --reporter=list` | **197 passed, 0 failed, 25 skipped** (8.6 min) | `e2e-run-retest1.log` |
+| O-a network check | `npx playwright test tests/e2e/p3-retest1.spec.ts` (new) | 1 passed (desktop), 1 skipped (mobile, same network shape) | `e2e-retest1-Oa.log`, `e2e-retest1-Oa.jsonl` |
+| axe at 375 and 1280 incl. a 5-entry from → to history | `p3-a11y.spec.ts` (new state `request-history-from-to`) | **0 violations of any impact** in all 26 scans (13 states × 2 widths); no overflow | `axe/*.json`, `a11y-T10.jsonl`, `screenshots/*-T10-request-history-from-to.png` |
+| Security advisor | `get_advisors(security)` | no new findings | `supabase-advisors-retest1.log` |
+
+**Skips (25):** identical to the first run (same Phase 1/2 mobile skips, Phase 3 API-only tests on mobile, `p3-d2-evidence` ×2 needs env ids, `p2-account-deletion` ×2 needs a throwaway account). No new skip.
+**Passwords** came only from `.env.test.local` via the environment; I grepped `docs/testing/`, `tests/` and `features/` for both values: 0 hits.
+**Phase 1/2 evidence:** the full run overwrote files under `docs/testing/phase1/` and `docs/testing/phase2/`; I restored them with `git checkout -- docs/testing/phase1 docs/testing/phase2`. Phase 3 evidence files from the first run (axe JSON, T-03/T-10 screenshots, appended JSONL) were refreshed by this run; the originals remain at `c102946`.
+
+### Test changes (strengthened only; nothing weakened)
+- `tests/e2e/p3-classification.spec.ts`
+  - T-03 UI: the D-1 "from" check is now a **hard** assertion. New: for each classification entry, the text a screen reader gets (aria-hidden removed) must contain `Changed from <from> to <to>` and must not contain "→", and the arrow must be `aria-hidden`.
+  - Concurrency: the order checks are now **hard** (each from = previous to, first from = unclassified, last to = stored value). New hard checks: `seq` strictly increasing; `created_at` non-decreasing in `seq` order (microsecond precision); unique ids; exactly one `request.created`, and it comes first. New UI check: the request page shows the stored value as the badge and the last history entry ends "to <stored value>".
+- `tests/e2e/p3-helpers.ts`: `apiEvents` now reads in the app's order (`order=seq`) and returns `seq`.
+- `tests/e2e/p3-a11y.spec.ts`: the 200-char-title request now has 4 transitions; new axe/overflow state `request-history-from-to` with the history visible.
+- `tests/e2e/p3-retest1.spec.ts` (new): O-a. It checks that list queries on the project and request pages never select `internal_notes` and never return the note text, that the detail query still loads notes, and that the history query orders by `seq.asc`.
+- `tests/db/requests_tester.test.sql`: plan 123 → 138, new section O1–O15 (below).
+
+## Schema of `activity_events` (live)
+| Check | Result | pgTAP |
+|---|---|---|
+| `seq` bigint NOT NULL GENERATED ALWAYS AS IDENTITY | yes (`attidentity='a'`) | O1, event_ordering #2 |
+| `seq` unique | `activity_events_seq_key` unique index on `seq` alone; 0 duplicates | O2, O11 |
+| Explicit `seq` on INSERT/UPDATE, even as owner/superuser | rejected `428C9` | event_ordering #11, O9 |
+| `seq` client-writable | no (authenticated: SELECT only; anon: nothing) | event_ordering #3, O10, G4 |
+| `created_at` default | `clock_timestamp()` | O3, event_ordering #1 |
+| Guard trigger enabled after the backfill | `activity_events_guard` `tgenabled='O'`, BEFORE UPDATE and DELETE | O4, O5 |
+| Guard still blocks (superuser) | UPDATE summary, `SET seq = DEFAULT`, back-dating `created_at` → `P0001 activity_event_immutable`; DELETE → `P0001` | O6–O8, X5, dev #22 |
+| Indexes | `(entity_type, entity_id, seq)`, `(project_id, seq desc)` | catalog |
+| Whole-table invariants in the suite's transaction | `created_at` never decreases in `seq` order; every request's chain is unbroken in `seq` order; the latest event equals the stored value; `request.created` precedes all classifications | O12–O15 |
+
+## Verdicts on the fixes
+**D-2 (High): FIXED, verified.**
+- **26 concurrency runs** reproduced the original conditions: 10 parallel identical calls, then 12 parallel mixed calls (`additional`, `needs_clarification`, `included`). 25 runs were isolated and 1 ran inside the full suite with 2 workers.
+- **26/26 passed** with the order assertions now hard. Before the fix, the same test failed in 4/10, 3/5 and 1/3 runs.
+- DB check per request, ordered by `seq` (`sql-D2-retest1-verification.log`): 26 requests, **252** classification events (7–12 per request).
+
+| Check | Result |
+|---|---|
+| Chain unbroken (each from = previous to, first from = unclassified) | 26/26 |
+| Order by `seq` = order by `created_at` | 26/26 |
+| `created_at` strictly increasing in `seq` order | 26/26 |
+| Last event = stored classification | 26/26 |
+| Duplicate `seq` | 0 |
+| Duplicate rows | 0 |
+| `request.created` events | exactly one per request (26) |
+| 10 identical parallel calls | 1 event, every run |
+
+- **The race really occurred.** In 4/25 isolated runs the final transaction's start time (`requests.updated_at = now()`) was earlier than the previous event's `created_at`. That is exactly the waiting-on-lock condition that produced D-2 under `default now()`. This is a lower bound, because only the last transaction of each run can be checked this way.
+- UI: the request page badge equals the last history entry in every run.
+- After the full E2E run, the whole table (126 events) had 126 distinct `seq` values, and `created_at` was non-decreasing in `seq` order.
+
+**D-1 (Medium): FIXED, verified.**
+- History entries render the summary, then `<from> → <to>`, then the time, e.g. "Marked "Classify me" as Needs clarification / Included → Needs clarification" (`screenshots/*-T03-history.png`).
+- Screen readers get "Changed from Included to Needs clarification"; the arrow is `aria-hidden`.
+- The T-03 UI test now passes at both widths with hard assertions (it was 2 failures in the first run).
+- The first entry correctly reads "Not classified yet → Included". Non-classification events (`request.created`) show only their summary.
+- axe: 0 violations at 375 and 1280 with a 5-entry history and a 200-char unbroken title.
+
+**O-a (was O-3): RESOLVED.**
+- `listRequests` now selects `id, project_id, title, description, source_channel, received_on, classification, created_at, updated_at`.
+- I observed this on the wire (`e2e-retest1-Oa.jsonl`): 2 list queries, neither with `internal_notes` in the URL or the note text in the body.
+- The detail query still loads the notes, and they are shown on the request page. AC-5 still passes.
+
+**O-b (was O-1): ACCEPTED as specified.**
+- BR-5 now documents the server tolerance of UTC today + 1 (DEC-011), and the UI enforces local today.
+- Server: today+1 accepted, today+2 rejected on INSERT and UPDATE (tester pgTAP V1–V3). UI: future dates blocked (T-02 E2E, both widths).
+- Behaviour matches the reworded spec.
+
+## Acceptance criteria (retest 1)
+| Criterion | Result | Evidence |
+|---|---|---|
+| AC-1 create / persist / list | **PASS** | T-01 E2E ×2; pgTAP dev 1–3, tester V8/V12 |
+| AC-2 validation UI + server | **PASS** | T-02 E2E (UI ×2, API); tester V1–V17. BR-5 per DEC-011 (O-b) |
+| AC-3 classify → label + history (from → to, time); same value no entry; history immutable | **PASS** (was FAIL) | T-03 UI ×2 (from → to, hard); concurrency 26/26; API immutability; pgTAP C1–C19, X5, O1–O15, event_ordering 11/11 |
+| AC-4 direct classification / events writes rejected | **PASS** | `api-T03-T04.jsonl`; pgTAP dev 7, 13–15, tester G4, G6, E1–E3, V14, O9 |
+| AC-5 private label; notes only on the request row | **PASS** | T-05 E2E; O-a network check (list queries carry no notes) |
+| AC-6 revision usage | **PASS** | T-06 E2E; pgTAP U1–U12, R9–R13 |
+| AC-7 archived read-only (UI + server) | **PASS** | T-07 E2E; pgTAP R0–R13 |
+| AC-8 B / anon isolation | **PASS** | T-08 E2E; pgTAP B1–B14, R7b, N1–N7 |
+| AC-9 no money; Additional hint, no dead action | **PASS** | T-09 E2E; pgTAP G17, C18 |
+| AC-10 axe, keyboard, no overflow at 375/1280 | **PASS** | 26 scans, 0 violations of any impact (incl. new history state); keyboard test ×2 |
+| AC-11 Phase 1 + 2 regression | **PASS** | full run 197 passed / 0 failed; pgTAP 12/22/32/80 |
+
+## Test scenarios (retest 1)
+| ID | Result | Evidence |
+|---|---|---|
+| T-01 | PASS | see AC-1 |
+| T-02 | PASS | see AC-2 |
+| T-03 | **PASS** (was FAIL) | D-1 and D-2 verified above |
+| T-04 | PASS | see AC-4 |
+| T-05 | PASS | see AC-5 (O-3/O-a resolved) |
+| T-06 | PASS | see AC-6 |
+| T-07 | PASS | see AC-7 |
+| T-08 | PASS | see AC-8 |
+| T-09 | PASS | see AC-9 |
+| T-10 | PASS | see AC-10 |
+| T-11 | PASS | see AC-11 |
+
+## New defects
+None.
+
+## Observations (no defect raised)
+- **O-c:** The migration is recorded remotely as version `20261116181650`, but the repo file is `20261116170000_event_ordering.sql`. This is the same pattern as every earlier migration (e.g. profiles `20261116091814` vs `…100000`), so it is not new. The SQL bodies are identical. A future `supabase db push` / `migration list` against this project would show a mismatch; the Team Lead may want to reconcile it before release.
+- **O-d:** `seq` guarantees the true order *per request*, because `classify_request` holds the row lock until commit. Across different entities, which are not serialised against each other, `seq` reflects insert order, not commit order. This is harmless for the per-request history the spec requires. A future project-wide activity feed (Phase 5) should keep that in mind. In practice `created_at` and `seq` agreed across all 126 events of the full run.
+- O-2 and O-4 to O-7 from the first run are unchanged and still need no action.
+
+## Security advisor
+Same two findings as before (`authenticated_security_definer_function_executable` for `classify_request`, `confirm_scope`, `delete_my_account`; `auth_leaked_password_protection`). Both are dispositioned in `docs/security/ADVISOR_NOTES.md`, so there are **no new findings**. Nothing relates to `activity_events` or `seq`.
+
+## Cleanup (retest 1)
+- Using the test-only bypass (`guardscope.account_deletion`), I deleted all projects of a@ and b@, once before the full run and once at the end (`sql-cleanup-retest1.log`).
+- Final state:
+  - only `a@guardscope.test` and `b@guardscope.test` exist;
+  - projects, versions, items, requests, events and usages are all 0;
+  - both profiles have null fields.
+- The pgTAP users were rolled back.
+
+## Files added or changed by the Tester (retest 1)
+- `tests/db/requests_tester.test.sql`
+- `tests/e2e/p3-classification.spec.ts`
+- `tests/e2e/p3-helpers.ts`
+- `tests/e2e/p3-a11y.spec.ts`
+- `tests/e2e/p3-retest1.spec.ts` (new)
+- `docs/testing/phase3/**`
+- this report
+
+## Final acceptance decision (retest 1)
+**ACCEPTED at `18b3482`.** D-1 and D-2 are fixed and independently verified. AC-1 to AC-11 and T-01 to T-11 pass. The regression is clean: 197/197 E2E executed passed, 327/327 pgTAP and 120/120 unit tests. There are no new defects and no new advisor findings. ISS-014 and ISS-015 can be closed as "verified by Tester Phase 3 retest 1 (18b3482)". O-c is a release-hygiene note for the Team Lead and does not block acceptance.

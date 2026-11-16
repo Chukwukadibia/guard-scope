@@ -3,7 +3,7 @@
 -- Keep every assertion on ONE line (the wrapper rewrites lines that start with select ok/is/throws_ok/lives_ok).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(123);
+select plan(138);
 
 insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
 values
@@ -202,6 +202,22 @@ select lives_ok($$update public.requests set title = repeat('q', 200) where id =
 select lives_ok($$select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-0000000000a4","role":"authenticated"}', true)$$, 'X9 impersonate A for long-title classify');
 select lives_ok($$select public.classify_request(current_setting('t.r1')::uuid, 'needs_clarification')$$, 'X10 classify a 200-char-title request (summary truncated, fits 300)');
 select ok((select bool_and(updated_at >= created_at) from public.requests), 'X11 updated_at never before created_at');
+-- ===================== O: event ordering (Phase 3 retest 1, D-2 / ISS-015) =====================
+select ok((select attidentity = 'a' and attnotnull and atttypid = 'bigint'::regtype from pg_attribute where attrelid = 'public.activity_events'::regclass and attname = 'seq'), 'O1 seq is bigint NOT NULL GENERATED ALWAYS AS IDENTITY');
+select ok(exists (select 1 from pg_index i where i.indrelid = 'public.activity_events'::regclass and i.indisunique and i.indnkeyatts = 1 and i.indkey[0] = (select attnum from pg_attribute where attrelid = 'public.activity_events'::regclass and attname = 'seq')), 'O2 a unique index covers seq alone');
+select is((select pg_get_expr(d.adbin, d.adrelid) from pg_attrdef d join pg_attribute a on a.attrelid = d.adrelid and a.attnum = d.adnum where d.adrelid = 'public.activity_events'::regclass and a.attname = 'created_at'), 'clock_timestamp()', 'O3 created_at defaults to clock_timestamp() (insert time, not transaction start)');
+select is((select tgenabled::text from pg_trigger where tgrelid = 'public.activity_events'::regclass and tgname = 'activity_events_guard'), 'O', 'O4 append-only guard trigger is enabled (tgenabled = O) after the backfill');
+select ok((select (tgtype & 2) = 2 and (tgtype & 8) = 8 and (tgtype & 16) = 16 from pg_trigger where tgrelid = 'public.activity_events'::regclass and tgname = 'activity_events_guard'), 'O5 guard fires BEFORE UPDATE and DELETE');
+select throws_ok($$update public.activity_events set summary = 'rewritten' where project_id = current_setting('t.p1')::uuid$$, 'P0001', 'activity_event_immutable', 'O6 superuser UPDATE of an event is still blocked by the guard');
+select throws_ok($$update public.activity_events set seq = default where project_id = current_setting('t.p1')::uuid$$, 'P0001', 'activity_event_immutable', 'O7 re-numbering seq (SET seq = DEFAULT) is blocked by the guard');
+select throws_ok($$update public.activity_events set created_at = now() - interval '1 day' where project_id = current_setting('t.p1')::uuid$$, 'P0001', 'activity_event_immutable', 'O8 back-dating created_at is blocked by the guard');
+select throws_ok($$update public.activity_events set seq = 1 where project_id = current_setting('t.p1')::uuid$$, '428C9', null, 'O9 explicit seq value rejected on UPDATE (GENERATED ALWAYS)');
+select ok(has_column_privilege('authenticated', 'public.activity_events', 'seq', 'select') and not has_column_privilege('anon', 'public.activity_events', 'seq', 'select'), 'O10 seq readable by authenticated (reader orders by it), not by anon');
+select is((select count(*)::int from (select seq from public.activity_events group by seq having count(*) > 1) d), 0, 'O11 no duplicate seq values');
+select ok((select coalesce(bool_and(prev_c is null or prev_c <= created_at), true) from (select created_at, lag(created_at) over (order by seq) as prev_c from public.activity_events) x), 'O12 created_at never decreases in seq order (whole table, incl. this suite)');
+select ok((select coalesce(bool_and(f = coalesce(prev_t, 'unclassified')), true) from (select metadata ->> 'from' as f, lag(metadata ->> 'to') over (partition by entity_id order by seq) as prev_t from public.activity_events where event_type = 'request.classified') x), 'O13 every request: each from equals the previous to in seq order (first from = unclassified)');
+select ok((select coalesce(bool_and(r.classification = coalesce((select e.metadata ->> 'to' from public.activity_events e where e.entity_id = r.id and e.event_type = 'request.classified' order by e.seq desc limit 1), 'unclassified')), true) from public.requests r), 'O14 every request: latest event by seq equals the stored classification');
+select ok((select coalesce(bool_and(c.seq < e.seq), true) from public.activity_events c join public.activity_events e on e.entity_id = c.entity_id and e.event_type = 'request.classified' where c.event_type = 'request.created'), 'O15 request.created precedes every classification of that request in seq order');
 select throws_ok($$delete from public.projects where id = current_setting('t.p1')::uuid$$, 'P0001', null, 'X12 a project with history/confirmed scope cannot be deleted outside account deletion');
 select set_config('guardscope.account_deletion', 'on', true);
 select lives_ok($$delete from public.projects where id = current_setting('t.p1')::uuid$$, 'X13 with the deletion flag, project + requests + usages + events cascade');

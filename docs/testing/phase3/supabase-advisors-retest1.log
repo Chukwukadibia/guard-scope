@@ -1,0 +1,7 @@
+# get_advisors(security) on eqozjuaaajstrewygqxr, 2026-11-16 (after migration event_ordering), Phase 3 retest 1
+WARN authenticated_security_definer_function_executable (count 3):
+  public.classify_request(p_request_id uuid, p_classification text)
+  public.confirm_scope(p_version_id uuid)
+  public.delete_my_account()
+WARN auth_leaked_password_protection (Auth)
+# Both are dispositioned in docs/security/ADVISOR_NOTES.md (rows 5-6). No new findings; nothing on activity_events / seq.

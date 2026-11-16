@@ -2,6 +2,10 @@
 
 All notable project changes, newest first. Feature-level detail lives in `features/<feature>/CHANGELOG.md`.
 
+## 2026-11-16 — Phase 3 (request capture & classification)
+- Quick request capture with private notes; freelancer-only classification with an append-only, write-ordered history (from → to); revision usage tracking against the confirmed allowance.
+- Independent testing: 1 fix cycle (D-1 Medium, D-2 High history ordering). Accepted.
+
 ## 2026-11-16 — Phase 2 (projects & original scope)
 - Projects (create/edit/complete/archive/reopen), the scope draft, confirmed original baseline and later versions (immutable in the database), Dashboard count and New project action, account deletion.
 - Independent testing: 1 fix cycle (D-1 to D-5). Accepted.

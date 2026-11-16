@@ -89,7 +89,9 @@ test('T-10 axe + overflow on every Phase 3 page and state', async ({
     });
     await apiClassify(page, token, ids[c], c);
   }
-  await apiClassify(page, token, longId, 'included');
+  // retest 1 (D-1): a multi-entry from -> to history with the 200-char unbroken title
+  for (const c of ['included', 'needs_clarification', 'additional', 'included'])
+    await apiClassify(page, token, longId, c);
   for (let i = 0; i < 2; i++)
     await rest(page, token, 'POST', '/rest/v1/revision_usages', {
       project_id: pid,
@@ -106,7 +108,14 @@ test('T-10 axe + overflow on every Phase 3 page and state', async ({
 
   // 4. request detail in each state
   await openRequest(page, pid, longId);
+  const history = page.getByRole('region', { name: 'History' });
+  await expect(history.getByRole('listitem')).toHaveCount(5);
+  await expect(history.getByRole('listitem').nth(2)).toContainText(
+    /Changed from Included\s*→?\s*to Needs clarification/,
+  );
+  await history.scrollIntoViewIfNeeded();
   await check('request-included-long-text');
+  await check('request-history-from-to');
   await page.getByRole('button', { name: 'Edit request' }).click();
   await check('request-edit-form');
   for (const c of ['additional', 'needs_clarification']) {

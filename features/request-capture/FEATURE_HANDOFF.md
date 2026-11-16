@@ -1,0 +1,31 @@
+# Phase 3 — Request Capture & Classification — Handoff
+
+- **Branch / commit:** `feature/p3-request-capture` (from `feature/p2-projects-and-scope`, which includes `main`). Product code accepted at `18b3482`.
+- **Migrations** (dev):
+  - `20261116160000_requests.sql`: `requests`, append-only `activity_events`, `revision_usages`, event triggers, `classify_request`.
+  - `20261116170000_event_ordering.sql`: write-time `created_at` (`clock_timestamp()`) and `seq` identity ordering.
+  - Remote version numbers differ from the file names; see ISS-016.
+- **Contracts** (`src/lib/api/`):
+  - `requests.ts`: list (no private notes), get, create, update, `classifyRequest`.
+  - `revisions.ts`: list, record, undo.
+  - `activity.ts`: `listEntityEvents`, ordered by `seq`.
+- **DB rules:**
+  - Classification changes only via the RPC (no-op for the same value).
+  - Events are append-only and immutable, ordered by `seq`.
+  - Revision usage only after a scope is confirmed, and only linked to requests in the same project.
+  - Archived projects are read-only.
+  - `received_on` ≤ UTC today + 1 (DEC-011).
+- **UI:**
+  - Requests section on the project page: quick capture, classification filter.
+  - Request page: scope comparison, freelancer decision, from → to history, edit.
+  - Revisions panel: allowance, used, remaining / over-use, record and undo.
+- **Tests:**
+  - Unit 120.
+  - pgTAP 327 across 7 files.
+  - E2E 197 passed / 0 failed / 25 deliberate skips.
+  - axe 0 violations in 26 scans.
+  - Concurrency 26/26.
+- **Known observations:**
+  - `seq` order is meaningful within a request. A project-wide feed (Phase 6) should order by `seq` globally and understand that it is write order.
+  - History reads are capped at 200 events per entity.
+- **Next:** Phase 4 (change orders), which will turn "Additional" requests into versioned proposals.

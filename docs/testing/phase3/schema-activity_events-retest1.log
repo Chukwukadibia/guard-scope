@@ -1,0 +1,11 @@
+# Live schema of public.activity_events (eqozjuaaajstrewygqxr), Phase 3 retest 1
+applied migration: version 20261116181650 name event_ordering (repo file 20261116170000_event_ordering.sql);
+  stored statements are byte-identical to the repo file (compared via supabase_migrations.schema_migrations.statements).
+created_at default : clock_timestamp()
+seq                : bigint, NOT NULL, attidentity = 'a' (GENERATED ALWAYS AS IDENTITY); sequence activity_events_seq_seq
+indexes            : activity_events_pkey (id) UNIQUE | activity_events_seq_key (seq) UNIQUE
+                     | activity_events_entity_idx (entity_type, entity_id, seq) | activity_events_project_idx (project_id, seq DESC)
+triggers           : activity_events_guard tgenabled = 'O' (enabled), BEFORE UPDATE OR DELETE (pgTAP O4/O5)
+guard behaviour    : superuser UPDATE summary / SET seq = DEFAULT / back-date created_at -> P0001 activity_event_immutable;
+                     DELETE -> P0001 (X5); explicit seq on INSERT/UPDATE -> 428C9 (event_ordering #11, O9)
+grants             : authenticated SELECT only (G4) incl. seq; anon none

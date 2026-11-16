@@ -1,0 +1,8 @@
+
+Running 2 tests using 2 workers
+
+  -  2 [mobile] › tests/e2e/p3-retest1.spec.ts:29:1 › O-a: project and request pages never fetch internal_notes in list queries; history read by seq
+  ✓  1 [desktop] › tests/e2e/p3-retest1.spec.ts:29:1 › O-a: project and request pages never fetch internal_notes in list queries; history read by seq (6.3s)
+
+  1 skipped
+  1 passed (18.4s)

@@ -1,0 +1,28 @@
+# Phase 3 retest 1 (commit 18b3482) - D-2 DB verification after 25 concurrency runs
+# Source: e2e-p3-concurrency-retest1-repeat25.log (25/25 passed), request title 'Race', one request per run.
+# Each run: 10 parallel classify_request('included') then 12 parallel calls cycling additional/needs_clarification/included.
+# Query (superuser, execute_sql): per request, classification events ordered by seq:
+#   chain_ok          = every from equals the previous to (first from = unclassified)
+#   seq_eq_created    = row_number() by seq equals row_number() by (created_at, seq)
+#   created_strict    = created_at strictly increasing in seq order
+#   last_ok           = last event (by seq) 'to' equals requests.classification
+#   seq_unique        = no duplicate seq
+#   contention_evidence = requests.updated_at (= now() of the LAST applying transaction, i.e. its start time)
+#                         is earlier than the created_at of the previous event: that transaction started before the
+#                         previous change was written and waited on the row lock (the D-2 trigger condition).
+#   dup_rows          = identical (entity, metadata, created_at) rows
+requests=25 class_events=243 min_ev_per_request=7 max_ev_per_request=12
+chain_ok=25/25 seq_eq_created=25/25 created_strict=25/25 last_ok=25/25 seq_unique=25/25
+request.created events=25 (one per request) dup_rows=0
+contention_evidence=4/25 (lower bound: only the final transaction of each run can be checked this way)
+# Per-request chains (seq:from>to@created_at) were inspected; all 25 form one path ending at the stored value.
+# Example 29af9a4e stored=needs_clarification:
+# 282:unclassified>included | 283:included>needs_clarification | 284:needs_clarification>additional | 285:additional>included
+# | 286:included>needs_clarification | 287:needs_clarification>included | 288:included>additional | 289:additional>needs_clarification
+# | 290:needs_clarification>additional | 291:additional>needs_clarification   (created_at 18:47:24.948323 .. 18:47:25.921201, increasing)
+
+# Run 26: the concurrency test inside the full E2E run (e2e-run-retest1.log, workers=2, other suites in parallel)
+request 1d9553ce stored=needs_clarification class_events=9 chain_ok=true created_strict=true last_ok=true
+whole activity_events table after the full run: 126 events, 126 distinct seq; created_at non-decreasing in seq order: true
+# Totals for retest 1: 26 concurrency runs (25 isolated + 1 in the full suite), 26/26 requests consistent, 252 classification events,
+# 0 chain breaks, 0 seq/created_at disagreements, 0 last-entry mismatches, 0 duplicates. (Before the fix: 4/10, 3/5, 1/3 runs failed.)

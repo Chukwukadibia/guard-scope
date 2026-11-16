@@ -1,0 +1,7 @@
+# Phase 3 retest 1 cleanup (superuser, execute_sql), after the full E2E run and the O-a run
+begin; select set_config('guardscope.account_deletion','on',true);
+delete from public.projects where owner_id in (select id from auth.users where email in ('a@guardscope.test','b@guardscope.test'));
+commit;
+# Result: projects=0 versions=0 items=0 requests=0 events=0 usages=0; users = a@guardscope.test, b@guardscope.test;
+# profiles=2, both with null display_name and default_currency. (Same cleanup was also run once before the full E2E run.)
+# pgTAP users were created inside ROLLBACK transactions and never persisted.

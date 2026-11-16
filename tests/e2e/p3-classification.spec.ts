@@ -30,6 +30,14 @@ test.afterEach(async ({ page }) => {
   await archiveTracked(page, tracked);
 });
 
+/** Microseconds since epoch from a PostgREST timestamptz (keeps the sub-millisecond part). */
+const micros = (ts: string): bigint => {
+  const m = /^(.*T\d{2}:\d{2}:\d{2})(?:\.(\d+))?(.*)$/.exec(ts);
+  if (!m) throw new Error(`bad timestamp ${ts}`);
+  const zone = m[3] || 'Z';
+  return BigInt(Date.parse(m[1] + zone)) * 1000n + BigInt((m[2] ?? '').padEnd(6, '0').slice(0, 6));
+};
+
 const label: Record<string, string> = {
   unclassified: 'Not classified yet',
   included: 'Included',
@@ -106,11 +114,34 @@ test.describe('T-03 / AC-3 classify and history', () => {
       'additional>included',
     ]);
 
-    // AC-3: the entry shows from -> to. The UI must state what it changed FROM.
+    // AC-3: the entry shows from -> to. The UI must state what it changed FROM (retest 1: hard).
     for (const e of entryTexts)
-      expect
-        .soft(e.text, `history entry for ${e.from} -> ${e.to} should name the previous value`)
-        .toContain(label[e.from]);
+      expect(
+        e.text,
+        `history entry for ${e.from} -> ${e.to} should name the previous value`,
+      ).toContain(label[e.from]);
+    // Screen readers: each classification entry reads "Changed from <from> to <to>" (arrow hidden).
+    const after = historyRegion(page).getByRole('listitem');
+    for (let i = 0; i < entryTexts.length; i++) {
+      const e = entryTexts[i];
+      const li = after.nth(i + 1);
+      const spoken = (
+        await li.evaluate((el) => {
+          const walk = (n: Node): string =>
+            n.nodeType === Node.TEXT_NODE
+              ? (n.textContent ?? '')
+              : (n as Element).getAttribute?.('aria-hidden') === 'true'
+                ? ''
+                : Array.from(n.childNodes).map(walk).join('');
+          return walk(el);
+        })
+      ).replace(/\s+/g, ' ');
+      expect(spoken, `spoken text of entry ${i + 1}`).toContain(
+        `Changed from ${label[e.from]} to ${label[e.to]}`,
+      );
+      expect(spoken).not.toContain('→');
+      await expect(li.locator('[aria-hidden="true"]')).toHaveText('→');
+    }
   });
 
   test('API: same value twice adds no event; history cannot be edited or deleted', async ({
@@ -255,12 +286,41 @@ test.describe('T-03 / AC-3 classify and history', () => {
     for (const k of Object.keys(bal)) if (bal[k] === 0) delete bal[k];
     expect(bal).toEqual(expectedBal);
     expect(chain.filter(([f]) => f === 'unclassified')).toHaveLength(1);
-    // Order (soft): the history is read ordered by created_at; each entry's "from" should equal the
-    // previous entry's "to". created_at = now() (transaction start) may not follow commit order.
-    expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+    // Order (hard since retest 1, D-2 / ISS-015): read in the app's order (seq), each entry's "from"
+    // equals the previous entry's "to", and the last entry equals the stored value.
+    expect(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
     for (let i = 1; i < chain.length; i++)
-      expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
-    expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      expect(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+    expect(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+    // seq strictly increasing and unique; created_at order agrees with seq order.
+    const all = await apiEvents(page, token, rid);
+    for (let i = 1; i < all.length; i++) {
+      expect(all[i].seq, `seq increases at ${i}`).toBeGreaterThan(all[i - 1].seq);
+      expect(
+        micros(all[i].created_at),
+        `created_at non-decreasing in seq order at ${i}`,
+      ).toBeGreaterThanOrEqual(micros(all[i - 1].created_at));
+    }
+    expect(new Set(all.map((e) => e.id)).size).toBe(all.length);
+    expect(all.filter((e) => e.event_type === 'request.created')).toHaveLength(1);
+    expect(all[0].event_type).toBe('request.created');
+    logEvidence('api-T03-concurrency-retest1.jsonl', testInfo, 'seq order', {
+      requestId: rid,
+      finalValue,
+      events: all.map((e) => ({
+        seq: e.seq,
+        created_at: e.created_at,
+        type: e.event_type,
+        from: e.metadata.from,
+        to: e.metadata.to,
+      })),
+    });
+    // UI: the request page shows the stored value and a history whose last entry ends at it.
+    await openRequest(page, pid, rid);
+    const items = historyRegion(page).getByRole('listitem');
+    await expect(items).toHaveCount(all.length);
+    await expect(items.last()).toContainText(`to ${label[finalValue]}`);
+    await expect(page.locator('h1').locator('..').locator('..')).toContainText(label[finalValue]);
   });
 });
 

@@ -1,0 +1,31 @@
+
+Running 25 tests using 1 worker
+
+  ✓   1 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (6.8s)
+  ✓   2 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (6.5s)
+  ✓   3 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (6.4s)
+  ✓   4 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (5.7s)
+  ✓   5 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (5.0s)
+  ✓   6 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (5.3s)
+  ✓   7 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (6.2s)
+  ✓   8 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (4.8s)
+  ✓   9 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (5.8s)
+  ✓  10 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (5.2s)
+  ✓  11 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (6.2s)
+  ✓  12 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (5.9s)
+  ✓  13 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (5.1s)
+  ✓  14 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (6.4s)
+  ✓  15 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (6.0s)
+  ✓  16 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (6.2s)
+  ✓  17 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (5.2s)
+  ✓  18 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (5.2s)
+  ✓  19 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (5.6s)
+  ✓  20 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (4.7s)
+  ✓  21 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (4.3s)
+  ✓  22 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (4.4s)
+  ✓  23 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (6.2s)
+  ✓  24 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (5.8s)
+  ✓  25 [desktop] › tests/e2e/p3-classification.spec.ts:211:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (6.3s)
+
+  25 passed (3.3m)
+EXIT=0

@@ -80,11 +80,12 @@ export async function apiEvents(page: Page, token: string, entityId: string) {
     page,
     token,
     'GET',
-    `/rest/v1/activity_events?select=*&entity_id=eq.${entityId}&order=created_at`,
+    `/rest/v1/activity_events?select=*&entity_id=eq.${entityId}&order=seq`,
   );
   expect(r.status).toBe(200);
   return r.body as {
     id: string;
+    seq: number;
     event_type: string;
     summary: string;
     metadata: Record<string, unknown>;
