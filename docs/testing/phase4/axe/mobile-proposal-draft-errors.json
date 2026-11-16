@@ -1,0 +1,14 @@
+{
+  "url": "http://localhost:4173/projects/8ac7dabd-81ed-4fd5-a0eb-68f7326c6300/changes/4f0cbc12-0835-40f5-aa58-794a82922974",
+  "violations": [
+    {
+      "id": "empty-heading",
+      "impact": "minor",
+      "help": "Headings should not be empty",
+      "nodes": [
+        "h4"
+      ]
+    }
+  ],
+  "passes": 46
+}

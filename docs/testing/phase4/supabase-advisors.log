@@ -1,0 +1,6 @@
+# Supabase security advisor, guardscope-dev, 2026-11-16 (after Phase 4 migration), commit bc96c8b
+WARN authenticated_security_definer_function_executable (8): cancel_change_order_version, classify_request, confirm_scope,
+     create_change_order, delete_my_account, discard_change_order_draft, new_change_order_version, send_change_order_version
+     -> all listed as Intentional in docs/security/ADVISOR_NOTES.md. _lock_change_order is NOT flagged (not executable; also pgTAP G8/G12, API T-09 403/401).
+WARN auth_leaked_password_protection (1) -> accepted, ISS-008 (dashboard setting).
+No ERROR-level lints. No new unaccepted findings.

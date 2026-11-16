@@ -1,0 +1,14 @@
+{
+  "url": "http://localhost:4173/projects/4ec35a12-726f-4c15-8186-c230a1ed4982",
+  "violations": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": [
+        ".border-2 > .flex-wrap.flex.gap-2 > .bg-brand-600.text-white.hover\\:bg-brand-700"
+      ]
+    }
+  ],
+  "passes": 44
+}

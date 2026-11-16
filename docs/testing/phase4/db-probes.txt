@@ -1,0 +1,8 @@
+# DB probes (single transaction, ROLLBACK), guardscope-dev, commit bc96c8b, 2026-11-16
+yesterday_deadline_send                 = pending   (proposed_deadline = current_date - 1 is accepted at send; documented 1-day TZ tolerance in send_change_order_version)
+price_10.005_stored_as                  = 10.01     (numeric(14,2) rounds silently; no 3-dp rejection at DB level)
+time_1.005_stored_as                    = 1.01      (numeric(8,2) rounds silently)
+postgrest_json_version                  = {"price_impact":10.01,"time_impact_value":1.01}   (JSON numbers, ISS-017 precondition)
+postgrest_json_project                  = {"agreed_price":400.00}                            (JSON number, ISS-017 precondition)
+superuser_created_by_change_after_send  = allowed   (created_by not in guard; not a content column; no client grant)
+superuser_id_change_after_send          = allowed   (id not in guard; no client grant; no FK references versions.id)

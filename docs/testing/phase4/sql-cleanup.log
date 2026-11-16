@@ -1,0 +1,5 @@
+# Final test-only cleanup, guardscope-dev, 2026-11-16 (prescribed statement; users not deleted)
+begin; select set_config('guardscope.account_deletion','on',true); delete from public.projects where owner_id in (select id from auth.users where email in ('a@guardscope.test','b@guardscope.test')); commit;
+a@guardscope.test: display_name=null default_currency=null projects=0
+b@guardscope.test: display_name=null default_currency=null projects=0
+DB totals: users=2 projects=0 requests=0 change_orders=0 versions=0 activity_events=0

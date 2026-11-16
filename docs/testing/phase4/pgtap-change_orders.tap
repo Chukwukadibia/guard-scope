@@ -1,0 +1,41 @@
+# tests/db/change_orders.test.sql (developer) — wrapped with scripts/pgtap-wrap.py, executed via Supabase execute_sql on guardscope-dev, ends in ROLLBACK. Commit bc96c8b. 2026-11-16
+1..39
+ok 1 - unclassified request cannot create a proposal
+ok 2 - included request cannot create a proposal (REQ-004)
+ok 3 - additional request creates a proposal
+ok 4 - only one proposal per request
+ok 5 - v1 draft pre-filled from request, project currency, no private notes
+ok 6 - created event
+ok 7 - no direct insert into change_orders
+ok 8 - no direct insert into versions
+ok 9 - owner edits draft
+ok 10 - send rejects empty description
+ok 11 - send rejects zero impact
+ok 12 - time value without unit rejected
+ok 13 - send rejects a past deadline
+ok 14 - owner cannot write status directly
+ok 15 - valid draft sends
+ok 16 - v1 pending with send time
+ok 17 - cannot send twice
+ok 18 - owner update of sent version affects nothing
+ok 19 - cannot discard a sent version
+ok 20 - create v2 draft
+ok 21 - only one draft at a time
+ok 22 - v2 copies v1
+ok 23 - send v2
+ok 24 - v1 superseded by v2
+ok 25 - v1 content preserved
+ok 26 - cancel pending v2
+ok 27 - cannot cancel twice
+ok 28 - discard v3 draft keeps proposal
+ok 29 - v3 removed, v1/v2 kept
+ok 30 - privileged content update of sent version blocked
+ok 31 - cancelled -> pending blocked
+ok 32 - sent version cannot be deleted
+ok 33 - history records every state change in order
+ok 34 - B sees nothing of A
+ok 35 - B cannot create a version on A's proposal
+ok 36 - no proposal changes on a completed project
+ok 37 - anon cannot read versions
+ok 38 - grant matrix: anon no RPC; helper not callable
+ok 39 - account deletion removes proposals

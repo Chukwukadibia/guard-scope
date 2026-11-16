@@ -1,0 +1,13 @@
+
+Running 8 tests using 2 workers
+
+  ✓  2 [mobile] › tests/e2e/p4-iss017.spec.ts:29:3 › ISS-017 (a) proposal editor: save and send after reload with existing integer price and time (7.7s)
+  ✓  1 [desktop] › tests/e2e/p4-iss017.spec.ts:29:3 › ISS-017 (a) proposal editor: save and send after reload with existing integer price and time (7.9s)
+  ✓  3 [mobile] › tests/e2e/p4-iss017.spec.ts:29:3 › ISS-017 (a) proposal editor: save and send after reload with existing decimal price and time (7.8s)
+  ✓  4 [desktop] › tests/e2e/p4-iss017.spec.ts:29:3 › ISS-017 (a) proposal editor: save and send after reload with existing decimal price and time (7.9s)
+  ✓  6 [desktop] › tests/e2e/p4-iss017.spec.ts:67:3 › ISS-017 (b) Phase 2 project edit form saves with an untouched integer agreed price (3.8s)
+  ✓  5 [mobile] › tests/e2e/p4-iss017.spec.ts:67:3 › ISS-017 (b) Phase 2 project edit form saves with an untouched integer agreed price (4.6s)
+  ✓  8 [mobile] › tests/e2e/p4-iss017.spec.ts:67:3 › ISS-017 (b) Phase 2 project edit form saves with an untouched decimal agreed price (3.4s)
+  ✓  7 [desktop] › tests/e2e/p4-iss017.spec.ts:67:3 › ISS-017 (b) Phase 2 project edit form saves with an untouched decimal agreed price (3.8s)
+
+  8 passed (34.6s)

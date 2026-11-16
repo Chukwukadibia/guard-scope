@@ -1,0 +1,29 @@
+    History
+    Request recorded: Additional one
+    16 Nov 2026, 22:19 UTC
+    Marked \"Additional one\" as Additional
+    Changed from
+    Not classified yet →
+    to
+     Additional
+    16 Nov 2026, 22:19 UTC"
+
+      351 |     await expect(decision).toContainText('You marked this as outside the agreement.');
+      352 |     await expect(decision).toContainText(/change proposal once change orders are available/);
+    > 353 |     expect(await page.locator('main').innerText()).not.toMatch(money);
+          |                                                        ^
+      354 |     await expect(page.getByRole('button', { name: /change (order|proposal)/i })).toHaveCount(0);
+      355 |     await expect(page.getByRole('link', { name: /change (order|proposal)/i })).toHaveCount(0);
+      356 |     await shot3(page, testInfo, 'T09-additional');
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:353:56
+
+    Error Context: test-results/p3-classification-T-09-AC--c432e--hint-without-a-dead-action-mobile/error-context.md
+
+  2 failed
+    [desktop] › tests/e2e/p2-a11y.spec.ts:33:1 › T-11 axe + overflow on every Phase 2 page and state 
+    [mobile] › tests/e2e/p3-classification.spec.ts:328:3 › T-09 / AC-9 no money; Phase 4 hint; BR-6 wording › Included shows no value; Additional shows the hint without a dead action 
+  6 passed (2.1m)
+  ✓  1 [desktop] › tests/e2e/p2-a11y.spec.ts:33:1 › T-11 axe + overflow on every Phase 2 page and state (44.6s)
+  ✓  2 [desktop] › tests/e2e/p2-a11y.spec.ts:33:1 › T-11 axe + overflow on every Phase 2 page and state (46.2s)
+  ✓  3 [desktop] › tests/e2e/p2-a11y.spec.ts:33:1 › T-11 axe + overflow on every Phase 2 page and state (41.7s)
+  3 passed (2.4m)

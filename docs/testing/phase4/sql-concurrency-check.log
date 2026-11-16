@@ -1,0 +1,7 @@
+# DB cross-check after concurrency runs (12 + 20 iterations, 6 parallel calls per race) and API specs, guardscope-dev, 2026-11-16
+# All change orders in the DB at that moment (only users a@/b@ exist).
+change_orders=39 versions=74
+max_drafts_per_co=1 max_pending_per_co=1
+cos_with_version_gaps=0 dup_requests=0
+versions_whose_last_event_disagrees (latest event by seq for that version vs stored status)=0
+dup_seq=0
