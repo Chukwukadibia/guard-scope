@@ -8,6 +8,7 @@ import { createProject, getProject, updateProject } from '../../lib/api/projects
 import { getMyProfile } from '../../lib/api/profile';
 import { errorMessages, toApiError } from '../../lib/api/errors';
 import { summaryErrors } from '../../lib/domain/formErrors';
+import { numericToInput } from '../../lib/domain/format';
 import { supportedCurrencies } from '../../lib/domain/profile';
 import {
   LIMITS,
@@ -70,7 +71,7 @@ export function ProjectFormPage() {
               client_name: p.client_name,
               client_contact: p.client_contact ?? '',
               description: p.description ?? '',
-              agreed_price: p.agreed_price ?? '',
+              agreed_price: numericToInput(p.agreed_price),
               currency: p.currency,
               start_date: p.start_date ?? '',
               deadline: p.deadline ?? '',

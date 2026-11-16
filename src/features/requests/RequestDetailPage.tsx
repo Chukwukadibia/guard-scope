@@ -29,6 +29,7 @@ import { RequestForm } from './RequestForm';
 import { RevisionsPanel } from './RevisionsPanel';
 import { RequestHistoryList } from './RequestHistory';
 import { ItemList } from '../scope/ScopeView';
+import { RequestProposalPanel } from '../changes/RequestProposalPanel';
 
 const options: Exclude<Classification, 'unclassified'>[] = [
   'included',
@@ -250,6 +251,14 @@ export function RequestDetailPage() {
           <p className="text-sm">{classificationExplainer[request.classification]}</p>
         )}
       </section>
+
+      <RequestProposalPanel
+        key={`${request.id}-${request.classification}`}
+        projectId={project.id}
+        requestId={request.id}
+        classification={request.classification}
+        projectActive={project.status === 'active'}
+      />
 
       {request.classification === 'included' && (
         <RevisionsPanel

@@ -24,6 +24,7 @@ import { ScopeView } from '../scope/ScopeView';
 import { DraftEditor } from '../scope/DraftEditor';
 import { RequestsSection } from '../requests/RequestsSection';
 import { RevisionsPanel } from '../requests/RevisionsPanel';
+import { ChangeProposalsSection } from '../changes/ChangeProposalsSection';
 import type { RequestListItem } from '../../lib/api/requests';
 
 const statusActions: Record<
@@ -306,6 +307,7 @@ export function ProjectDetailPage() {
       </section>
 
       <RequestsSection projectId={project.id} archived={archived} onChanged={setRequests} />
+      <ChangeProposalsSection projectId={project.id} />
       <RevisionsPanel
         projectId={project.id}
         currentScope={current}

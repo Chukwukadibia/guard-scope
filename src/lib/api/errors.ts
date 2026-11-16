@@ -12,6 +12,17 @@ export type ApiErrorCode =
   | 'project_archived'
   | 'scope_locked'
   | 'invalid_classification'
+  | 'request_not_additional'
+  | 'change_order_exists'
+  | 'project_not_active'
+  | 'not_draft'
+  | 'not_pending'
+  | 'draft_exists'
+  | 'missing_content'
+  | 'invalid_impact'
+  | 'invalid_time_impact'
+  | 'deadline_in_past'
+  | 'proposal_locked'
   | 'network'
   | 'unknown';
 
@@ -66,6 +77,18 @@ const p0001Codes = new Map<string, ApiErrorCode>([
   ['scope_version_immutable', 'scope_locked'],
   ['not_authenticated', 'not_authenticated'],
   ['invalid_classification', 'invalid_classification'],
+  ['request_not_additional', 'request_not_additional'],
+  ['change_order_exists', 'change_order_exists'],
+  ['project_not_active', 'project_not_active'],
+  ['not_draft', 'not_draft'],
+  ['not_pending', 'not_pending'],
+  ['draft_exists', 'draft_exists'],
+  ['missing_content', 'missing_content'],
+  ['invalid_impact', 'invalid_impact'],
+  ['invalid_time_impact', 'invalid_time_impact'],
+  ['deadline_in_past', 'deadline_in_past'],
+  ['change_order_version_immutable', 'proposal_locked'],
+  ['invalid_transition', 'proposal_locked'],
 ]);
 
 export const errorMessages: Record<ApiErrorCode, string> = {
@@ -82,6 +105,19 @@ export const errorMessages: Record<ApiErrorCode, string> = {
   project_archived: 'This project is archived. Reopen it to make changes.',
   scope_locked: 'Confirmed scope cannot be changed. Edit the draft instead.',
   invalid_classification: 'Choose one of the listed classifications.',
+  request_not_additional: 'Only requests you marked as Additional can become a change proposal.',
+  change_order_exists: 'This request already has a change proposal. Open it to make a new version.',
+  project_not_active:
+    'Change proposals can only be changed while the project is active. Reopen the project first.',
+  not_draft:
+    'This version was already sent, so it can no longer be changed. Refresh to see the latest state.',
+  not_pending: 'Only a sent proposal that is still waiting for the client can be cancelled.',
+  draft_exists: 'There is already a draft version. Edit or discard it first.',
+  missing_content: 'Add a title and a description before sending.',
+  invalid_impact: 'Enter a price impact above 0, a time impact above 0, or both.',
+  invalid_time_impact: 'Enter both a time amount and a unit, or leave both empty.',
+  deadline_in_past: "The proposed deadline can't be in the past.",
+  proposal_locked: 'A sent proposal cannot be changed. Create a new version instead.',
   network: "Can't reach GuardScope. Check your connection and try again.",
   unknown: 'Something went wrong. Please try again.',
 };

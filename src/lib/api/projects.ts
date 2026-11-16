@@ -9,7 +9,7 @@ export type Project = {
   client_name: string;
   client_contact: string | null;
   description: string | null;
-  agreed_price: string | null; // numeric as string (exact)
+  agreed_price: string | number | null; // PostgREST returns numeric as a JSON number
   currency: string;
   start_date: string | null;
   deadline: string | null;

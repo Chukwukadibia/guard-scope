@@ -60,3 +60,12 @@ export const kindHeading: Record<'deliverable' | 'exclusion' | 'assumption', str
   exclusion: 'Not included (exclusions)',
   assumption: 'Assumptions',
 };
+
+/**
+ * PostgREST returns Postgres numeric columns as JSON numbers (e.g. 400, not "400.00"). Form fields hold
+ * strings, so convert at the boundary. Null/undefined become ''. (ISS-017)
+ */
+export function numericToInput(value: string | number | null | undefined): string {
+  if (value === null || value === undefined) return '';
+  return String(value);
+}

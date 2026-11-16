@@ -93,3 +93,12 @@ describe('format (BR-4, BR-5)', () => {
     expect(revisionAllowanceLabel('number', 3)).toBe('3 revisions included');
   });
 });
+
+test('ISS-017: an existing numeric price from the API can be validated without changes', async () => {
+  const { numericToInput } = await import('../../src/lib/domain/format');
+  const values = { ...base, agreed_price: numericToInput(2000) };
+  expect(values.agreed_price).toBe('2000');
+  expect(() => validateProject(values)).not.toThrow();
+  expect(validateProject(values)).toEqual({});
+  expect(numericToInput(null)).toBe('');
+});

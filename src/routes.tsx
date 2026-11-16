@@ -10,6 +10,7 @@ import { ProjectsPage } from './features/projects/ProjectsPage';
 import { ProjectFormPage } from './features/projects/ProjectFormPage';
 import { ProjectDetailPage } from './features/projects/ProjectDetailPage';
 import { RequestDetailPage } from './features/requests/RequestDetailPage';
+import { ChangeOrderPage } from './features/changes/ChangeOrderPage';
 import { SettingsPage } from './features/settings/SettingsPage';
 import { PublicProposalPage } from './features/public/PublicProposalPage';
 import { NotFoundPage } from './features/NotFoundPage';
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
           { path: 'projects/:id', element: <ProjectDetailPage /> },
           { path: 'projects/:id/edit', element: <ProjectFormPage /> },
           { path: 'projects/:id/requests/:requestId', element: <RequestDetailPage /> },
+          { path: 'projects/:id/changes/:changeId', element: <ChangeOrderPage /> },
           { path: 'settings', element: <SettingsPage /> },
         ],
       },
