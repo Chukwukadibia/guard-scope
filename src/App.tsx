@@ -1,14 +1,22 @@
-// Phase 0 placeholder only. No feature code until Phase 1 is approved (HUMAN_APPROVAL_LOG.md HA-002).
+import { RouterProvider } from 'react-router-dom';
+import { AuthProvider } from './features/auth/AuthProvider';
+import { router } from './routes';
+import { isSupabaseConfigured } from './lib/supabase';
+
 export default function App() {
+  if (!isSupabaseConfigured) {
+    return (
+      <main className="mx-auto max-w-md p-8">
+        <h1 className="text-xl font-semibold">GuardScope is not configured</h1>
+        <p className="mt-2 text-sm text-slate-600">
+          Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY (see .env.example).
+        </p>
+      </main>
+    );
+  }
   return (
-    <main className="mx-auto max-w-xl p-4 sm:p-8">
-      <h1 className="text-2xl font-semibold text-slate-900">GuardScope</h1>
-      <p className="mt-2 text-slate-600">
-        Know what&apos;s included. Charge for what&apos;s extra.
-      </p>
-      <p className="mt-6 text-sm text-slate-500">
-        Foundation build. Features are not yet available.
-      </p>
-    </main>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   );
 }

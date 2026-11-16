@@ -1,7 +1,7 @@
-# Placeholder connect-src: tighten to https://<project-ref>.supabase.co once the Supabase project exists (ARCHITECTURE.md §5.2).
+# connect-src is set to the guardscope-dev project. Production deploys must substitute their own project host (ARCHITECTURE.md §5.2).
 /*
   Referrer-Policy: no-referrer
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'self' https://*.supabase.co; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'self' https://eqozjuaaajstrewygqxr.supabase.co; manifest-src 'self'; worker-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
