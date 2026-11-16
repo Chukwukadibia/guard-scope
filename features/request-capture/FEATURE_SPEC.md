@@ -42,7 +42,7 @@ Client requests arrive through WhatsApp, email, calls and meetings. The freelanc
 - **BR-2:** Classification changes go through `classify_request` only; there is no direct column write. Setting the same value again is a no-op (no duplicate event).
 - **BR-3:** `activity_events` is append-only: no update or delete (account deletion excepted). Events are written only by server functions and triggers.
 - **BR-4:** A revision usage may link only to a request in the same project.
-- **BR-5:** The received date can't be in the future (client and server). Dates are stored as calendar dates.
+- **BR-5:** The received date can't be in the future. The UI enforces the user's local today. The server rejects dates later than its UTC today + 1 day: a deliberate allowance so users in time zones ahead of UTC are never wrongly rejected (DEC-011). Dates are stored as calendar dates.
 - **BR-6:** The UI never says a request is "legally" in or out of scope. It says "You marked this as …".
 
 ## 6. States & edge cases

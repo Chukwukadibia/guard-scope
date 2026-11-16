@@ -112,3 +112,23 @@ export function summariseRevisions(
   }
   return { allowanceType, allowanceCount, used, remaining: null, overBy: 0 };
 }
+
+function isClassification(v: unknown): v is Classification {
+  return typeof v === 'string' && Object.prototype.hasOwnProperty.call(classificationLabel, v);
+}
+
+/**
+ * AC-3: the "from → to" labels of a `request.classified` history event, read from its metadata.
+ * Returns null for other events or unexpected metadata (the summary is still shown).
+ */
+export function classificationTransition(
+  eventType: string,
+  metadata: unknown,
+): { from: string; to: string } | null {
+  if (eventType !== 'request.classified' || typeof metadata !== 'object' || metadata === null) {
+    return null;
+  }
+  const { from, to } = metadata as Record<string, unknown>;
+  if (!isClassification(from) || !isClassification(to)) return null;
+  return { from: classificationLabel[from], to: classificationLabel[to] };
+}

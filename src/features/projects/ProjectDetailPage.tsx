@@ -24,7 +24,7 @@ import { ScopeView } from '../scope/ScopeView';
 import { DraftEditor } from '../scope/DraftEditor';
 import { RequestsSection } from '../requests/RequestsSection';
 import { RevisionsPanel } from '../requests/RevisionsPanel';
-import type { ClientRequest } from '../../lib/api/requests';
+import type { RequestListItem } from '../../lib/api/requests';
 
 const statusActions: Record<
   ProjectStatus,
@@ -54,7 +54,7 @@ export function ProjectDetailPage() {
   const location = useLocation();
   const online = useOnline();
   const [project, setProject] = useState<Project | null>(null);
-  const [requests, setRequests] = useState<ClientRequest[]>([]);
+  const [requests, setRequests] = useState<RequestListItem[]>([]);
   const [scope, setScope] = useState<ProjectScope | null>(null);
   const [loadError, setLoadError] = useState<ApiErrorCode | null>(null);
   const [notice, setNotice] = useState<{ tone: 'success' | 'error'; text: string } | null>(() => {

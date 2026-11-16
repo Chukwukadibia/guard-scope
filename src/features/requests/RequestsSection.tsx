@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Inbox } from 'lucide-react';
 import { Alert, EmptyState } from '../../components/ui/Alert';
 import { Button, Spinner } from '../../components/ui/Button';
-import { createRequest, listRequests, type ClientRequest } from '../../lib/api/requests';
+import { createRequest, listRequests, type RequestListItem } from '../../lib/api/requests';
 import { errorMessages, toApiError } from '../../lib/api/errors';
 import { formatDate } from '../../lib/domain/format';
 import {
@@ -25,9 +25,9 @@ export function RequestsSection({
 }: {
   projectId: string;
   archived: boolean;
-  onChanged?: (requests: ClientRequest[]) => void;
+  onChanged?: (requests: RequestListItem[]) => void;
 }) {
-  const [requests, setRequests] = useState<ClientRequest[] | null>(null);
+  const [requests, setRequests] = useState<RequestListItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>('all');
   const [notice, setNotice] = useState<string | null>(null);

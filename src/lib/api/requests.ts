@@ -27,17 +27,22 @@ export type RequestInput = {
 const columns =
   'id, project_id, title, description, source_channel, received_on, classification, internal_notes, created_at, updated_at';
 
-export async function listRequests(projectId: string): Promise<ClientRequest[]> {
+/** List rows never carry private notes (data minimisation, AC-5); the detail view loads them. */
+export type RequestListItem = Omit<ClientRequest, 'internal_notes'>;
+const listColumns =
+  'id, project_id, title, description, source_channel, received_on, classification, created_at, updated_at';
+
+export async function listRequests(projectId: string): Promise<RequestListItem[]> {
   assertProjectId(projectId);
   const { data, error } = await supabase
     .from('requests')
-    .select(columns)
+    .select(listColumns)
     .eq('project_id', projectId)
     .order('received_on', { ascending: false })
     .order('created_at', { ascending: false })
     .limit(500);
   if (error) throw toApiError(error);
-  return (data ?? []) as ClientRequest[];
+  return (data ?? []) as RequestListItem[];
 }
 
 export async function getRequest(projectId: string, requestId: string): Promise<ClientRequest> {

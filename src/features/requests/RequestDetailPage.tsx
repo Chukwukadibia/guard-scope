@@ -11,6 +11,7 @@ import {
   listRequests,
   updateRequest,
   type ClientRequest,
+  type RequestListItem,
 } from '../../lib/api/requests';
 import { listEntityEvents, type ActivityEvent } from '../../lib/api/activity';
 import { errorMessages, toApiError, type ApiErrorCode } from '../../lib/api/errors';
@@ -26,6 +27,7 @@ import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { ClassificationBadge } from './ClassificationBadge';
 import { RequestForm } from './RequestForm';
 import { RevisionsPanel } from './RevisionsPanel';
+import { RequestHistoryList } from './RequestHistory';
 import { ItemList } from '../scope/ScopeView';
 
 const options: Exclude<Classification, 'unclassified'>[] = [
@@ -40,7 +42,7 @@ export function RequestDetailPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [scope, setScope] = useState<ProjectScope | null>(null);
   const [request, setRequest] = useState<ClientRequest | null>(null);
-  const [allRequests, setAllRequests] = useState<ClientRequest[]>([]);
+  const [allRequests, setAllRequests] = useState<RequestListItem[]>([]);
   const [events, setEvents] = useState<ActivityEvent[] | null>(null);
   const [loadError, setLoadError] = useState<ApiErrorCode | null>(null);
   const [editing, setEditing] = useState(false);
@@ -271,14 +273,7 @@ export function RequestDetailPage() {
         ) : events.length === 0 ? (
           <p className="text-sm text-slate-600">No history yet.</p>
         ) : (
-          <ol className="space-y-2 text-sm">
-            {events.map((ev) => (
-              <li key={ev.id} className="flex flex-col gap-0.5 border-l-2 border-slate-300 pl-3">
-                <span className="wrap-anywhere">{ev.summary}</span>
-                <span className="text-xs text-slate-600">{formatDateTime(ev.created_at)}</span>
-              </li>
-            ))}
-          </ol>
+          <RequestHistoryList events={events} />
         )}
       </section>
     </div>

@@ -8,7 +8,7 @@ import {
   undoRevisionUsage,
   type RevisionUsage,
 } from '../../lib/api/revisions';
-import type { ClientRequest } from '../../lib/api/requests';
+import type { RequestListItem } from '../../lib/api/requests';
 import type { ScopeVersion } from '../../lib/api/scope';
 import { errorMessages, toApiError } from '../../lib/api/errors';
 import { formatDateTime, revisionAllowanceLabel } from '../../lib/domain/format';
@@ -29,7 +29,7 @@ export function RevisionsPanel({
   projectId: string;
   currentScope: ScopeVersion | null;
   archived: boolean;
-  requests: ClientRequest[];
+  requests: RequestListItem[];
   /** On a request page: usage is linked to this request and the list is filtered to it. */
   fixedRequestId?: string;
 }) {
