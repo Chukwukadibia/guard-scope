@@ -1,0 +1,29 @@
+
+Running 2 tests using 2 workers
+
+  -  2 [mobile] › tests/e2e/p2-account-deletion.spec.ts:12:1 › T-10 delete account: empty and wrong password blocked; correct deletes, signs out, cannot sign in
+throwaway user id: 8323ab42-19af-4e3f-b356-9cf6ecf3c09f, project: 1f8b8b79-8c33-4409-a781-9d3254a05d7e
+  ✘  1 [desktop] › tests/e2e/p2-account-deletion.spec.ts:12:1 › T-10 delete account: empty and wrong password blocked; correct deletes, signs out, cannot sign in (4.3s)
+
+
+  1) [desktop] › tests/e2e/p2-account-deletion.spec.ts:12:1 › T-10 delete account: empty and wrong password blocked; correct deletes, signs out, cannot sign in 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 4
+
+      82 |   await shot(page, testInfo, 'T10-wrong-password');
+      83 |   const still = await rest(page, token, 'GET', `/rest/v1/projects?select=id`);
+    > 84 |   expect((still.body as unknown[]).length).toBe(2);
+         |                                            ^
+      85 |   await page.reload();
+      86 |   await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible(); // still signed in
+      87 |
+        at /home/user/guard-scope/tests/e2e/p2-account-deletion.spec.ts:84:44
+
+    Error Context: test-results/p2-account-deletion-T-10-d-516e0-es-signs-out-cannot-sign-in-desktop/error-context.md
+
+  1 failed
+    [desktop] › tests/e2e/p2-account-deletion.spec.ts:12:1 › T-10 delete account: empty and wrong password blocked; correct deletes, signs out, cannot sign in 
+  1 skipped

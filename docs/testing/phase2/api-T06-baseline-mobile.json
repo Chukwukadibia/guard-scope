@@ -1,7 +1,7 @@
 {
   "baseline_before_v2": {
-    "id": "03c2f613-d418-4d95-903f-4de0546354a1",
-    "project_id": "f10cf634-2ce4-4465-a3d5-43e8c372694e",
+    "id": "bca56c08-d669-4ac0-80a2-0d9aca2c3ca7",
+    "project_id": "1f5d02ed-8dd0-4eff-9dfc-160f4f6f1c9f",
     "version_no": 1,
     "summary": "Original summary",
     "revision_allowance_type": "number",
@@ -11,33 +11,33 @@
     "currency": "EUR",
     "deadline": "2026-12-31",
     "created_by": "d79005b2-c3c3-4e52-ae27-ca6342043e42",
-    "created_at": "2026-11-16T12:14:38.213568+00:00",
-    "updated_at": "2026-11-16T12:14:42.458466+00:00",
-    "confirmed_at": "2026-11-16T12:14:42.458466+00:00",
+    "created_at": "2026-11-16T13:29:12.322237+00:00",
+    "updated_at": "2026-11-16T13:29:16.174084+00:00",
+    "confirmed_at": "2026-11-16T13:29:16.174084+00:00",
     "is_original_baseline": true,
     "scope_items": [
       {
-        "id": "7bad9563-aabe-467d-b9cd-a04d4cd979fc",
-        "kind": "deliverable",
-        "created_at": "2026-11-16T12:14:39.620147+00:00",
-        "sort_order": 1,
-        "description": "D1 original",
-        "scope_version_id": "03c2f613-d418-4d95-903f-4de0546354a1"
-      },
-      {
-        "id": "c6e08826-df2a-44ac-a299-55b7aadf46d2",
+        "id": "18019662-4a4b-4359-9899-613418c0ce89",
         "kind": "exclusion",
-        "created_at": "2026-11-16T12:14:40.488475+00:00",
+        "created_at": "2026-11-16T13:29:14.483375+00:00",
         "sort_order": 1,
         "description": "E1 original",
-        "scope_version_id": "03c2f613-d418-4d95-903f-4de0546354a1"
+        "scope_version_id": "bca56c08-d669-4ac0-80a2-0d9aca2c3ca7"
+      },
+      {
+        "id": "2976a415-8bd0-42d0-b94e-4fc7b4f9f4b0",
+        "kind": "deliverable",
+        "created_at": "2026-11-16T13:29:13.463418+00:00",
+        "sort_order": 1,
+        "description": "D1 original",
+        "scope_version_id": "bca56c08-d669-4ac0-80a2-0d9aca2c3ca7"
       }
     ]
   },
   "versions_after_v2": [
     {
-      "id": "03c2f613-d418-4d95-903f-4de0546354a1",
-      "project_id": "f10cf634-2ce4-4465-a3d5-43e8c372694e",
+      "id": "bca56c08-d669-4ac0-80a2-0d9aca2c3ca7",
+      "project_id": "1f5d02ed-8dd0-4eff-9dfc-160f4f6f1c9f",
       "version_no": 1,
       "summary": "Original summary",
       "revision_allowance_type": "number",
@@ -47,32 +47,32 @@
       "currency": "EUR",
       "deadline": "2026-12-31",
       "created_by": "d79005b2-c3c3-4e52-ae27-ca6342043e42",
-      "created_at": "2026-11-16T12:14:38.213568+00:00",
-      "updated_at": "2026-11-16T12:14:42.458466+00:00",
-      "confirmed_at": "2026-11-16T12:14:42.458466+00:00",
+      "created_at": "2026-11-16T13:29:12.322237+00:00",
+      "updated_at": "2026-11-16T13:29:16.174084+00:00",
+      "confirmed_at": "2026-11-16T13:29:16.174084+00:00",
       "is_original_baseline": true,
       "scope_items": [
         {
-          "id": "7bad9563-aabe-467d-b9cd-a04d4cd979fc",
-          "kind": "deliverable",
-          "created_at": "2026-11-16T12:14:39.620147+00:00",
-          "sort_order": 1,
-          "description": "D1 original",
-          "scope_version_id": "03c2f613-d418-4d95-903f-4de0546354a1"
-        },
-        {
-          "id": "c6e08826-df2a-44ac-a299-55b7aadf46d2",
+          "id": "18019662-4a4b-4359-9899-613418c0ce89",
           "kind": "exclusion",
-          "created_at": "2026-11-16T12:14:40.488475+00:00",
+          "created_at": "2026-11-16T13:29:14.483375+00:00",
           "sort_order": 1,
           "description": "E1 original",
-          "scope_version_id": "03c2f613-d418-4d95-903f-4de0546354a1"
+          "scope_version_id": "bca56c08-d669-4ac0-80a2-0d9aca2c3ca7"
+        },
+        {
+          "id": "2976a415-8bd0-42d0-b94e-4fc7b4f9f4b0",
+          "kind": "deliverable",
+          "created_at": "2026-11-16T13:29:13.463418+00:00",
+          "sort_order": 1,
+          "description": "D1 original",
+          "scope_version_id": "bca56c08-d669-4ac0-80a2-0d9aca2c3ca7"
         }
       ]
     },
     {
-      "id": "816520d4-720d-4bfa-bc00-94692cf9db1a",
-      "project_id": "f10cf634-2ce4-4465-a3d5-43e8c372694e",
+      "id": "4d0669a1-e649-410f-adec-33bcd5e93f11",
+      "project_id": "1f5d02ed-8dd0-4eff-9dfc-160f4f6f1c9f",
       "version_no": 2,
       "summary": "Changed summary",
       "revision_allowance_type": "none",
@@ -82,32 +82,32 @@
       "currency": "EUR",
       "deadline": "2027-02-28",
       "created_by": "d79005b2-c3c3-4e52-ae27-ca6342043e42",
-      "created_at": "2026-11-16T12:14:42.458466+00:00",
-      "updated_at": "2026-11-16T12:14:47.088811+00:00",
-      "confirmed_at": "2026-11-16T12:14:47.088811+00:00",
+      "created_at": "2026-11-16T13:29:16.174084+00:00",
+      "updated_at": "2026-11-16T13:29:20.080688+00:00",
+      "confirmed_at": "2026-11-16T13:29:20.080688+00:00",
       "is_original_baseline": false,
       "scope_items": [
         {
-          "id": "73763d31-4db0-47c2-97aa-d0879c091eab",
+          "id": "36bf86ad-3ceb-4ef8-ba08-caf5826c9d2d",
           "kind": "deliverable",
-          "created_at": "2026-11-16T12:14:42.458466+00:00",
+          "created_at": "2026-11-16T13:29:16.174084+00:00",
           "sort_order": 1,
           "description": "D1 changed",
-          "scope_version_id": "816520d4-720d-4bfa-bc00-94692cf9db1a"
+          "scope_version_id": "4d0669a1-e649-410f-adec-33bcd5e93f11"
         },
         {
-          "id": "7c7f25d9-3ff7-4501-afa5-1efd1f533190",
+          "id": "77463024-eae8-4a78-8cd7-105be978b0e8",
           "kind": "deliverable",
-          "created_at": "2026-11-16T12:14:45.653852+00:00",
+          "created_at": "2026-11-16T13:29:19.235392+00:00",
           "sort_order": 2,
           "description": "D2 new",
-          "scope_version_id": "816520d4-720d-4bfa-bc00-94692cf9db1a"
+          "scope_version_id": "4d0669a1-e649-410f-adec-33bcd5e93f11"
         }
       ]
     },
     {
-      "id": "59025331-a2a0-4bdc-84d7-52e96b08263a",
-      "project_id": "f10cf634-2ce4-4465-a3d5-43e8c372694e",
+      "id": "34edfdd8-d98a-4578-b510-9a6cf87965c4",
+      "project_id": "1f5d02ed-8dd0-4eff-9dfc-160f4f6f1c9f",
       "version_no": 3,
       "summary": "Changed summary",
       "revision_allowance_type": "none",
@@ -117,26 +117,26 @@
       "currency": null,
       "deadline": null,
       "created_by": "d79005b2-c3c3-4e52-ae27-ca6342043e42",
-      "created_at": "2026-11-16T12:14:47.088811+00:00",
-      "updated_at": "2026-11-16T12:14:47.088811+00:00",
+      "created_at": "2026-11-16T13:29:20.080688+00:00",
+      "updated_at": "2026-11-16T13:29:20.080688+00:00",
       "confirmed_at": null,
       "is_original_baseline": false,
       "scope_items": [
         {
-          "id": "2125c2b1-610c-4889-9a31-ddfd2ac5186b",
+          "id": "127b7dca-f316-4302-87b2-21d21a3acb9b",
           "kind": "deliverable",
-          "created_at": "2026-11-16T12:14:47.088811+00:00",
+          "created_at": "2026-11-16T13:29:20.080688+00:00",
           "sort_order": 1,
           "description": "D1 changed",
-          "scope_version_id": "59025331-a2a0-4bdc-84d7-52e96b08263a"
+          "scope_version_id": "34edfdd8-d98a-4578-b510-9a6cf87965c4"
         },
         {
-          "id": "eb15e425-6e53-4afc-a560-bafb5eb80164",
+          "id": "24c12118-3213-4f7b-857a-d5bb352e827b",
           "kind": "deliverable",
-          "created_at": "2026-11-16T12:14:47.088811+00:00",
+          "created_at": "2026-11-16T13:29:20.080688+00:00",
           "sort_order": 2,
           "description": "D2 new",
-          "scope_version_id": "59025331-a2a0-4bdc-84d7-52e96b08263a"
+          "scope_version_id": "34edfdd8-d98a-4578-b510-9a6cf87965c4"
         }
       ]
     }

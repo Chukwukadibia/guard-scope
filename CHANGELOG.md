@@ -2,6 +2,10 @@
 
 All notable project changes, newest first. Feature-level detail lives in `features/<feature>/CHANGELOG.md`.
 
+## 2026-11-16 — Phase 2 (projects & original scope)
+- Projects (create/edit/complete/archive/reopen), the scope draft, confirmed original baseline and later versions (immutable in the database), Dashboard count and New project action, account deletion.
+- Independent testing: 1 fix cycle (D-1 to D-5). Accepted.
+
 ## 2026-11-16 — Phase 1 (authentication & app shell)
 - Supabase dev project `guardscope-dev` (eu-west-2) with the `profiles` migration and RLS.
 - Registration, sign-in/out, password recovery, protected routes, session-ended handling, app shell, settings, PWA.

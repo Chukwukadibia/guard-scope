@@ -1,0 +1,13 @@
+# Retest 1 (c380e81) — security advisor + cleanup, guardscope-dev (eqozjuaaajstrewygqxr), 2026-11-16
+get_advisors(security):
+  authenticated_security_definer_function_executable: confirm_scope(uuid), delete_my_account()  [already dispositioned, docs/security/ADVISOR_NOTES.md]
+  auth_leaked_password_protection                                                                [already dispositioned]
+  => no new findings
+Cleanup (begin; set_config('guardscope.account_deletion','on',true); delete from public.projects where owner_id in (a@, b@); reset a@/b@ profile fields; commit):
+  auth.users = a@guardscope.test, b@guardscope.test (only)
+  throwaway p2-delete-throwaway@guardscope.test: users 0, identities 0 (deleted through the UI by T-10)
+  projects 0, scope_versions 0, scope_items 0, profiles 2 (display_name/default_currency all null)
+T-10 throwaway: password generated in the shell into a 0600 scratch file, read into the Playwright env and the file deleted before the run;
+  only a locally computed bcrypt hash went into SQL. A first T-10 attempt failed on the spec's "2 projects" precondition because I had also
+  seeded 2 projects via SQL (the spec seeds its own) — my setup error; that user was removed and recreated clean
+  (e2e-p2-account-deletion-retest1-attempt1-setup-error.log). Second attempt passed (e2e-p2-account-deletion-retest1.log).

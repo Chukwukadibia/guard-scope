@@ -1,11 +1,29 @@
 import { test, expect, USER_B, apiSession, isMobile, signInViaUi } from './helpers';
-import { apiCreateProject, openProject, rest, shot, uniq } from './p2-helpers';
+import {
+  apiCreateProject,
+  archiveTracked,
+  openProject,
+  rest,
+  shot,
+  trackCreatedProjects,
+  type TrackedProjects,
+  uniq,
+} from './p2-helpers';
 
 /**
  * Phase 2 Tester — projects (T-01, T-02, T-03, T-09, §6 not-found). Written from FEATURE_SPEC/TEST_PLAN.
  * Data is tagged "P2T …"; leftover rows are removed by the Tester's SQL cleanup after the run.
  */
 test.use({ signedInAs: 'A' });
+
+// Test hygiene: archive every project this test created (see trackCreatedProjects).
+let tracked: TrackedProjects = [];
+test.beforeEach(({ page }) => {
+  tracked = trackCreatedProjects(page);
+});
+test.afterEach(async ({ page }) => {
+  await archiveTracked(page, tracked);
+});
 
 const tokenOf = (s: Record<string, unknown>) => s.access_token as string;
 const userIdOf = (s: Record<string, unknown>) => (s.user as { id: string }).id;

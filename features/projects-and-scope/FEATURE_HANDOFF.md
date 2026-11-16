@@ -1,0 +1,29 @@
+# Phase 2 — Projects & Original Scope — Handoff
+
+- **Branch / commit:** `feature/p2-projects-and-scope` (on top of `feature/p1-authentication`). Product code accepted at `c380e81`; later commits are tests, docs and evidence only.
+- **Migrations** (applied to guardscope-dev):
+  - `20261116130000_projects_scope.sql`: tables `projects`, `scope_versions`, `scope_items`; RLS; column grants; triggers (owner default, `archived_at`, initial draft, immutability guards); RPCs `confirm_scope(uuid)` and `delete_my_account()`.
+  - `20261116131000_inline_deletion_flag.sql`: forward fix.
+  - Reverting SQL is in `IMPLEMENTATION_PLAN.md` §3.
+- **Contracts** (`src/lib/api/`):
+  - `projects.ts`: list, count, get, create, update; malformed ids → `not_found`.
+  - `scope.ts`: get project scope (baseline/current/draft), update draft, add/update/delete item, confirm.
+  - `account.ts`: `deleteMyAccount`.
+  - Error codes are in `errors.ts`, including `P0001` database codes.
+- **Business rules in the DB:**
+  - Owner from the session only.
+  - One draft and one baseline per project.
+  - Confirmed versions and their items are immutable (guard triggers run before RLS).
+  - Archived projects are locked except reopening.
+  - Confirmation snapshots price, currency and deadline.
+- **UI:** projects list/filter, form, detail (overview, original agreement, current version, draft editor with item reordering, confirm panel), Dashboard count and list, Settings → Delete account, route error page.
+- **Tests:**
+  - Unit: 102.
+  - pgTAP: 32 + 80 (Phase 2), and Phase 1's 12 + 22 still pass.
+  - E2E: 162 passed / 0 failed / 18 deliberate skips (retest 1); axe 0 violations in 28 scans.
+- **Known observations (not defects; see ACCEPTANCE_REPORT):**
+  - The API rounds a 3-decimal price rather than rejecting it; the UI rejects it.
+  - A stale-tab RLS denial shows the generic "couldn't find that" message.
+  - The `guardscope.account_deletion` flag is reachable only from raw SQL, never from PostgREST.
+- **Deferred by spec:** revision-usage tracking (Phase 3), activity history (Phase 6), plan limits (Phase 7), per-project hard delete (not in the PRD).
+- **Next safe action:** the supervisor approves Phase 3 (request capture and classification).

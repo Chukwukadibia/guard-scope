@@ -1,0 +1,10 @@
+
+Running 2 tests using 2 workers
+
+  -  2 [mobile] › tests/e2e/p2-account-deletion.spec.ts:12:1 › T-10 delete account: empty and wrong password blocked; correct deletes, signs out, cannot sign in
+throwaway user id: 1c66775e-0002-4e25-a1f7-35eb3f8931a2, project: 5e793628-3a15-4f5d-85c1-516dc106247d
+old token after deletion: HTTP 200 []
+  ✓  1 [desktop] › tests/e2e/p2-account-deletion.spec.ts:12:1 › T-10 delete account: empty and wrong password blocked; correct deletes, signs out, cannot sign in (7.3s)
+
+  1 skipped
+  1 passed (20.0s)

@@ -1,4 +1,5 @@
 import { test, expect, USER_A, isMobile, screenshot } from './helpers';
+import { rest } from './p2-helpers';
 
 test.use({ signedInAs: 'A' });
 
@@ -124,13 +125,35 @@ test.describe('T-12 / AC-8 settings validation', () => {
 });
 
 test.describe('T-16 / AC-12 empty states, no dead actions', () => {
+  // ISS-013 / P2 D-5: Phase 2 FEATURE_SPEC §6 (approved, HA-004) replaces the Phase 1 `/projects`
+  // placeholder ("Projects will appear here") with an empty state that has a create action. The
+  // Phase 1 intent is kept: an empty state is shown and every action in it works (no dead actions).
   for (const [path, heading, emptyTitle] of [
     ['/', 'Dashboard', 'No projects yet'],
-    ['/projects', 'Projects', 'Projects will appear here'],
+    ['/projects', 'Projects', 'No active projects'],
   ] as const) {
     test(`${path} shows "${emptyTitle}" and no non-functional actions`, async ({
       page,
+      sessionA,
     }, testInfo) => {
+      test.setTimeout(180_000);
+      // Precondition: an empty state needs user A to have no active projects. In a full-suite run
+      // Phase 2 specs (which archive their projects after each test) may still be running in the
+      // other worker, so wait for the precondition instead of racing it.
+      await expect
+        .poll(
+          async () => {
+            const r = await rest(
+              page,
+              sessionA.access_token as string,
+              'GET',
+              '/rest/v1/projects?select=id&status=eq.active',
+            );
+            return r.status === 200 ? (r.body as unknown[]).length : -1;
+          },
+          { timeout: 120_000, message: 'user A still has active projects' },
+        )
+        .toBe(0);
       await page.goto(path);
       await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
       await expect(page.getByRole('heading', { level: 2, name: emptyTitle })).toBeVisible();
@@ -141,6 +164,18 @@ test.describe('T-16 / AC-12 empty states, no dead actions', () => {
         .evaluateAll((els) => els.map((e) => e.getAttribute('href')));
       for (const h of hrefs) expect(h && h !== '#' && !h.startsWith('javascript:')).toBeTruthy();
       await screenshot(page, testInfo, `T16-${heading.toLowerCase()}`);
+      if (path === '/projects') {
+        // Phase 2 §6: the empty state itself offers a working create action.
+        const empty = main.locator('section').filter({
+          has: page.getByRole('heading', { level: 2, name: emptyTitle }),
+        });
+        const create = empty.getByRole('link', { name: 'New project' });
+        await expect(create).toHaveCount(1);
+        await expect(create).toHaveAttribute('href', '/projects/new');
+        await create.click();
+        await expect(page).toHaveURL(/\/projects\/new$/);
+        await expect(page.getByLabel('Project title')).toBeVisible();
+      }
     });
   }
 });

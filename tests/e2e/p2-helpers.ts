@@ -149,3 +149,41 @@ export async function openProject(page: Page, id: string) {
   await page.goto(`/projects/${id}`);
   await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible();
 }
+
+/**
+ * Test hygiene (retest 1): records every project created through `page` (UI or REST, any user)
+ * so the spec can archive them after the test. Without this, Phase 2 specs left user A with
+ * active projects and broke Phase 1's T-16 empty-state precondition in a full-suite run.
+ */
+export type TrackedProjects = { id: string; token: string }[] & { pending?: Promise<void>[] };
+
+export function trackCreatedProjects(page: Page): TrackedProjects {
+  const created: TrackedProjects = [];
+  created.pending = [];
+  page.on('response', (res) => {
+    const req = res.request();
+    if (req.method() !== 'POST' || res.status() !== 201) return;
+    if (!/\/rest\/v1\/projects(\?|$)/.test(res.url())) return;
+    const token = (req.headers()['authorization'] ?? '').replace(/^Bearer /, '');
+    created.pending?.push(
+      res
+        .json()
+        .then((body: { id?: string }[] | { id?: string }) => {
+          for (const row of Array.isArray(body) ? body : [body])
+            if (row.id && token) created.push({ id: row.id, token });
+        })
+        .catch(() => undefined),
+    );
+  });
+  return created;
+}
+
+/** Archives the tracked projects that are not archived yet (archive is the only removal, C-4). */
+export async function archiveTracked(page: Page, created: TrackedProjects) {
+  await Promise.all(created.pending ?? []);
+  for (const { id, token } of created.splice(0)) {
+    await rest(page, token, 'PATCH', `/rest/v1/projects?id=eq.${id}&status=neq.archived`, {
+      status: 'archived',
+    }).catch(() => undefined);
+  }
+}

@@ -10,10 +10,22 @@ import {
   rest,
   shot,
   uniq,
+  archiveTracked,
+  trackCreatedProjects,
+  type TrackedProjects,
 } from './p2-helpers';
 
 /** Phase 2 Tester — scope (T-04..T-08). */
 test.use({ signedInAs: 'A' });
+
+// Test hygiene: archive every project this test created (see trackCreatedProjects).
+let tracked: TrackedProjects = [];
+test.beforeEach(({ page }) => {
+  tracked = trackCreatedProjects(page);
+});
+test.afterEach(async ({ page }) => {
+  await archiveTracked(page, tracked);
+});
 
 const tokenOf = (s: Record<string, unknown>) => s.access_token as string;
 
@@ -159,8 +171,10 @@ test.describe('T-05 / AC-5 confirm', () => {
     const dlg = await confirmViaUi(page);
     await expect(dlg.getByRole('alert')).toBeVisible();
     await shot(page, testInfo, 'T05-empty-scope');
+    // Exact text. Alert starts with a visually hidden "Error: " prefix for screen readers
+    // (Phase 1 a11y pattern), so the full accessible text is asserted, prefix included.
     await expect(dlg.getByRole('alert')).toHaveText(
-      'Add at least one deliverable before confirming the scope.',
+      'Error: Add at least one deliverable before confirming the scope.',
     );
     // nothing confirmed
     const vs = await getVersions(page, tokenOf(sessionA), id);
@@ -236,8 +250,9 @@ test.describe('T-05 / AC-5 confirm', () => {
     const dlg2 = await confirmViaUi(page2);
     await expect(dlg2.getByRole('alert')).toBeVisible();
     await shot(page2, testInfo, 'T05-stale-confirm');
+    // Exact text incl. the sr-only "Error: " prefix (see the empty-scope test above).
     await expect(dlg2.getByRole('alert')).toHaveText(
-      'This scope was already confirmed. Refresh the page to see the latest version.',
+      'Error: This scope was already confirmed. Refresh the page to see the latest version.',
     );
     const vs = await getVersions(page, token, id);
     expect(vs.filter((v) => v.confirmed_at)).toHaveLength(1);

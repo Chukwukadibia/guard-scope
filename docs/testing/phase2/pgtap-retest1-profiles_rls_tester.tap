@@ -1,0 +1,24 @@
+1..22
+ok 1 - T-07/BR-4: new profile created by trigger with empty name and currency
+ok 2 - §5.1: RLS enabled on every public table
+ok 3 - T-10/AC-7: no password-like columns in public
+ok 4 - security definer handle_new_user pins search_path to empty
+ok 5 - anon cannot execute set_updated_at
+ok 6 - anon has no table privileges on profiles
+ok 7 - A selecting B by id returns 0 rows
+ok 8 - A updating B affects 0 rows
+ok 9 - A updating own profile affects 1 row
+ok 10 - A own update persisted
+ok 11 - A cannot delete B profile
+ok 12 - A cannot write created_at (column grant)
+ok 13 - DB rejects lowercase currency
+ok 14 - DB rejects 121-char display name
+ok 15 - DB rejects empty display name
+ok 16 - B cannot see A profile
+ok 17 - B profile was not changed by A
+ok 18 - anon cannot update profiles
+ok 19 - anon cannot insert profiles
+ok 20 - anon cannot delete profiles
+ok 21 - both profiles still exist after attacks
+ok 22 - profile cascades on auth user delete
+# executed via Supabase MCP execute_sql on eqozjuaaajstrewygqxr at c380e81 (pgtap-wrap output, comment lines stripped; ends in ROLLBACK)

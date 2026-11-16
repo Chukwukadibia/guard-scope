@@ -9,10 +9,22 @@ import {
   rest,
   shot,
   uniq,
+  archiveTracked,
+  trackCreatedProjects,
+  type TrackedProjects,
 } from './p2-helpers';
 
 /** Phase 2 Tester — T-11 / AC-11: axe (0 serious/critical), keyboard, no overflow at 375/1280. */
 test.use({ signedInAs: 'A' });
+
+// Test hygiene: archive every project this test created (see trackCreatedProjects).
+let tracked: TrackedProjects = [];
+test.beforeEach(({ page }) => {
+  tracked = trackCreatedProjects(page);
+});
+test.afterEach(async ({ page }) => {
+  await archiveTracked(page, tracked);
+});
 
 const tokenOf = (s: Record<string, unknown>) => s.access_token as string;
 const serious = (v: { impact?: string | null }[]) =>

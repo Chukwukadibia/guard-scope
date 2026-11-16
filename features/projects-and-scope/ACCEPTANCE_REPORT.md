@@ -4,7 +4,7 @@
 **Commit tested:** `309d83c` (branch `feature/p2-projects-and-scope`; `src/` and `supabase/` untouched throughout)
 **Backend:** Supabase `guardscope-dev` (`eqozjuaaajstrewygqxr`) · **Date:** 2026-11-16
 **Evidence folder:** `docs/testing/phase2/`
-**Status:** COMPLETE — **not accepted**: D-1 (Medium) and D-2 (Low–Medium) must be fixed and the outdated Phase 1 test (D-5) updated first.
+**Status:** COMPLETE — not accepted at `309d83c` (sections below). **Retest 1 at `c380e81`: ACCEPTED** (see "Retest 1" at the end).
 
 ## How it was run
 | What | Command / method | Result | Evidence |
@@ -98,3 +98,126 @@ None. D-5 needs the spec owner to confirm the changed Phase 1 assertion.
 
 ## Decision
 **Not accepted at `309d83c`.** The database and security layer pass every check (AC-6/7/8/10 are strong). Fix D-1 and D-2, update D-5, then retest. D-3 and D-4 can be fixed or accepted by the spec owner.
+
+---
+
+# Retest 1 (commit c380e81)
+
+**Run mode:** Tester subagent, independent verification against FEATURE_SPEC / TEST_PLAN, not the developer's claims. **Date:** 2026-11-16. **Backend:** `guardscope-dev`. `src/` and `supabase/` not modified, nothing committed. Evidence under `docs/testing/phase2/` (files from this retest carry `retest1`; the screenshots, `axe/*.json` and `api-*` evidence were regenerated at `c380e81`).
+
+## What changed and how I checked the developer's test edits
+- `git diff 3a7c1eb c380e81 -- src tests`: the fixes are in `errors.ts` (P0001/PGRST116/42501/23502 mapping), `projects.ts`/`scope.ts` (uuid guard), `ProjectDetailPage.tsx` (one-shot notice, Overview allowance, `grid-cols-1`), and `wrap-anywhere`/`min-w-0` in the list, detail, scope view, item editor, dashboard and settings.
+- The developer also touched my Tester specs (`p2-*.spec.ts`, `p2-helpers.ts`). I ran prettier over the `3a7c1eb` versions and diffed them with `c380e81`. They are **identical**: the edits were formatting only, so **no assertion was weakened**.
+
+## How it was run
+| What | Command / method | Result | Evidence |
+|---|---|---|---|
+| Format, lint, typecheck, unit, build, bundle-secrets | `npm run check` | exit 0. Unit tests 102/102 in 10 files (includes the developer's new `errors`, `projectsApi` and `projectDetail` tests) | `check-retest1.log` |
+| pgTAP Phase 2 (dev) | `python3 -I scripts/pgtap-wrap.py tests/db/projects_scope.test.sql` → `execute_sql` (ROLLBACK) | **32/32** | `pgtap-retest1-projects_scope.tap` |
+| pgTAP Phase 2 (tester) | same, `projects_scope_tester.test.sql` | **80/80** | `pgtap-retest1-projects_scope_tester.tap` |
+| pgTAP Phase 1 | same, `profiles_rls.test.sql` / `profiles_rls_tester.test.sql` | **12/12**, **22/22** | `pgtap-retest1-profiles_rls*.tap` |
+| Full E2E regression (Phase 1 + Phase 2 + the developer's debug specs + new `p2-retest1.spec.ts`) | `set -a && . ./.env.test.local && set +a && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium npm run test:e2e -- --trace off --workers=2 --reporter=list` on clean data | **162 passed, 0 failed, 18 skipped** | `e2e-run-retest1.log` |
+| T-10 account deletion (needs a throwaway account, so it is skipped in the full run) | `P2_THROWAWAY_EMAIL=… P2_THROWAWAY_PW=… npx playwright test tests/e2e/p2-account-deletion.spec.ts` (password only in the env) | 1 passed (desktop; mobile skipped by design) | `e2e-p2-account-deletion-retest1.log` |
+| axe at 375 and 1280 | `p2-a11y.spec.ts`: 14 pages/states × 2 widths, including the long-text list/detail, not-found, archived, confirm-dialog error and settings delete error | **0 violations of any impact** (0 serious/critical) on all 28 scans. The same test asserts no horizontal overflow | `axe/*.json`, `screenshots/*-T11-*.png` |
+| Advisor | `get_advisors(security)` | same 2 dispositioned items; **no new findings** | `supabase-advisors-and-cleanup-retest1.log` |
+
+**Full-run history (nothing hidden):**
+- **Attempt 1** (`e2e-run-retest1-attempt1.log`): 142 passed, **4 failed**. All 4 were Phase 1 T-16 (`/` and `/projects` × 2 viewports). The Phase 2 specs, which run earlier in alphabetical order, left user A with active projects, so the empty-state precondition was false. Every D-1..D-4 check passed in this attempt.
+- I made the following test-hygiene fixes:
+  - the Phase 2 specs now archive the projects each test creates (`trackCreatedProjects`/`archiveTracked`, hooked in `p2-projects`, `p2-scope`, `p2-a11y` and `p2-retest1`);
+  - T-16 now waits up to 120 s for its precondition (A has 0 active projects) before asserting.
+
+  No assertion was changed.
+- **Attempt 2** (`…-attempt2.log`): 156 passed, 6 failed:
+  - T-16 again: a race in my tracker, which `afterEach` ran before the response body was read. Fixed by awaiting the pending reads.
+  - My new D-4 test expected Back to return to `/edit`. Saving an edit navigates with `replace: true`, which is unchanged since `3a7c1eb` and the intended design, so the expectation was mine and wrong. It now expects the earlier detail entry and asserts no notice there.
+- **Attempt 3:** the run reported above.
+- **18 skips, all deliberate:**
+  - the same Phase 1 skips as before;
+  - Phase 2 desktop-only API tests on mobile (T-01 default currency, T-05 API, T-07/T-08, T-09);
+  - T-10 × 2 (run separately above).
+
+## D-5 / ISS-013: Phase 1 test updated (authorised by the Team Lead under the approved Phase 2 spec §6, HA-004)
+`tests/e2e/settings-and-empty-states.spec.ts` T-16 `/projects` now expects:
+- the Phase 2 empty state heading "No active projects";
+- no buttons and no dead links in `main`, as before;
+- a "New project" link **inside the empty state** with `href="/projects/new"` that, when clicked, opens the create form.
+
+The Phase 1 intent is unchanged: an empty state with no dead actions. The `/` (Dashboard) case is unchanged. A comment cites ISS-013 and §6.
+
+## Alert "Error:" prefix: my decision
+`Alert` (Phase 1) renders `<span class="sr-only">Error: </span>` inside `role="alert"` so that status is not conveyed by colour alone (PRD §12). That is correct product behaviour. I did **not** loosen the check to `toContainText`. The T-05 assertions now use the **exact full accessible text**: `toHaveText('Error: Add at least one deliverable before confirming the scope.')` and `'Error: This scope was already confirmed. Refresh the page to see the latest version.'`. This is as strict as before and also pins the prefix.
+
+## The 42501 → not_found risk: assessed
+- **Where 42501 reaches an owner:** stale-tab writes after a confirmation elsewhere never return 42501. Updates and deletes affect 0 rows, and inserts hit the guard trigger (`scope_version_immutable`). Both map to "Confirmed scope cannot be changed. Edit the draft instead." I verified this in the UI (`p2-retest1` "after the draft was confirmed elsewhere"; nothing was written). The only owner path to 42501 is an insert into the draft of a project that was **archived** in another tab. That path now shows "We couldn't find that. It may have been removed, or you may not have access." and writes nothing (`retest1-42501-*.log`: `403 {"code":"42501"…}`; `*-R1-stale-after-archive.png`).
+- **Against the spec:** §6 requires that "a double-confirm or stale draft returns a safe error message". The message is safe and not wrong, but less specific than "archived". The double-confirm and stale-confirm cases (the ones §6 names) show the specific texts. **Acceptable.** Recorded as observation O-6 below.
+- **Leak:** none.
+  - 42501 is returned identically for another user's row and for a random id (`sql-oracle-probe.log`), and both now map to the same text.
+  - The client error carries no title, id or state. The test asserts that the text contains neither "archived" nor the id.
+  - The mapping makes "not yours" and "missing" indistinguishable in the UI, which is what §6 asks for.
+
+## Defect verdicts
+| Defect | Verdict | Evidence |
+|---|---|---|
+| **D-1** (ISS-009) error mapping | **FIXED, verified** | All four of my original D-1 checks now pass at both widths: T-05 empty scope, T-05 stale-tab confirm, the T-03 archived edit URL (soft assertion passes), and §6 random/B-owned/malformed ids with the identical "Project not found" page. Further checks in `p2-retest1`: stale writes after confirm → scope-locked text; after archive → not-found text; the malformed id makes **no Supabase request**, on both `/projects/not-a-uuid` and `/edit`. Unit tests cover the P0001 map, PGRST116, 42501 and 23502. |
+| **D-2** (ISS-010) long-text overflow | **FIXED, verified** | `p2-a11y` T-11 (200-character unbroken title/client, 5000-character description and items) passes with no horizontal overflow at 375 and 1280. The list, detail (draft + baseline + current) and dashboard all wrap (`mobile-T11-projects-list.png`, `*-T11-detail-baseline-current-draft-long-text.png`). Realistic long text still wraps normally. |
+| **D-3** (ISS-011) overview allowance | **FIXED, verified** | The Overview line now reads "Confirmed … · 1 deliverable, 1 exclusion · Revisions: X" for all four cases: 2 / 1 / none / not specified ("2 revisions included", "1 revision included", "No revisions included", "Not specified", BR-4). It keeps the **baseline** value after the draft's allowance changes to 7 (`p2-retest1` D-3 × 4 × 2 widths; `*-R1-D3-overview.png`). |
+| **D-4** (ISS-012) notice on reload | **FIXED, verified** | "Project updated." shows after saving, and is absent after a reload, after confirm + reload (the original reproduction) and after Back/Forward. Back/Forward navigation still works (`p2-retest1` D-4; the developer's D-4 "Project created." test also passes). |
+| **D-5** (ISS-013) outdated Phase 1 test | **RESOLVED** (test updated, see above) | T-16 passes at both widths in the full run. |
+
+## Updated acceptance criteria (c380e81)
+| Criterion | Result | Notes / evidence |
+|---|---|---|
+| AC-1 | PASS | T-01 ✓ |
+| AC-2 | PASS | T-02 UI + API ✓; pgTAP V1–V19 ✓ (O-1 still open as an observation) |
+| AC-3 | PASS | T-03 ✓, including the archived edit-URL message |
+| AC-4 | PASS | T-04 ✓ |
+| AC-5 | PASS | T-05 UI (exact messages) + API (sequential and concurrent) ✓ |
+| AC-6 | PASS | T-06 deep-equal ✓; pgTAP C7/C8 md5 ✓ |
+| AC-7 | PASS | T-07 ✓; pgTAP I1–I6 ✓ |
+| AC-8 | PASS | T-08 ✓; pgTAP B1–B9, X1–X3, U1–U4, G1–G11 ✓ |
+| AC-9 | PASS | T-09 ✓ |
+| AC-10 | PASS | T-10 ✓ (throwaway account deleted through the UI; 0 rows remain); pgTAP D1–D6 ✓ |
+| AC-11 | **PASS** (was FAIL) | axe 0 violations × 28; keyboard ✓; no overflow at 375/1280, including the 200/5000-character unbroken text |
+| AC-12 | **PASS** (was FAIL) | All Phase 1 specs pass in the same full run; pgTAP Phase 1 12/12 + 22/22 |
+
+## Updated test scenarios
+| ID | Result |
+|---|---|
+| T-01 … T-04 | PASS |
+| T-05 | **PASS** (was FAIL) |
+| T-06 … T-10 | PASS |
+| T-11 | **PASS** (was FAIL) |
+| T-12 (Phase 1 regression) | **PASS** (was FAIL) |
+| §6 not found / not yours / malformed | **PASS** (was FAIL) |
+| Retest-only `p2-retest1.spec.ts` (stale writes, 42501, malformed id makes no request, D-3 × 4, D-4) | PASS (8 tests × 2 widths) |
+
+## New defects
+**None.**
+
+New observation:
+- **O-6:** a stale-tab item add after the project was archived elsewhere shows the generic not-found text rather than "This project is archived". It is safe, leaks nothing and writes nothing. Optional polish: re-fetch the project on a 42501 error. This is not a §6 violation.
+
+Observations O-1 to O-5 are unchanged.
+
+## Cleanup
+- `auth.users` contains only a@ and b@guardscope.test. projects, scope_versions and scope_items are 0, and both profiles' fields are null.
+- The T-10 throwaway account was deleted by the test through the UI. Its identities are 0.
+- The pgTAP users were rolled back.
+- **Restored from git:** the Phase 1 evidence files (`docs/testing/phase1/axe/*.json`, `docs/testing/phase1/screenshots/*.png`) that the full regression overwrote.
+
+## Files changed by the Tester in this retest
+- `tests/e2e/p2-scope.spec.ts`: the exact alert text now includes the sr-only prefix; added the cleanup hooks.
+- `tests/e2e/settings-and-empty-states.spec.ts`: the D-5 update and the T-16 precondition wait.
+- `tests/e2e/p2-helpers.ts`: added `trackCreatedProjects` and `archiveTracked`.
+- `tests/e2e/p2-projects.spec.ts` and `tests/e2e/p2-a11y.spec.ts`: added the cleanup hooks.
+- `tests/e2e/p2-retest1.spec.ts`: new.
+- `docs/testing/phase2/*retest1*` plus the regenerated evidence.
+- this report.
+
+## Final acceptance decision
+**ACCEPTED at `c380e81`.**
+- AC-1 to AC-12 and T-01 to T-12 all pass.
+- D-1 to D-4 are fixed and independently verified, and D-5 is resolved (the Team Lead authorised the test update under HA-004).
+- There are no new defects.
+- Before close-out, the Team Lead should update ISS-009 to ISS-013 to "Verified / Closed".
