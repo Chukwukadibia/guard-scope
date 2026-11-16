@@ -1,0 +1,15 @@
+# tests/db/profiles_rls.test.sql (implementer-authored)
+# Run 2026-11-16 via: python3 -I scripts/pgtap-wrap.py tests/db/profiles_rls.test.sql -> mcp__Supabase__execute_sql (project eqozjuaaajstrewygqxr); transaction ends in ROLLBACK
+1..12
+ok 1 - profiles created by trigger
+ok 2 - anon cannot execute handle_new_user
+ok 3 - authenticated cannot execute handle_new_user
+ok 4 - authenticated cannot execute set_updated_at
+ok 5 - A sees exactly one profile
+ok 6 - A sees only own profile
+ok 7 - A can update own profile
+ok 8 - A cannot change id (column grant)
+ok 9 - A cannot insert profiles
+ok 10 - A cannot delete profiles
+ok 11 - anon cannot read profiles
+ok 12 - A could not update B's profile

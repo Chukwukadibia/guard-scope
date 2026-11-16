@@ -1,0 +1,55 @@
+# T-09 / AC-6 PostgREST checks with real user JWTs (2026-11-16T09:42:32Z). Tokens/passwords redacted.
+A id=d79005b2-c3c3-4e52-ae27-ca6342043e42  B id=d911eb73-851a-47c6-bb42-e604ac2b5616
+
+## A GET B's profile by id (expect [])
+$ curl https://eqozjuaaajstrewygqxr.supabase.co/rest/v1/profiles?id=eq.d911eb73-851a-47c6-bb42-e604ac2b5616&select=* -H apikey: <redacted> -H Authorization: Bearer <redacted>
+[]
+HTTP 200
+
+## A GET all profiles (expect only A)
+$ curl https://eqozjuaaajstrewygqxr.supabase.co/rest/v1/profiles?select=id -H apikey: <redacted> -H Authorization: Bearer <redacted>
+[{"id":"d79005b2-c3c3-4e52-ae27-ca6342043e42"}]
+HTTP 200
+
+## A PATCH B display_name (expect [] / 0 rows)
+$ curl -X PATCH https://eqozjuaaajstrewygqxr.supabase.co/rest/v1/profiles?id=eq.d911eb73-851a-47c6-bb42-e604ac2b5616 -H apikey: <redacted> -H Authorization: Bearer <redacted> -H Content-Type: application/json -H Prefer: return=representation -d {"display_name":"hacked"}
+[]
+HTTP 200
+
+## A DELETE B (expect error 42501)
+$ curl -X DELETE https://eqozjuaaajstrewygqxr.supabase.co/rest/v1/profiles?id=eq.d911eb73-851a-47c6-bb42-e604ac2b5616 -H apikey: <redacted> -H Authorization: Bearer <redacted> -H Prefer: return=representation
+{"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT DELETE ON public.profiles TO authenticated;","message":"permission denied for table profiles"}
+HTTP 403
+
+## A POST new profile (expect error 42501)
+$ curl -X POST https://eqozjuaaajstrewygqxr.supabase.co/rest/v1/profiles -H apikey: <redacted> -H Authorization: Bearer <redacted> -H Content-Type: application/json -d {"id":"d911eb73-851a-47c6-bb42-e604ac2b5616"}
+{"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT INSERT ON public.profiles TO authenticated;","message":"permission denied for table profiles"}
+HTTP 403
+
+## A PATCH own id (expect error 42501, column grant)
+$ curl -X PATCH https://eqozjuaaajstrewygqxr.supabase.co/rest/v1/profiles?id=eq.d79005b2-c3c3-4e52-ae27-ca6342043e42 -H apikey: <redacted> -H Authorization: Bearer <redacted> -H Content-Type: application/json -d {"id":"00000000-0000-0000-0000-000000000001"}
+{"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT UPDATE ON public.profiles TO authenticated;","message":"permission denied for table profiles"}
+HTTP 403
+
+## anon GET profiles (expect 401/42501)
+$ curl https://eqozjuaaajstrewygqxr.supabase.co/rest/v1/profiles?select=* -H apikey: <redacted>
+{"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT SELECT ON public.profiles TO anon;","message":"permission denied for table profiles"}
+HTTP 401
+
+## anon PATCH profiles (expect 401/42501)
+$ curl -X PATCH https://eqozjuaaajstrewygqxr.supabase.co/rest/v1/profiles?id=eq.d911eb73-851a-47c6-bb42-e604ac2b5616 -H apikey: <redacted> -H Content-Type: application/json -d {"display_name":"x"}
+{"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT SELECT, UPDATE ON public.profiles TO anon;","message":"permission denied for table profiles"}
+HTTP 401
+
+## tampered JWT GET profiles (expect 401)
+$ curl https://eqozjuaaajstrewygqxr.supabase.co/rest/v1/profiles?select=id -H apikey: <redacted> -H Authorization: Bearer <tampered-token-redacted>
+{"code":"PGRST301","details":"None of the keys was able to decode the JWT","hint":null,"message":"No suitable key or wrong key type"}
+HTTP 401
+
+## B GET B's profile (control: expect 1 row)
+$ curl https://eqozjuaaajstrewygqxr.supabase.co/rest/v1/profiles?id=eq.d911eb73-851a-47c6-bb42-e604ac2b5616&select=id,display_name -H apikey: <redacted> -H Authorization: Bearer <redacted>
+[{"id":"d911eb73-851a-47c6-bb42-e604ac2b5616","display_name":null}]
+HTTP 200
+
+## GET /auth/v1/settings
+{"external":{"anonymous_users":false,"apple":false,"azure":false,"bitbucket":false,"discord":false,"facebook":false,"snapchat":false,"figma":false,"fly":false,"github":false,"gitlab":false,"google":false,"keycloak":false,"kakao":false,"linkedin":false,"linkedin_oidc":false,"notion":false,"spotify":false,"slack":false,"slack_oidc":false,"workos":false,"twitch":false,"twitter":false,"email":true,"phone":false,"zoom":false},"disable_signup":false,"mailer_autoconfirm":false,"phone_autoconfirm":false,"sms_provider":"twilio","saml_enabled":false,"saml_private_key_next_configured":true,"passkeys_enabled":false}

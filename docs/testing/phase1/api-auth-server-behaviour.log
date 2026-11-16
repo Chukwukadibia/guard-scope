@@ -1,0 +1,30 @@
+# Auth server behaviour checks (2026-11-16T09:42:53Z). Passwords redacted; bodies trimmed of tokens.
+
+## T-15 API: password grant, existing email + wrong password
+{"code":400,"error_code":"invalid_credentials","msg":"Invalid login credentials"}
+HTTP 400
+
+## T-15 API: password grant, non-existent email
+{"code":400,"error_code":"invalid_credentials","msg":"Invalid login credentials"}
+HTTP 400
+
+## T-15 API: signup with an already-registered email (a@)
+{"id":"97686481-eeb2-41e4-bbb0-b69984a22575","aud":"authenticated","role":"","email":"a@guardscope.test","phone":"","confirmation_sent_at":"2026-11-16T09:42:55.452739882Z","app_metadata":{"provider":"email","providers":["email"]},"user_metadata":{},"identities":[],"created_at":"2026-11-16T09:42:55.452739882Z","updated_at":"2026-11-16T09:42:55.452739882Z","is_anonymous":false}
+HTTP 200
+
+## BR-2 API: sign in as unconfirmed user t-unconfirmed@guardscope.test (correct password; SQL-created fixture)
+{"code":400,"error_code":"email_not_confirmed","msg":"Email not confirmed"}
+HTTP 400
+
+## BR-2/AC-11 API: unconfirmed user + WRONG password
+{"code":400,"error_code":"invalid_credentials","msg":"Invalid login credentials"}
+HTTP 400
+
+## BR-1 API: server-side minimum password length. Throwaway user t-pwlen@ (SQL fixture) signs in, then PUT /auth/v1/user with a 7-char password
+sign-in ok: yes
+--- 7 chars:
+HTTP 200
+{'email': 't-pwlen@guardscope.test', 'updated_at': '2026-11-16T09:45:02.326535Z'}
+--- 5 chars:
+{"code":422,"error_code":"weak_password","msg":"Password should be at least 6 characters.","weak_password":{"reasons":["length"]}}
+HTTP 422

@@ -1,0 +1,35 @@
+
+ RUN  v5.1.0 /tmp/claude-0/-home-user-Legit-Predict/6a8ddc8f-b74e-5cc4-a1f8-4c2778fd4e59/scratchpad/guard-scope
+
+ ✓ tests/unit/validation.test.ts > auth validation > email 3ms
+ ✓ tests/unit/validation.test.ts > auth validation > password minimum 8 (BR-1) 0ms
+ ✓ tests/unit/validation.test.ts > profile validation (AC-8, T-12) > display name length 1ms
+ ✓ tests/unit/validation.test.ts > profile validation (AC-8, T-12) > currency must be a supported ISO code; empty allowed (no USD default) 1ms
+ ✓ tests/unit/errors.test.ts > error mapping > { code: 'invalid_credentials' } -> invalid_credentials 2ms
+ ✓ tests/unit/errors.test.ts > error mapping > { code: 'email_not_confirmed' } -> email_not_confirmed 1ms
+ ✓ tests/unit/errors.test.ts > error mapping > { code: 'over_email_send_rate_limit' } -> rate_limited 0ms
+ ✓ tests/unit/errors.test.ts > error mapping > { status: 429 } -> rate_limited 0ms
+ ✓ tests/unit/errors.test.ts > error mapping > { code: '42501', …(1) } -> unknown 0ms
+ ✓ tests/unit/errors.test.ts > error mapping > [TypeError: Failed to fetch] -> network 0ms
+ ✓ tests/unit/errors.test.ts > error mapping > messages never echo backend text and do not reveal account existence 1ms
+ ✓ tests/unit/App.test.tsx > shows only a loading state (no protected content) while the session is being checked 83ms
+ ✓ tests/unit/safeNext.test.ts > safeNext (T-05, AC-3) > allows in-app path /projects 3ms
+ ✓ tests/unit/safeNext.test.ts > safeNext (T-05, AC-3) > allows in-app path /settings?tab=1 1ms
+ ✓ tests/unit/safeNext.test.ts > safeNext (T-05, AC-3) > allows in-app path null 0ms
+ ✓ tests/unit/safeNext.test.ts > safeNext (T-05, AC-3) > allows in-app path  0ms
+ ✓ tests/unit/safeNext.test.ts > safeNext (T-05, AC-3) > rejects //evil.com 0ms
+ ✓ tests/unit/safeNext.test.ts > safeNext (T-05, AC-3) > rejects https://evil.com 0ms
+ ✓ tests/unit/safeNext.test.ts > safeNext (T-05, AC-3) > rejects /\evil.com 0ms
+ ✓ tests/unit/safeNext.test.ts > safeNext (T-05, AC-3) > rejects javascript:alert(1) 0ms
+ ✓ tests/unit/safeNext.test.ts > safeNext (T-05, AC-3) > rejects evil.com 1ms
+ ✓ tests/unit/safeNext.test.ts > safeNext (T-05, AC-3) > rejects /	/evil.com 0ms
+
+ Test Files  4 passed (4)
+      Tests  22 passed (22)
+   Start at  09:40:22
+   Duration  1.87s (environment 72%, setup 12%, import 9%, transform 3%, tests 3%)
+
+    Isolate  4 workers spawned · ~823ms startup each (spawn + environment, per file)
+             at least ~274ms faster with isolate: false — reuses workers across files instead of one per file
+
+EXIT=0
