@@ -1,0 +1,15 @@
+{"project":"desktop","label":"missing title","data":{"status":400,"body":{"code":"23502","details":null,"hint":null,"message":"null value in column \"title\" of relation \"requests\" violates not-null constraint"}}}
+{"project":"desktop","label":"blank title","data":{"status":400,"body":{"code":"23514","details":null,"hint":null,"message":"new row for relation \"requests\" violates check constraint \"requests_title_check\""}}}
+{"project":"desktop","label":"201-char title","data":{"status":400,"body":{"code":"23514","details":null,"hint":null,"message":"new row for relation \"requests\" violates check constraint \"requests_title_check\""}}}
+{"project":"desktop","label":"5001-char description","data":{"status":400,"body":{"code":"23514","details":null,"hint":null,"message":"new row for relation \"requests\" violates check constraint \"requests_description_check\""}}}
+{"project":"desktop","label":"5001-char notes","data":{"status":400,"body":{"code":"23514","details":null,"hint":null,"message":"new row for relation \"requests\" violates check constraint \"requests_internal_notes_check\""}}}
+{"project":"desktop","label":"bad channel","data":{"status":400,"body":{"code":"23514","details":null,"hint":null,"message":"new row for relation \"requests\" violates check constraint \"requests_source_channel_check\""}}}
+{"project":"desktop","label":"future date +2","data":{"status":400,"body":{"code":"23514","details":null,"hint":null,"message":"received_on_in_future"}}}
+{"project":"desktop","label":"future date +30","data":{"status":400,"body":{"code":"23514","details":null,"hint":null,"message":"received_on_in_future"}}}
+{"project":"desktop","label":"not a date","data":{"status":400,"body":{"code":"22008","details":null,"hint":null,"message":"date/time field value out of range: \"2026-02-30\""}}}
+{"project":"desktop","label":"garbage date","data":{"status":400,"body":{"code":"22007","details":null,"hint":null,"message":"invalid input syntax for type date: \"next week-ish\""}}}
+{"project":"desktop","label":"null date","data":{"status":400,"body":{"code":"23502","details":null,"hint":null,"message":"null value in column \"received_on\" of relation \"requests\" violates not-null constraint"}}}
+{"project":"desktop","label":"forged classification","data":{"status":403,"body":{"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT INSERT ON public.requests TO authenticated;","message":"permission denied for table requests"}}}
+{"project":"desktop","label":"forged created_at","data":{"status":403,"body":{"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT INSERT ON public.requests TO authenticated;","message":"permission denied for table requests"}}}
+{"project":"desktop","label":"received_on 'yesterday' literal","data":{"status":201,"body":[{"received_on":"2026-11-15"}]}}
+{"project":"desktop","label":"future date +1 (tolerance)","data":{"status":201}}

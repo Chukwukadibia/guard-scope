@@ -1,0 +1,348 @@
+
+Running 40 tests using 2 workers
+
+  ✘   2 [desktop] › tests/e2e/p3-classification.spec.ts:41:3 › T-03 / AC-3 classify and history › each option updates the label and appends one history entry; same value adds none (10.8s)
+  ✓   3 [desktop] › tests/e2e/p3-classification.spec.ts:116:3 › T-03 / AC-3 classify and history › API: same value twice adds no event; history cannot be edited or deleted (8.0s)
+  ✓   1 [desktop] › tests/e2e/p3-a11y.spec.ts:39:1 › T-10 axe + overflow on every Phase 3 page and state (29.4s)
+  ✘   4 [desktop] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (9.1s)
+  ✘   5 [desktop] › tests/e2e/p3-a11y.spec.ts:139:1 › T-10 keyboard: capture and classify without a mouse (11.2s)
+  ✓   6 [desktop] › tests/e2e/p3-classification.spec.ts:236:3 › T-09 / AC-9 no money; Phase 4 hint; BR-6 wording › Included shows no value; Additional shows the hint without a dead action (11.7s)
+  ✓   8 [desktop] › tests/e2e/p3-revisions.spec.ts:49:3 › T-06 / AC-6 revision usage › no recording before a scope is confirmed (3.0s)
+  ✘   7 [desktop] › tests/e2e/p3-requests.spec.ts:34:3 › T-01 / AC-1 capture › quick add with title only, full add, reload, list order, filter (7.8s)
+  ✓   9 [desktop] › tests/e2e/p3-revisions.spec.ts:70:3 › T-06 / AC-6 revision usage › numeric allowance 2: record, over-use without negatives, undo (10.1s)
+  ✓  10 [desktop] › tests/e2e/p3-requests.spec.ts:147:3 › T-01 / AC-1 capture › edit a request persists after reload (5.8s)
+  ✓  12 [desktop] › tests/e2e/p3-requests.spec.ts:166:3 › T-02 / AC-2 validation › UI: field errors + focused summary, nothing sent (3.9s)
+  ✓  11 [desktop] › tests/e2e/p3-revisions.spec.ts:132:3 › T-06 / AC-6 revision usage › allowance "none" and "not specified": used shown, no remaining figure (9.7s)
+  ✘  13 [desktop] › tests/e2e/p3-requests.spec.ts:230:3 › T-02 / AC-2 validation › API: the same invalid data is rejected by the server (5.8s)
+  ✓  14 [desktop] › tests/e2e/p3-revisions.spec.ts:155:3 › T-06 / AC-6 revision usage › allowance comes from the latest confirmed scope, not the draft (6.3s)
+  ✓  15 [desktop] › tests/e2e/p3-requests.spec.ts:276:3 › T-05 / AC-5 private notes › private label on the request; notes nowhere else in the UI or history (7.9s)
+  ✓  16 [desktop] › tests/e2e/p3-revisions.spec.ts:177:3 › T-06 / AC-6 revision usage › request page: record a revision linked to an Included request (5.5s)
+  ✓  17 [desktop] › tests/e2e/p3-requests.spec.ts:341:3 › T-07 / AC-7 archived project › requests visible; every write blocked in UI and API (8.6s)
+  ✓  18 [desktop] › tests/e2e/p3-revisions.spec.ts:211:3 › T-06 / AC-6 revision usage › API: a usage cannot link to a request from another project (BR-4) (7.7s)
+  ✓  19 [desktop] › tests/e2e/p3-requests.spec.ts:425:3 › T-08 / AC-8 isolation › B and anon cannot touch A’s requests, events, usages or the RPC (10.3s)
+  ✓  21 [desktop] › tests/e2e/p3-requests.spec.ts:524:3 › §6 not found › missing, foreign, malformed and wrong-project request ids look the same (11.0s)
+  ✓  20 [mobile] › tests/e2e/p3-a11y.spec.ts:39:1 › T-10 axe + overflow on every Phase 3 page and state (24.9s)
+  ✘  22 [mobile] › tests/e2e/p3-classification.spec.ts:41:3 › T-03 / AC-3 classify and history › each option updates the label and appends one history entry; same value adds none (9.2s)
+  -  24 [mobile] › tests/e2e/p3-classification.spec.ts:116:3 › T-03 / AC-3 classify and history › API: same value twice adds no event; history cannot be edited or deleted
+  -  25 [mobile] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history
+  ✘  23 [mobile] › tests/e2e/p3-a11y.spec.ts:139:1 › T-10 keyboard: capture and classify without a mouse (9.9s)
+  ✓  26 [mobile] › tests/e2e/p3-classification.spec.ts:236:3 › T-09 / AC-9 no money; Phase 4 hint; BR-6 wording › Included shows no value; Additional shows the hint without a dead action (11.5s)
+  ✘  27 [mobile] › tests/e2e/p3-requests.spec.ts:34:3 › T-01 / AC-1 capture › quick add with title only, full add, reload, list order, filter (8.5s)
+  ✓  28 [mobile] › tests/e2e/p3-revisions.spec.ts:49:3 › T-06 / AC-6 revision usage › no recording before a scope is confirmed (2.1s)
+  ✓  29 [mobile] › tests/e2e/p3-requests.spec.ts:147:3 › T-01 / AC-1 capture › edit a request persists after reload (4.8s)
+  ✓  30 [mobile] › tests/e2e/p3-revisions.spec.ts:70:3 › T-06 / AC-6 revision usage › numeric allowance 2: record, over-use without negatives, undo (9.3s)
+  ✓  31 [mobile] › tests/e2e/p3-requests.spec.ts:166:3 › T-02 / AC-2 validation › UI: field errors + focused summary, nothing sent (4.5s)
+  -  33 [mobile] › tests/e2e/p3-requests.spec.ts:230:3 › T-02 / AC-2 validation › API: the same invalid data is rejected by the server
+  ✓  32 [mobile] › tests/e2e/p3-revisions.spec.ts:132:3 › T-06 / AC-6 revision usage › allowance "none" and "not specified": used shown, no remaining figure (7.0s)
+  ✓  34 [mobile] › tests/e2e/p3-requests.spec.ts:276:3 › T-05 / AC-5 private notes › private label on the request; notes nowhere else in the UI or history (5.4s)
+  ✓  35 [mobile] › tests/e2e/p3-revisions.spec.ts:155:3 › T-06 / AC-6 revision usage › allowance comes from the latest confirmed scope, not the draft (5.0s)
+  ✓  36 [mobile] › tests/e2e/p3-requests.spec.ts:341:3 › T-07 / AC-7 archived project › requests visible; every write blocked in UI and API (5.5s)
+  -  38 [mobile] › tests/e2e/p3-requests.spec.ts:425:3 › T-08 / AC-8 isolation › B and anon cannot touch A’s requests, events, usages or the RPC
+  ✓  37 [mobile] › tests/e2e/p3-revisions.spec.ts:177:3 › T-06 / AC-6 revision usage › request page: record a revision linked to an Included request (4.7s)
+  -  40 [mobile] › tests/e2e/p3-revisions.spec.ts:211:3 › T-06 / AC-6 revision usage › API: a usage cannot link to a request from another project (BR-4)
+  ✓  39 [mobile] › tests/e2e/p3-requests.spec.ts:524:3 › §6 not found › missing, foreign, malformed and wrong-project request ids look the same (11.0s)
+
+
+  1) [desktop] › tests/e2e/p3-a11y.spec.ts:139:1 › T-10 keyboard: capture and classify without a mouse 
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator:  getByRole('region', { name: 'Client requests' }).getByRole('button', { name: 'Add details or private notes' })
+    Expected: focused
+    Received: inactive
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeFocused" getByRole('region', { name: 'Client requests' }).getByRole('button', { name: 'Add details or private notes' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Client requests' }).getByRole('button', { name: 'Add details or private notes' })
+        14 × locator resolved to <button type="button" aria-expanded="false" class="min-h-11 text-sm text-brand-700 underline">Add details or private notes</button>
+           - unexpected value "inactive"
+
+
+      156 |   await page.keyboard.press('Tab'); // channel
+      157 |   await page.keyboard.press('Tab'); // "Add details or private notes"
+    > 158 |   await expect(reqs.getByRole('button', { name: 'Add details or private notes' })).toBeFocused();
+          |                                                                                    ^
+      159 |   await page.keyboard.press('Enter');
+      160 |   await expect(reqs.getByLabel('Details (optional)')).toBeVisible();
+      161 |
+        at /home/user/guard-scope/tests/e2e/p3-a11y.spec.ts:158:84
+
+    Error Context: test-results/p3-a11y-T-10-keyboard-capture-and-classify-without-a-mouse-desktop/error-context.md
+
+  2) [desktop] › tests/e2e/p3-classification.spec.ts:41:3 › T-03 / AC-3 classify and history › each option updates the label and appends one history entry; same value adds none 
+
+    Error: history entry for unclassified -> included should name the previous value
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "Not classified yet"
+    Received string:    "Marked \"Classify me\" as Included
+    16 Nov 2026, 14:14 UTC"
+
+      111 |       expect
+      112 |         .soft(e.text, `history entry for ${e.from} -> ${e.to} should name the previous value`)
+    > 113 |         .toContain(label[e.from]);
+          |          ^
+      114 |   });
+      115 |
+      116 |   test('API: same value twice adds no event; history cannot be edited or deleted', async ({
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:113:10
+
+    Error: history entry for included -> needs_clarification should name the previous value
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "Included"
+    Received string:    "Marked \"Classify me\" as Needs clarification
+    16 Nov 2026, 14:14 UTC"
+
+      111 |       expect
+      112 |         .soft(e.text, `history entry for ${e.from} -> ${e.to} should name the previous value`)
+    > 113 |         .toContain(label[e.from]);
+          |          ^
+      114 |   });
+      115 |
+      116 |   test('API: same value twice adds no event; history cannot be edited or deleted', async ({
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:113:10
+
+    Error: history entry for needs_clarification -> additional should name the previous value
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "Needs clarification"
+    Received string:    "Marked \"Classify me\" as Additional
+    16 Nov 2026, 14:14 UTC"
+
+      111 |       expect
+      112 |         .soft(e.text, `history entry for ${e.from} -> ${e.to} should name the previous value`)
+    > 113 |         .toContain(label[e.from]);
+          |          ^
+      114 |   });
+      115 |
+      116 |   test('API: same value twice adds no event; history cannot be edited or deleted', async ({
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:113:10
+
+    Error: history entry for additional -> included should name the previous value
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "Additional"
+    Received string:    "Marked \"Classify me\" as Included
+    16 Nov 2026, 14:14 UTC"
+
+      111 |       expect
+      112 |         .soft(e.text, `history entry for ${e.from} -> ${e.to} should name the previous value`)
+    > 113 |         .toContain(label[e.from]);
+          |          ^
+      114 |   });
+      115 |
+      116 |   test('API: same value twice adds no event; history cannot be edited or deleted', async ({
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:113:10
+
+    Error Context: test-results/p3-classification-T-03-AC--e58a9--entry-same-value-adds-none-desktop/error-context.md
+
+  3) [desktop] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history 
+
+    Error: link 7
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "needs_clarification"
+    Received: "included"
+
+      227 |     logEvidence('api-T03-concurrency.jsonl', testInfo, 'chain', { same, mixed, chain, finalValue });
+      228 |     expect(chain[0][0]).toBe('unclassified');
+    > 229 |     for (let i = 1; i < chain.length; i++) expect(chain[i][0], `link ${i}`).toBe(chain[i - 1][1]);
+          |                                                                             ^
+      230 |     for (const [f, t] of chain) expect(f).not.toBe(t);
+      231 |     expect(chain[chain.length - 1][1]).toBe(finalValue);
+      232 |   });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:229:77
+
+    Error Context: test-results/p3-classification-T-03-AC--e9520--keeps-a-consistent-history-desktop/error-context.md
+
+  4) [desktop] › tests/e2e/p3-requests.spec.ts:34:3 › T-01 / AC-1 capture › quick add with title only, full add, reload, list order, filter 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 7
+    + Received  + 1
+
+    - Array [
+    -   "Today later",
+    -   "Add a contact form",
+    -   "Extra landing page",
+    -   "Mid one",
+    -   "Old one",
+    - ]
+    + Array []
+
+      104 |     await page.reload();
+      105 |     const titles = (await reqs.getByRole('listitem').allInnerTexts()).map((t) => t.split('\n')[0]);
+    > 106 |     expect(titles).toEqual([
+          |                    ^
+      107 |       'Today later',
+      108 |       'Add a contact form',
+      109 |       'Extra landing page',
+        at /home/user/guard-scope/tests/e2e/p3-requests.spec.ts:106:20
+
+    Error Context: test-results/p3-requests-T-01-AC-1-capt-8544d-dd-reload-list-order-filter-desktop/error-context.md
+
+  5) [desktop] › tests/e2e/p3-requests.spec.ts:230:3 › T-02 / AC-2 validation › API: the same invalid data is rejected by the server 
+
+    Error: not a date: [{"id":"5a84f1a8-8dcf-4be2-a770-d0c958aca7db","project_id":"0bdb4031-8b83-4c61-9309-4ecdb3063b5b","title":"t","description":null,"source_channel":null,"received_on":"2026-11-15","classification":"unclassified","internal_notes":null,"created_at":"2026-11-16T14:15:07.628522+00:00","updated_at":"2026-11-16T14:15:07.628522+00:00"}]
+
+    expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 400
+    Received:    201
+
+      253 |       const r = await rest(page, token, 'POST', '/rest/v1/requests', { project_id: pid, ...body });
+      254 |       logEvidence('api-T02.jsonl', testInfo, label, { status: r.status, body: r.body });
+    > 255 |       expect(r.status, `${label}: ${JSON.stringify(r.body)}`).toBeGreaterThanOrEqual(400);
+          |                                                               ^
+      256 |     }
+      257 |     // +1 day is accepted on purpose (time-zone tolerance) — recorded as an observation
+      258 |     const plus1 = await rest(page, token, 'POST', '/rest/v1/requests', {
+        at /home/user/guard-scope/tests/e2e/p3-requests.spec.ts:255:63
+
+    Error Context: test-results/p3-requests-T-02-AC-2-vali-a0318-a-is-rejected-by-the-server-desktop/error-context.md
+
+  6) [mobile] › tests/e2e/p3-a11y.spec.ts:139:1 › T-10 keyboard: capture and classify without a mouse 
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator:  getByRole('region', { name: 'Client requests' }).getByRole('button', { name: 'Add details or private notes' })
+    Expected: focused
+    Received: inactive
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeFocused" getByRole('region', { name: 'Client requests' }).getByRole('button', { name: 'Add details or private notes' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Client requests' }).getByRole('button', { name: 'Add details or private notes' })
+        14 × locator resolved to <button type="button" aria-expanded="false" class="min-h-11 text-sm text-brand-700 underline">Add details or private notes</button>
+           - unexpected value "inactive"
+
+
+      156 |   await page.keyboard.press('Tab'); // channel
+      157 |   await page.keyboard.press('Tab'); // "Add details or private notes"
+    > 158 |   await expect(reqs.getByRole('button', { name: 'Add details or private notes' })).toBeFocused();
+          |                                                                                    ^
+      159 |   await page.keyboard.press('Enter');
+      160 |   await expect(reqs.getByLabel('Details (optional)')).toBeVisible();
+      161 |
+        at /home/user/guard-scope/tests/e2e/p3-a11y.spec.ts:158:84
+
+    Error Context: test-results/p3-a11y-T-10-keyboard-capture-and-classify-without-a-mouse-mobile/error-context.md
+
+  7) [mobile] › tests/e2e/p3-classification.spec.ts:41:3 › T-03 / AC-3 classify and history › each option updates the label and appends one history entry; same value adds none 
+
+    Error: history entry for unclassified -> included should name the previous value
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "Not classified yet"
+    Received string:    "Marked \"Classify me\" as Included
+    16 Nov 2026, 14:15 UTC"
+
+      111 |       expect
+      112 |         .soft(e.text, `history entry for ${e.from} -> ${e.to} should name the previous value`)
+    > 113 |         .toContain(label[e.from]);
+          |          ^
+      114 |   });
+      115 |
+      116 |   test('API: same value twice adds no event; history cannot be edited or deleted', async ({
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:113:10
+
+    Error: history entry for included -> needs_clarification should name the previous value
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "Included"
+    Received string:    "Marked \"Classify me\" as Needs clarification
+    16 Nov 2026, 14:15 UTC"
+
+      111 |       expect
+      112 |         .soft(e.text, `history entry for ${e.from} -> ${e.to} should name the previous value`)
+    > 113 |         .toContain(label[e.from]);
+          |          ^
+      114 |   });
+      115 |
+      116 |   test('API: same value twice adds no event; history cannot be edited or deleted', async ({
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:113:10
+
+    Error: history entry for needs_clarification -> additional should name the previous value
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "Needs clarification"
+    Received string:    "Marked \"Classify me\" as Additional
+    16 Nov 2026, 14:15 UTC"
+
+      111 |       expect
+      112 |         .soft(e.text, `history entry for ${e.from} -> ${e.to} should name the previous value`)
+    > 113 |         .toContain(label[e.from]);
+          |          ^
+      114 |   });
+      115 |
+      116 |   test('API: same value twice adds no event; history cannot be edited or deleted', async ({
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:113:10
+
+    Error: history entry for additional -> included should name the previous value
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "Additional"
+    Received string:    "Marked \"Classify me\" as Included
+    16 Nov 2026, 14:15 UTC"
+
+      111 |       expect
+      112 |         .soft(e.text, `history entry for ${e.from} -> ${e.to} should name the previous value`)
+    > 113 |         .toContain(label[e.from]);
+          |          ^
+      114 |   });
+      115 |
+      116 |   test('API: same value twice adds no event; history cannot be edited or deleted', async ({
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:113:10
+
+    Error Context: test-results/p3-classification-T-03-AC--e58a9--entry-same-value-adds-none-mobile/error-context.md
+
+  8) [mobile] › tests/e2e/p3-requests.spec.ts:34:3 › T-01 / AC-1 capture › quick add with title only, full add, reload, list order, filter 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 7
+    + Received  + 1
+
+    - Array [
+    -   "Today later",
+    -   "Add a contact form",
+    -   "Extra landing page",
+    -   "Mid one",
+    -   "Old one",
+    - ]
+    + Array []
+
+      104 |     await page.reload();
+      105 |     const titles = (await reqs.getByRole('listitem').allInnerTexts()).map((t) => t.split('\n')[0]);
+    > 106 |     expect(titles).toEqual([
+          |                    ^
+      107 |       'Today later',
+      108 |       'Add a contact form',
+      109 |       'Extra landing page',
+        at /home/user/guard-scope/tests/e2e/p3-requests.spec.ts:106:20
+
+    Error Context: test-results/p3-requests-T-01-AC-1-capt-8544d-dd-reload-list-order-filter-mobile/error-context.md
+
+  8 failed
+    [desktop] › tests/e2e/p3-a11y.spec.ts:139:1 › T-10 keyboard: capture and classify without a mouse 
+    [desktop] › tests/e2e/p3-classification.spec.ts:41:3 › T-03 / AC-3 classify and history › each option updates the label and appends one history entry; same value adds none 
+    [desktop] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history 
+    [desktop] › tests/e2e/p3-requests.spec.ts:34:3 › T-01 / AC-1 capture › quick add with title only, full add, reload, list order, filter 
+    [desktop] › tests/e2e/p3-requests.spec.ts:230:3 › T-02 / AC-2 validation › API: the same invalid data is rejected by the server 
+    [mobile] › tests/e2e/p3-a11y.spec.ts:139:1 › T-10 keyboard: capture and classify without a mouse 
+    [mobile] › tests/e2e/p3-classification.spec.ts:41:3 › T-03 / AC-3 classify and history › each option updates the label and appends one history entry; same value adds none 
+    [mobile] › tests/e2e/p3-requests.spec.ts:34:3 › T-01 / AC-1 capture › quick add with title only, full add, reload, list order, filter 
+  5 skipped
+  27 passed (3.1m)

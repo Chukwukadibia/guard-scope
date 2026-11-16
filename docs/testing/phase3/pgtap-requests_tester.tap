@@ -1,0 +1,125 @@
+# tests/db/requests_tester.test.sql (Tester) @ 6184f91 — wrapped with scripts/pgtap-wrap.py, executed via Supabase execute_sql (guardscope-dev), ends in ROLLBACK
+1..123
+ok 1 - G1 anon has no table privilege on requests
+ok 2 - G2 anon has no table privilege on activity_events
+ok 3 - G3 anon has no table privilege on revision_usages
+ok 4 - G4 authenticated: activity_events is SELECT-only
+ok 5 - G5 authenticated cannot delete/truncate requests (C-2)
+ok 6 - G6 classification is not client-writable (BR-2)
+ok 7 - G7 project_id cannot be updated (no moving requests)
+ok 8 - G8 server-owned request columns not client-writable
+ok 9 - G9 editable request fields are updatable
+ok 10 - G10 revision_usages: no UPDATE/TRUNCATE, DELETE (undo) allowed
+ok 11 - G11 recorded_by/recorded_at/id are server-owned
+ok 12 - G12 classify_request: authenticated yes, anon no
+ok 13 - G13 trigger functions not executable by clients
+ok 14 - G14 no PUBLIC execute on the RPC or definer triggers
+ok 15 - G15 RLS enabled on all three tables
+ok 16 - G16 classify_request is SECURITY DEFINER with empty search_path
+ok 17 - G17 REQ-004/AC-9: no monetary columns on Phase 3 tables
+ok 18 - V1 received_on = today+1 accepted (documented time-zone tolerance)
+ok 19 - V2 received_on = today+2 rejected
+ok 20 - V3 UPDATE to today+2 rejected
+ok 21 - V4 past date accepted on update
+ok 22 - V5 whitespace-only title rejected
+ok 23 - V6 null title rejected
+ok 24 - V7 explicit null received_on rejected
+ok 25 - V8 boundary lengths 200/5000/5000 accepted
+ok 26 - V9 description 5001 rejected
+ok 27 - V10 internal_notes 5001 rejected
+ok 28 - V11 201-char title rejected on UPDATE
+ok 29 - V12 all five channels accepted
+ok 30 - V13 channel is case-sensitive (label value rejected)
+ok 31 - V14 INSERT with classification rejected
+ok 32 - V15 INSERT with client-chosen id rejected
+ok 33 - V16 UPDATE of updated_at rejected
+ok 34 - V17 owner cannot delete a request (C-2)
+ok 35 - M1 owner cannot move a request to another own project
+ok 36 - M2 request still in its project
+ok 37 - C1 initial classification is unclassified (DEC-007)
+ok 38 - C2 unclassified -> additional
+ok 39 - C3 unclassified -> needs_clarification
+ok 40 - C4 needs_clarification stored
+ok 41 - C5 unclassified -> included; RPC returns the updated row
+ok 42 - C6 included -> needs_clarification
+ok 43 - C7 needs_clarification -> additional
+ok 44 - C8 additional -> included (back again)
+ok 45 - C9 included -> included is a no-op
+ok 46 - C10 exactly 4 classification events for 4 real changes
+ok 47 - C11 from/to pairs are exact
+ok 48 - C12 events carry actor, project and entity
+ok 49 - C13 cannot return to unclassified (initial state only)
+ok 50 - C14 null classification rejected
+ok 51 - C15 null id -> not_found
+ok 52 - C16 random id -> not_found
+ok 53 - C17 label text is not a valid value
+ok 54 - C18 BR-6: no legal wording in event summaries
+ok 55 - C19 summary says "Marked ... as ..."
+ok 56 - E1 owner cannot insert a forged event on own project
+ok 57 - E2 deletion flag does not grant a client DELETE on events
+ok 58 - E3 deletion flag does not open a direct classification write
+ok 59 - E4 title with JSON-looking quotes classifies
+ok 60 - E5 metadata cannot be injected through the title
+ok 61 - E6 one request.created event per request
+ok 62 - U1 usage with no request link
+ok 63 - U2 usage linked to a request in the same project
+ok 64 - U3 link to own request in another project rejected (BR-4)
+ok 65 - U4 link to a non-existent request rejected
+ok 66 - U5 no usage on a project without a confirmed scope (C-3)
+ok 67 - U6 note > 500 rejected
+ok 68 - U7 recorded_by cannot be forged
+ok 69 - U8 recorded_by defaults to the caller
+ok 70 - U9 usages cannot be edited
+ok 71 - U10 one revision.recorded event per accepted insert, none for rejected
+ok 72 - U11 revision.recorded carries the linked request id
+ok 73 - U12 usage on T3 Arch before archiving
+ok 74 - B1 B reads none of A's requests (by project filter)
+ok 75 - B2 B cannot read A's request by id (incl. internal notes)
+ok 76 - B3 B reads none of A's usages
+ok 77 - B4 B reads none of A's events
+ok 78 - B5 B cannot move A's request into B's project
+ok 79 - B6 B cannot link A's request to B's usage
+ok 80 - B7 B cannot record usage on A's project with B's request
+ok 81 - B8 B cannot create on A's project
+ok 82 - B9 B on A's request in a soon-archived project -> not_found
+ok 83 - B10 B cannot insert events into A's project
+ok 84 - B11 B sees B's own request.created event
+ok 85 - B12 B's DELETE of A's usage removed nothing
+ok 86 - B13 B's UPDATE of A's request changed nothing
+ok 87 - B14 no undo event from B's failed delete
+ok 88 - R0 A archived T3 Arch
+ok 89 - R1 no usage recorded on an archived project
+ok 90 - R2 no classification on an archived project
+ok 91 - R3 no request created on an archived project
+ok 92 - R4 archived requests stay readable
+ok 93 - R5 undo (DELETE) of a usage on an archived project removed nothing
+ok 94 - R6 edit on an archived project changed nothing
+ok 95 - R7 blocked actions wrote no events
+ok 96 - R7b B on A's ARCHIVED request gets not_found, not project_archived (no oracle)
+ok 97 - R8 after reopening, classification works again
+ok 98 - R9 after reopening, undo works
+ok 99 - R10 undo actually removed the usage
+ok 100 - R11 undo logged exactly once
+ok 101 - R12 actor_id recorded on all events of the project
+ok 102 - R13 undo event references the usage id
+ok 103 - N1 anon cannot read events
+ok 104 - N2 anon cannot read usages
+ok 105 - N3 anon cannot execute classify_request
+ok 106 - N4 anon cannot insert requests
+ok 107 - N5 anon cannot insert usages
+ok 108 - N6 RPC refuses a caller without auth.uid()
+ok 109 - N7 no rows visible without auth.uid()
+ok 110 - X1 metadata > 2048 bytes rejected
+ok 111 - X2 metadata ~1.5 KB accepted
+ok 112 - X3 summary > 300 rejected
+ok 113 - X4 unknown actor_type rejected
+ok 114 - X5 events undeletable even for superuser without the deletion flag
+ok 115 - X6 classification CHECK holds even for privileged writes
+ok 116 - X7 request.created summary for a 200-char title fits the 300 limit
+ok 117 - X8 superuser sets a 200-char title
+ok 118 - X9 impersonate A for long-title classify
+ok 119 - X10 classify a 200-char-title request (summary truncated, fits 300)
+ok 120 - X11 updated_at never before created_at
+ok 121 - X12 a project with history/confirmed scope cannot be deleted outside account deletion
+ok 122 - X13 with the deletion flag, project + requests + usages + events cascade
+ok 123 - X14 nothing left for the deleted project (and no undo events re-inserted)

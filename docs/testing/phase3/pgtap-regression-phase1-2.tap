@@ -1,0 +1,9 @@
+# Phase 1 + 2 pgTAP regression @ 6184f91 (Phase 3 migration applied). Each file wrapped with scripts/pgtap-wrap.py
+# and executed via Supabase execute_sql on guardscope-dev; every file ends in ROLLBACK. Full TAP returned for each run; all lines "ok".
+tests/db/profiles_rls.test.sql            1..12  ok 1..12   (0 not ok)
+tests/db/profiles_rls_tester.test.sql     1..22  ok 1..22   (0 not ok)
+tests/db/projects_scope.test.sql          1..32  ok 1..32   (0 not ok)
+tests/db/projects_scope_tester.test.sql   1..80  ok 1..80   (0 not ok)
+Notable: projects_scope_tester D4/D5 (account deletion with confirmed baseline) still pass with the new
+activity_events/revision_usages cascades; G10 (every SECURITY DEFINER function pins search_path) now also covers
+classify_request, requests_after_insert_event and revision_usages_event.

@@ -1,0 +1,299 @@
+
+Running 5 tests using 1 worker
+
+  ✘  1 [desktop] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (4.4s)
+  ✓  2 [desktop] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (4.8s)
+  ✘  3 [desktop] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (5.0s)
+  ✘  4 [desktop] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (4.1s)
+  ✓  5 [desktop] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history (4.1s)
+
+
+  1) [desktop] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history 
+
+    Error: history order: link 2
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "additional"
+    Received: "included"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error: history order: link 5
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "included"
+    Received: "additional"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error: history order: link 6
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "needs_clarification"
+    Received: "additional"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error: history order: link 7
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "included"
+    Received: "needs_clarification"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error: history order: link 8
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "additional"
+    Received: "included"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error: history order: link 9
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "needs_clarification"
+    Received: "included"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error: history order: link 10
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "additional"
+    Received: "needs_clarification"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error: last entry matches stored value
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "additional"
+    Received: "included"
+
+      247 |     for (let i = 1; i < chain.length; i++)
+      248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+    > 249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+          |                                                                                ^
+      250 |   });
+      251 | });
+      252 |
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:249:80
+
+    Error Context: test-results/p3-classification-T-03-AC--e9520--keeps-a-consistent-history-desktop/error-context.md
+
+  2) [desktop] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history 
+
+    Error: history order: link 4
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "additional"
+    Received: "included"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error: history order: link 5
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "needs_clarification"
+    Received: "additional"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error: history order: link 7
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "additional"
+    Received: "needs_clarification"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error: history order: link 8
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "included"
+    Received: "needs_clarification"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error: history order: link 9
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "included"
+    Received: "additional"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error: history order: link 10
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "needs_clarification"
+    Received: "included"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error Context: test-results/p3-classification-T-03-AC--e9520--keeps-a-consistent-history-desktop-repeat2/error-context.md
+
+  3) [desktop] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history 
+
+    Error: history order: link 2
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "additional"
+    Received: "needs_clarification"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error: history order: link 3
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "included"
+    Received: "additional"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error: history order: link 4
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "needs_clarification"
+    Received: "included"
+
+      246 |     expect.soft(chain[0][0], 'first event starts from unclassified').toBe('unclassified');
+      247 |     for (let i = 1; i < chain.length; i++)
+    > 248 |       expect.soft(chain[i][0], `history order: link ${i}`).toBe(chain[i - 1][1]);
+          |                                                            ^
+      249 |     expect.soft(chain[chain.length - 1][1], 'last entry matches stored value').toBe(finalValue);
+      250 |   });
+      251 | });
+        at /home/user/guard-scope/tests/e2e/p3-classification.spec.ts:248:60
+
+    Error Context: test-results/p3-classification-T-03-AC--e9520--keeps-a-consistent-history-desktop-repeat3/error-context.md
+
+  3 failed
+    [desktop] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history 
+    [desktop] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history 
+    [desktop] › tests/e2e/p3-classification.spec.ts:180:3 › T-03 / AC-3 classify and history › concurrent classification keeps a consistent history 
+  2 passed (42.4s)

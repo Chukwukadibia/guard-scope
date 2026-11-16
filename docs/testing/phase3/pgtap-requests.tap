@@ -1,0 +1,34 @@
+# tests/db/requests.test.sql @ 6184f91 — wrapped with scripts/pgtap-wrap.py, executed via Supabase execute_sql (guardscope-dev), ends in ROLLBACK
+1..32
+ok 1 - A creates request with title only
+ok 2 - received_on defaults to today
+ok 3 - request.created event recorded
+ok 4 - future received date rejected
+ok 5 - invalid channel rejected
+ok 6 - 201-char title rejected
+ok 7 - direct classification write rejected
+ok 8 - A classifies as additional
+ok 9 - classification event has from/to
+ok 10 - same classification again succeeds
+ok 11 - no duplicate event for same value
+ok 12 - invalid classification rejected
+ok 13 - client cannot insert events
+ok 14 - client cannot update events
+ok 15 - client cannot delete events
+ok 16 - no revision usage before scope is confirmed
+ok 17 - A records a revision used
+ok 18 - revision.recorded event
+ok 19 - A undoes a recorded revision
+ok 20 - revision.undone event
+ok 21 - cannot link a request from another project
+ok 22 - events immutable even for privileged roles
+ok 23 - B sees no requests of A
+ok 24 - B sees no events of A
+ok 25 - B cannot create a request on A's project
+ok 26 - B cannot classify A's request
+ok 27 - B cannot record usage on A's project
+ok 28 - no new requests on archived project
+ok 29 - no classification on archived project
+ok 30 - no edits on archived project
+ok 31 - anon cannot read requests
+ok 32 - account deletion removes requests, events and usages
