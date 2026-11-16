@@ -1,0 +1,100 @@
+# Mutation check: tests/e2e/retest2-d5-enumeration.spec.ts run (desktop) against a build of 808f64c with src/lib/api/auth.ts reverted to 4b64f14 (pre-fix), in a scratch copy. Expected: the two server-answer tests fail.
+
+Running 5 tests using 1 worker
+
+  ✘  1 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:111:3 › D-5 mocked server answers: register › every server answer gives the same UI as a 200, for registered and unregistered emails (15.6s)
+  ✓  2 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:128:3 › D-5 mocked server answers: register › weak_password and transport failure are surfaced (independent of the address) (940ms)
+  ✘  3 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:163:3 › D-5 mocked server answers: forgot password › every server answer gives the same neutral message as a 200, for both emails (657ms)
+  ✓  4 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:180:3 › D-5 mocked server answers: forgot password › transport failure shows the connection error for both emails (625ms)
+  -  5 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:195:3 › D-5 live (dev project) › register and forgot-password: real server status vs UI outcome
+
+
+  1) [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:111:3 › D-5 mocked server answers: register › every server answer gives the same UI as a 200, for registered and unregistered emails 
+
+    Error: 429 over_email_send_rate_limit / t-r2-new@guardscope.test
+
+    expect(received).toBe(expected) // Object.is equality
+
+    - Expected  -  7
+    + Received  + 14
+
+    - Check your email | GuardScope
+    + Create your account | GuardScope
+
+      Know what's included. Charge for what's extra.
+
+    - Check your email
+    -
+    - Success:
+    - If this email can be registered, we've sent a link to confirm your account. Open it, then sign in.
+    -
+    - Go to sign in
+    + Create your account
+    +
+    + Error:
+    + Too many attempts. Please wait a minute and try again.
+    +
+    + Email
+    + Password
+    +
+    + At least 8 characters.
+    +
+    + Create account
+    +
+    + Already have an account? Sign in
+
+      120 |       for (const email of [UNREGISTERED, USER_A.email]) {
+      121 |         const outcome = await registerOutcome(page, email);
+    > 122 |         expect(outcome, `${m.name} / ${email}`).toBe(baseline.replace(UNREGISTERED, email));
+          |                                                 ^
+      123 |       }
+      124 |       await page.unrouteAll();
+      125 |     }
+        at /tmp/claude-0/-home-user-Legit-Predict/6a8ddc8f-b74e-5cc4-a1f8-4c2778fd4e59/scratchpad/guard-scope/tests/e2e/retest2-d5-enumeration.spec.ts:122:49
+
+    Error Context: test-results/retest2-d5-enumeration-D-5-52167-red-and-unregistered-emails-desktop/error-context.md
+
+  2) [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:163:3 › D-5 mocked server answers: forgot password › every server answer gives the same neutral message as a 200, for both emails 
+
+    Error: 429 over_email_send_rate_limit / t-r2-new@guardscope.test
+
+    expect(received).toBe(expected) // Object.is equality
+
+    - Expected  - 5
+    + Received  + 7
+
+    - Success:
+    - If an account exists for that email, we've sent a link to reset the password. | GuardScope
+    + Error:
+    + Too many attempts. Please wait a minute and try again. | GuardScope
+
+      Know what's included. Charge for what's extra.
+
+      Reset your password
+
+    - Success:
+    - If an account exists for that email, we've sent a link to reset the password.
+    -
+    + Error:
+    + Too many attempts. Please wait a minute and try again.
+    +
+    + Email
+    + Send reset link
+      Back to sign in
+
+      171 |       await page.route('**/auth/v1/recover*', fulfil(m));
+      172 |       for (const email of [UNREGISTERED, USER_A.email]) {
+    > 173 |         expect(await resetOutcome(page, email), `${m.name} / ${email}`).toBe(baseline);
+          |                                                                         ^
+      174 |       }
+      175 |       if (m.status === 429) await screenshot(page, testInfo, 'R2-forgot-mock-429');
+      176 |       await page.unrouteAll();
+        at /tmp/claude-0/-home-user-Legit-Predict/6a8ddc8f-b74e-5cc4-a1f8-4c2778fd4e59/scratchpad/guard-scope/tests/e2e/retest2-d5-enumeration.spec.ts:173:73
+
+    Error Context: test-results/retest2-d5-enumeration-D-5-9be07-ge-as-a-200-for-both-emails-desktop/error-context.md
+
+  2 failed
+    [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:111:3 › D-5 mocked server answers: register › every server answer gives the same UI as a 200, for registered and unregistered emails 
+    [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:163:3 › D-5 mocked server answers: forgot password › every server answer gives the same neutral message as a 200, for both emails 
+  1 skipped
+  2 passed (23.5s)

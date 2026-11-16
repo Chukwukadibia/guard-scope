@@ -1,0 +1,24 @@
+# Phase 1 — Authentication & App Shell — Handoff
+
+- **Branch / commit:** `feature/p1-authentication` (based on `phase-0/foundation`). Product code is final at `808f64c`; later commits are docs and evidence only.
+- **Backend:** Supabase `guardscope-dev` (`eqozjuaaajstrewygqxr`, eu-west-2). Migration `supabase/migrations/20261116100000_profiles.sql` is applied: the `profiles` table, RLS (own row only; anon none), the `handle_new_user` trigger, `set_updated_at`, and default EXECUTE revoked from API roles.
+- **API contract** (`src/lib/api/`):
+  - `signUp`, `signIn`, `signOut` (local scope), `requestPasswordReset`, `updatePassword`, `getMyProfile`, `updateMyProfile`.
+  - Errors map to the `ApiErrorCode` values in `errors.ts`.
+  - `signUp` and `requestPasswordReset` never reveal account existence: only transport failures and `weak_password` throw (D-5).
+- **Frontend:**
+  - `AuthProvider`: verifies the session server-side, signs out across tabs, and shows the session-ended notice via the non-secret `guardscope.hadSession` marker.
+  - `RequireAuth` and `RedirectIfSignedIn`: `RedirectIfSignedIn` is the only place that redirects with `safeNext`.
+  - Pages: sign-in, register, forgot/reset password, Dashboard and Projects empty states, Settings, and the `/p` placeholder.
+  - Shared: `ErrorSummary` + `TextField`/`SelectField` with stable ids, offline banner, PWA (app shell only).
+- **Tests:**
+  - 50 unit tests; pgTAP 12 + 22 (`tests/db/`, run with `scripts/pgtap-wrap.py` while Docker is unavailable).
+  - Playwright E2E incl. axe: 101 passed / 0 failed / 11 skipped by design (retest 2).
+  - The `npm run check` gate includes `check:secrets`.
+- **Dev fixtures:** `tests/db/fixtures/create_test_users.sql` (DEV ONLY, DEC-009). Passwords live only in the git-ignored `.env.test.local`.
+- **Limitations / open items:**
+  - The AC-1 confirmation email and the AC-13 reset email/link are BLOCKED until OD-13 (custom SMTP) and the Site/Redirect URL settings are done.
+  - ISS-008: leaked-password protection is off.
+  - The Phase 1 tests run against the cloud dev project, not a local stack (R-14).
+  - When Supabase is rate-limited, sign-up and reset still show the neutral message by design (AC-11).
+- **Next safe action:** the supervisor decides on the BLOCKED exception and approves Phase 2 (Projects & original scope), which will also carry AUTH-004 (account deletion, D-P1-4) and the Dashboard create-project action (D-P1-6).

@@ -1,0 +1,33 @@
+# Retest 2 (808f64c) — Supabase edge logs, advisors, cleanup. Project eqozjuaaajstrewygqxr. 2026-11-16 (UTC)
+
+## edge_logs: POST /auth/v1/signup and /auth/v1/recover since 11:00Z (OPTIONS omitted)
+11:07:14  signup   422   weak_password, 7-char password, a@guardscope.test        (curl, api-retest2-d5-weakpw.log)
+11:07:14  signup   422   weak_password, 7-char password, t-r2-weak@guardscope.test (curl)
+11:10:14  signup   429   over_email_send_rate_limit  unregistered t-r2-new@  (R2 live spec)  UI: "Check your email"
+11:10:16  signup   200                               registered a@           (R2 live spec)  UI: "Check your email" (identical)
+11:11:18  recover  200                               unregistered t-r2-new@  (R2 live spec)  UI: "If an account exists..."
+11:11:19  recover  429   over_email_send_rate_limit  registered a@           (R2 live spec)  UI: identical neutral message
+11:16:14  signup   429                               unregistered t-e2e-new@ (full run, T-15) UI: identical
+11:17:16  signup   200                               registered a@           (full run, T-15) UI: identical
+11:17:19  recover  200                               unregistered nobody-t20@ (full run, T-20) UI: identical
+11:18:21  recover  429                               registered a@           (full run, T-20) UI: identical
+=> The email-send quota was exhausted during the whole retest: the D-5 condition was tested live, twice.
+   Error codes for the 11:10/11:11 calls are from the browser (e2e-retest2-d5-live.log).
+
+## GET /auth/v1/settings
+Exposes providers, disable_signup=false, mailer_autoconfirm=false. Site URL / Redirect URLs are NOT exposed
+by this endpoint -> their configuration could not be verified; remain pending.
+
+## Fixture
+t-unconfirmed@guardscope.test created by SQL (throwaway password, shell/scratch only, file deleted) for T-02;
+profile row was created by the trigger (AC-5). No user was created by any signup call (new-address signups got 429).
+
+## Security advisors
+1 WARN auth_leaked_password_protection (unchanged). No other findings.
+
+## Cleanup
+delete from auth.users where email not in ('a@guardscope.test','b@guardscope.test');
+update public.profiles set display_name = null, default_currency = null where id in (A, B);
+Final:
+a@guardscope.test | display_name null | default_currency null
+b@guardscope.test | display_name null | default_currency null

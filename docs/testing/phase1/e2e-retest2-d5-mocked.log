@@ -1,0 +1,16 @@
+
+Running 10 tests using 2 workers
+
+  ✓   2 [mobile] › tests/e2e/retest2-d5-enumeration.spec.ts:111:3 › D-5 mocked server answers: register › every server answer gives the same UI as a 200, for registered and unregistered emails (2.7s)
+  ✓   1 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:111:3 › D-5 mocked server answers: register › every server answer gives the same UI as a 200, for registered and unregistered emails (2.9s)
+  ✓   3 [mobile] › tests/e2e/retest2-d5-enumeration.spec.ts:128:3 › D-5 mocked server answers: register › weak_password and transport failure are surfaced (independent of the address) (1.5s)
+  ✓   4 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:128:3 › D-5 mocked server answers: register › weak_password and transport failure are surfaced (independent of the address) (1.5s)
+  ✓   5 [mobile] › tests/e2e/retest2-d5-enumeration.spec.ts:163:3 › D-5 mocked server answers: forgot password › every server answer gives the same neutral message as a 200, for both emails (2.8s)
+  ✓   6 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:163:3 › D-5 mocked server answers: forgot password › every server answer gives the same neutral message as a 200, for both emails (2.8s)
+  ✓   7 [mobile] › tests/e2e/retest2-d5-enumeration.spec.ts:180:3 › D-5 mocked server answers: forgot password › transport failure shows the connection error for both emails (674ms)
+  -   9 [mobile] › tests/e2e/retest2-d5-enumeration.spec.ts:195:3 › D-5 live (dev project) › register and forgot-password: real server status vs UI outcome
+  ✓   8 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:180:3 › D-5 mocked server answers: forgot password › transport failure shows the connection error for both emails (789ms)
+  -  10 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:195:3 › D-5 live (dev project) › register and forgot-password: real server status vs UI outcome
+
+  2 skipped
+  8 passed (20.3s)

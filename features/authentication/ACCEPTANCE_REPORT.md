@@ -175,3 +175,98 @@ Temporary SQL fixtures `t-unconfirmed@` and `t-pwlen@` deleted (no `t-e2e-new@`/
 
 ## Decision (retest 1)
 **Not accepted yet.** D-1, D-2, D-3 and D-4 are verified fixed and no regressions were found. Remaining before acceptance: decide and fix **D-5** (AC-11 enumeration through the email rate limit), then re-run T-15/T-20 once the email quota resets; AC-1/T-01 and AC-13/T-20 email steps remain **BLOCKED by OD-13** and the Site/Redirect URL settings.
+
+---
+
+# Retest 2 (commit 808f64c)
+
+**Tester run mode:** independent general-purpose subagent, fresh context · **Date:** 2026-11-16 · **Backend:** `guardscope-dev` (`eqozjuaaajstrewygqxr`)
+**Product change reviewed:** `git diff 4b64f14 808f64c` — `src/lib/api/auth.ts` (`isTransportFailure()`; `signUp` throws only `network` and `weak_password`; `requestPasswordReset` throws only `network`), new `tests/unit/authEnumeration.test.ts`, ISSUES_REGISTER line. No other `src/` or `supabase/` change.
+
+## Retest 2 evidence
+| File | Content |
+|---|---|
+| `check-retest2.log` | `npm run check`: format, lint, typecheck, unit **50/50** (7 files), build, `check:secrets` clean. Exit 0 |
+| `unit-retest2-mutation-prefix.log` | the new unit tests run against the **pre-fix** `auth.ts` (scratch copy): **8 failed / 9 passed** — the 429 and 5xx cases catch the old bug |
+| `e2e-retest2-d5-mocked.log` | tester spec `retest2-d5-enumeration.spec.ts`, network mocked with `page.route`, 1280 + 375: **8 passed** (2 live tests skipped here by design) |
+| `e2e-retest2-d5-mutation-prefix.log` | the same mocked spec against a build with the **pre-fix** `auth.ts`: both server-answer tests **fail**, so the spec detects D-5 |
+| `e2e-retest2-d5-live.log` | live D-5 check (desktop, run once with `R2_LIVE=1`): real status per call + UI outcome |
+| `api-retest2-d5-weakpw.log` | `/auth/v1/settings`; signup with a 7-character password for registered vs unregistered address |
+| `e2e-run-retest2.log` | full E2E regression, 1280 + 375: **101 passed, 0 failed, 11 skipped** |
+| `supabase-retest2-edge-logs-and-cleanup.log` | edge-log statuses for every signup/recover call, advisors, cleanup |
+| `screenshots/*-R2-*.png` | live register/forgot outcomes (new vs existing), mocked 429 forgot outcome |
+
+Skipped (11): 9 deliberate desktop-only rate-limited/mutating tests on mobile (as before) + the 2 `R2_LIVE` tests (they ran once, separately, see `e2e-retest2-d5-live.log`).
+
+## Code and unit-test review
+- `isTransportFailure()` is correct for supabase-js 2.119 (`auth-js` `handleError`): a request with no HTTP response becomes `AuthRetryableFetchError(…, 0)` → `network`; real 500–530 responses become `AuthRetryableFetchError(…, status)` with `status > 0` → neutral; 4xx with a non-JSON body becomes `AuthUnknownError` → neutral. `navigator.onLine === false` maps to `network` only when no response arrived (status 0). Nothing that reaches the server can produce a registration-dependent difference.
+- `weak_password` is thrown before the user lookup: **verified live** — 7-character password gives byte-identical `422 weak_password "Password should be at least 8 characters."` for `a@` (registered) and an unregistered address.
+- `signIn` unchanged: T-15 sign-in still identical `Email or password is incorrect.` for existing vs unknown email.
+- Unit tests are meaningful: they use the real `AuthApiError` / `AuthRetryableFetchError` classes and the real `auth.ts`; only the supabase client is mocked. Mutation check proves they fail on the pre-fix code. Limitation: they bypass the wire-format parsing (`handleError`); this gap is covered by the tester's Playwright route mocks (real supabase-js parses mocked 429/500/502/422/400 responses) and by the live run. The unit `weak_password` case uses `AuthApiError` rather than `AuthWeakPasswordError`; harmless, as both carry `code: 'weak_password'` and the E2E mock exercises the real class.
+- Accepted trade-off (documented in code): a genuinely rate-limited or SMTP-failing user sees the neutral message, not a rate-limit hint. This is what AC-11 requires; it continues to hide delivery failures until OD-13 (observation from the first run).
+
+## D-5 / ISS-007 verdict: **Verified fixed**
+- **Live, D-5 condition present:** the email-send quota was exhausted throughout the retest. Edge logs: register new → **429**, register existing → 200; forgot unknown → 200, forgot registered → **429** (both in the R2 live spec and again in the full run T-15/T-20). In every case the UI was **identical** for both addresses: "Check your email — If this email can be registered, we've sent a link…" and "If an account exists for that email, we've sent a link to reset the password."
+- **Mocked (1280 + 375):** for register and forgot-password, 429 `over_email_send_rate_limit`, 500 JSON, 502 non-JSON, 422 `user_already_exists`, 400 `email_address_not_authorized` each give exactly the same page text as a mocked 200, for both a@ and an unregistered address. `weak_password` (422) shows the strong-password message and a transport failure (aborted request) shows the connection message — identically for both addresses.
+- Previously failing T-15 register and T-20 tests now pass in the full run.
+
+## New defects
+None.
+
+## Retest 2 acceptance criteria
+| Criterion | Result | Evidence / note |
+|---|---|---|
+| AC-1 register → confirm → sign in | **BLOCKED** (OD-13) | register UI PASS; no email can be delivered (429 / team-only SMTP); sign-in → Dashboard PASS |
+| AC-2 sign out → redirect | PASS | T-03, full run |
+| AC-3 guard / `next` / no open redirect | PASS | T-04, T-05 |
+| AC-4 expired/invalid/removed session message | PASS | `auth-guard.spec.ts`, 1280 + 375 |
+| AC-5 profile by trigger | PASS | SQL fixture got its profile row automatically; pgTAP unchanged (no `supabase/` change) |
+| AC-6 RLS isolation | PASS (not re-run; no `supabase/` change since `9bf2cfa`) | |
+| AC-7 no passwords / no service key | PASS | `check:secrets` clean |
+| AC-8 settings persist + validation | PASS | T-11, T-12, §6 |
+| AC-9 375/1280, keyboard nav | PASS | |
+| AC-10 axe / focus / labels / headings | PASS | axe specs in full run, 0 serious/critical |
+| AC-11 no account enumeration | **PASS** | was FAIL (D-5 fixed): live + mocked, sign-in + register + forgot-password |
+| AC-12 empty states | PASS | |
+| AC-13 password reset | **BLOCKED** (OD-13 + URL settings) | request UI PASS and neutral; set-new-password from link untested |
+| §6 error summary | PASS | |
+| BR-1 server minimum 8 | PASS | 7 chars → 422 `weak_password` (signup, this run) |
+| BR-2 wording | PASS | T-02 |
+| BR-5 generic messages | PASS | as AC-11 |
+
+## Retest 2 test scenarios
+| ID | Result |
+|---|---|
+| T-01 | BLOCKED (OD-13) — UI part PASS |
+| T-02 | PASS (BR-2 sentence asserted; SQL fixture) |
+| T-03 | PASS |
+| T-04 | PASS |
+| T-05 | PASS (unit) |
+| T-06 | PASS |
+| T-07 | PASS (no DB change; pgTAP evidence from earlier runs) |
+| T-08 | PASS (no DB change; pgTAP evidence from earlier runs) |
+| T-09 | PASS (no DB change; `api-T09-rls-curl.log`) |
+| T-10 | PASS |
+| T-11 | PASS |
+| T-12 | PASS |
+| T-13 | PASS |
+| T-14 | PASS |
+| T-15 | **PASS** (sign-in, register; with the email limit exhausted) |
+| T-16 | PASS |
+| T-17 | PASS |
+| T-18 | PASS |
+| T-19 | PASS |
+| T-20 | BLOCKED (OD-13) — request UI part **PASS** (was FAIL in retest 1) |
+
+## Site / Redirect URL settings
+`GET /auth/v1/settings` does not expose the Site URL or Redirect URLs, so they could not be verified. **Still pending** (supervisor dashboard setting, `docs/deployment/SUPABASE_SETTINGS.md`).
+
+## Tester changes (retest 2)
+- Added `tests/e2e/retest2-d5-enumeration.spec.ts` (mocked 429/5xx/4xx/weak_password/transport answers for register and forgot-password at 1280 + 375; live check gated by `R2_LIVE=1`). No existing test was changed or weakened.
+- `src/` and `supabase/` not modified. Nothing committed.
+
+## Cleanup (retest 2)
+Temporary fixture `t-unconfirmed@guardscope.test` deleted; no user was created by any signup call. Final `auth.users`: `a@guardscope.test`, `b@guardscope.test`; both profiles have `display_name` and `default_currency` null. Throwaway fixture password file deleted; no password appears in any log. Security advisor unchanged (1 WARN, leaked password protection).
+
+## Final acceptance decision
+**Accepted, with BLOCKED items.** Every acceptance criterion passes except the email-delivery-dependent steps: AC-1 / T-01 (confirmation email) and AC-13 / T-20 (reset email and setting a new password from the link) remain **BLOCKED by OD-13** (default SMTP: team-only recipients and a tiny send quota) and the pending Site URL / Redirect URL settings. Re-run T-01 and T-20 end to end once custom SMTP and the URLs are configured. Observation carried forward: enable Leaked Password Protection if the plan allows; consider CAPTCHA on signup/recover with OD-13.

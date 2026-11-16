@@ -1,36 +1,29 @@
 # Project Status
 
-**Updated:** 2026-11-16 · **Current phase:** 0 — Foundation & governance · **State:** Phase 0 deliverables **submitted to the human gate** (not self-approved). ⏳ Awaiting HA-002. Phase 1 has **not** started.
+**Updated:** 2026-11-16 · **Current phase:** 1 — Authentication & app shell · **State:** Independently tested, **Accepted with BLOCKED items** (email delivery). ⏳ **Awaiting supervisor decisions** (see `features/authentication/COMPLETION_REPORT.md`). Phase 2 has **not** started.
 
 ## Repository
-- Target: `github.com/Chukwukadibia/guard-scope`. **No access (ISS-001)**, so nothing is pushed.
-- Work is staged as a local git repo in the AI session scratchpad (branch `phase-0/foundation`). It is **lost if the session container is reclaimed** before access is granted and it is pushed (R-13).
+- GitHub `Chukwukadibia/guard-scope` is readable from the AI session, but **push is refused (HTTP 403)**: the Claude GitHub App is not installed on the repo (ISS-001). The remote `main` has only an unrelated "Initial commit" (README).
+- Local branches: `phase-0/foundation` (Phase 0) → `feature/p1-authentication` (Phase 1). A bundle copy was sent to the supervisor.
 
-## Phase 0 deliverables (PRD §13 Phase 0, §22)
+## Environments
+- `guardscope-dev` Supabase project (`eqozjuaaajstrewygqxr`, eu-west-2, Free, $0). Migration `20261116100000_profiles` is applied. Test users `a@` and `b@guardscope.test` only.
+- The AI environment's network allowlist includes the dev project host.
 
-| Deliverable | Status |
+## Phase status
+
+| Phase | Status |
 |---|---|
-| MASTER_PRD.md v1.0.1 (name change only) | ✅ |
-| Playbook in repo + AI_TEAM_OPERATING_PROTOCOL.md | ✅ draft for approval |
-| ARCHITECTURE.md v0.2 | ✅ draft for approval (vendor facts marked VERIFY: BLOCKED until OD-12) |
-| Status, changelog, approval, decision, risk and issue logs | ✅ |
-| Feature template (`features/_TEMPLATE/`) | ✅ |
-| `.env.example` (no secrets) | ✅ |
-| Repeatable scripts: lint, format, typecheck, test, e2e, build, CI | ✅ verified below |
-| Supabase CLI config (`supabase init`, defaults untouched) | ✅ |
-| Phase 1 FEATURE_SPEC, IMPLEMENTATION_PLAN, TEST_PLAN | ✅ draft for approval |
+| 0 Foundation & governance | Delivered; approved (HA-002) |
+| 1 Authentication & app shell | Accepted with BLOCKED email steps; awaiting supervisor decisions |
+| 2–8 | Not started |
 
-## Verification evidence (commands actually run by the Team Lead, 2026-11-16, Node 22)
-- `npm run check` (prettier check, eslint, `tsc -b --noEmit`, vitest, vite build): **PASS**. 1 unit test passed; build produced `dist/` (JS 144 kB / 46 kB gzip).
-- `PW_CHROMIUM_PATH=/opt/pw-browsers/chromium npx playwright test --trace off`: **PASS**, 2/2 (desktop 1280 px and mobile 375 px placeholder smoke, no horizontal overflow).
-- `npm audit --omit=dev --audit-level=high`: **0 vulnerabilities**. Full audit: 1 moderate, dev-only (ISS-002).
-- `docker info`: daemon **unavailable**, so local Supabase/pgTAP cannot run in this environment (R-14).
-- Independent documentation review: a separate reviewer subagent found 4 HIGH, 6 MEDIUM and several LOW issues. All were fixed or flagged; see `features/foundation/ACCEPTANCE_REPORT.md`. A re-review of the fixes is still pending.
-
-## Decisions needed to start Phase 1
-See `features/authentication/START_REPORT.md` §7: OD-3 auth method, OD-12 Supabase region/project + test environment, OD-9 currency field, AUTH-004 placement, AUTH-005 inclusion. Approval of the architecture and protocol is also needed.
+## Open items needing the supervisor
+1. Approve Phase 1 with the BLOCKED email-delivery exception.
+2. OD-13: choose a production SMTP provider.
+3. Supabase dashboard: Site URL / Redirect URLs (`docs/deployment/SUPABASE_SETTINGS.md`); ISS-008 leaked-password protection.
+4. ISS-001: install the Claude GitHub App on `guard-scope` so the AI can push.
+5. Approve Phase 2.
 
 ## Next safe action
-1. Supervisor grants repo access (ISS-001). Then push `phase-0/foundation` and open a PR for review.
-2. Supervisor records HA-002 (approvals plus the decisions above).
-3. Only then: start Phase 1 in a fresh session per the protocol §9.
+Push both branches once ISS-001 is resolved. Start Phase 2 in a fresh session only after explicit approval.

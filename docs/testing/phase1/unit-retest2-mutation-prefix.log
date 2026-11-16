@@ -1,0 +1,100 @@
+# Mutation check: tests/unit/authEnumeration.test.ts (808f64c) run against src/lib/api/auth.ts from 4b64f14 (pre-fix) in a scratch copy. Expected: the rate-limit/5xx cases fail.
+
+ RUN  v5.1.0 /tmp/claude-0/-home-user-Legit-Predict/6a8ddc8f-b74e-5cc4-a1f8-4c2778fd4e59/scratchpad/mut
+
+ ❯ tests/unit/authEnumeration.test.ts (17 tests | 8 failed) 21ms
+   ❯ signUp: uniform outcome (AC-11) (9)
+     × over_email_send_rate_limit (429) -> needsConfirmation 5ms
+     × generic 429 -> needsConfirmation 1ms
+     × over_request_rate_limit (429) -> needsConfirmation 1ms
+     × SMTP failure (500 -> AuthRetryableFetchError) -> needsConfirmation 1ms
+   ❯ requestPasswordReset: uniform outcome (AC-11) (8)
+     × over_email_send_rate_limit (429) -> resolves 1ms
+     × generic 429 -> resolves 1ms
+     × over_request_rate_limit (429) -> resolves 1ms
+     × SMTP failure (500 -> AuthRetryableFetchError) -> resolves 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/authEnumeration.test.ts > signUp: uniform outcome (AC-11) > over_email_send_rate_limit (429) -> needsConfirmation
+ FAIL  tests/unit/authEnumeration.test.ts > signUp: uniform outcome (AC-11) > generic 429 -> needsConfirmation
+ FAIL  tests/unit/authEnumeration.test.ts > signUp: uniform outcome (AC-11) > over_request_rate_limit (429) -> needsConfirmation
+AssertionError: promise rejected "ApiError: rate_limited { code: 'rate…' }" instead of resolving
+ ❯ tests/unit/authEnumeration.test.ts:43:60
+     41|   test.each(serverAnswers)('%s -> needsConfirmation', async (_name, re…
+     42|     auth.signUp.mockResolvedValue({ data: { user: null, session: null …
+     43|     await expect(signUp('x@example.test', 'long-enough-pw')).resolves.…
+       |                                                            ^
+     44|       needsConfirmation: true,
+     45|     });
+
+Caused by: ApiError: rate_limited
+ ❯ toApiError src/lib/api/errors.ts:38:60
+ ❯ Module.signUp src/lib/api/auth.ts:20:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'rate_limited' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  tests/unit/authEnumeration.test.ts > signUp: uniform outcome (AC-11) > SMTP failure (500 -> AuthRetryableFetchError) -> needsConfirmation
+AssertionError: promise rejected "ApiError: network { code: 'network' }" instead of resolving
+ ❯ tests/unit/authEnumeration.test.ts:43:60
+     41|   test.each(serverAnswers)('%s -> needsConfirmation', async (_name, re…
+     42|     auth.signUp.mockResolvedValue({ data: { user: null, session: null …
+     43|     await expect(signUp('x@example.test', 'long-enough-pw')).resolves.…
+       |                                                            ^
+     44|       needsConfirmation: true,
+     45|     });
+
+Caused by: ApiError: network
+ ❯ toApiError src/lib/api/errors.ts:34:12
+ ❯ Module.signUp src/lib/api/auth.ts:20:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'network' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  tests/unit/authEnumeration.test.ts > requestPasswordReset: uniform outcome (AC-11) > over_email_send_rate_limit (429) -> resolves
+ FAIL  tests/unit/authEnumeration.test.ts > requestPasswordReset: uniform outcome (AC-11) > generic 429 -> resolves
+ FAIL  tests/unit/authEnumeration.test.ts > requestPasswordReset: uniform outcome (AC-11) > over_request_rate_limit (429) -> resolves
+AssertionError: promise rejected "ApiError: rate_limited { code: 'rate…' }" instead of resolving
+ ❯ tests/unit/authEnumeration.test.ts:69:56
+     67|   test.each(serverAnswers)('%s -> resolves', async (_name, result) => {
+     68|     auth.resetPasswordForEmail.mockResolvedValue({ data: {}, ...result…
+     69|     await expect(requestPasswordReset('x@example.test')).resolves.toBe…
+       |                                                        ^
+     70|   });
+     71|
+
+Caused by: ApiError: rate_limited
+ ❯ toApiError src/lib/api/errors.ts:38:60
+ ❯ Module.requestPasswordReset src/lib/api/auth.ts:46:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'rate_limited' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  tests/unit/authEnumeration.test.ts > requestPasswordReset: uniform outcome (AC-11) > SMTP failure (500 -> AuthRetryableFetchError) -> resolves
+AssertionError: promise rejected "ApiError: network { code: 'network' }" instead of resolving
+ ❯ tests/unit/authEnumeration.test.ts:69:56
+     67|   test.each(serverAnswers)('%s -> resolves', async (_name, result) => {
+     68|     auth.resetPasswordForEmail.mockResolvedValue({ data: {}, ...result…
+     69|     await expect(requestPasswordReset('x@example.test')).resolves.toBe…
+       |                                                        ^
+     70|   });
+     71|
+
+Caused by: ApiError: network
+ ❯ toApiError src/lib/api/errors.ts:34:12
+ ❯ Module.requestPasswordReset src/lib/api/auth.ts:46:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'network' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed | 9 passed (17)
+   Start at  11:06:42
+   Duration  855ms (environment 75%, setup 11%, import 6%, transform 4%, tests 3%, worker 1%)
+

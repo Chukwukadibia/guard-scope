@@ -1,0 +1,9 @@
+# Retest 2 (808f64c) live API checks, 2026-11-16T11:07:12Z. Key redacted.
+## GET /auth/v1/settings
+{"external":{"anonymous_users":false,"apple":false,"azure":false,"bitbucket":false,"discord":false,"facebook":false,"snapchat":false,"figma":false,"fly":false,"github":false,"gitlab":false,"google":false,"keycloak":false,"kakao":false,"linkedin":false,"linkedin_oidc":false,"notion":false,"spotify":false,"slack":false,"slack_oidc":false,"workos":false,"twitch":false,"twitter":false,"email":true,"phone":false,"zoom":false},"disable_signup":false,"mailer_autoconfirm":false,"phone_autoconfirm":false,"sms_provider":"twilio","saml_enabled":false,"saml_private_key_next_configured":true,"passkeys_enabled":false}
+## POST /auth/v1/signup email=a@guardscope.test password=<7 chars>
+{"code":422,"error_code":"weak_password","msg":"Password should be at least 8 characters.","weak_password":{"reasons":["length"]}}
+HTTP 422
+## POST /auth/v1/signup email=t-r2-weak@guardscope.test password=<7 chars>
+{"code":422,"error_code":"weak_password","msg":"Password should be at least 8 characters.","weak_password":{"reasons":["length"]}}
+HTTP 422

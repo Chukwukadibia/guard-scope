@@ -1,0 +1,9 @@
+
+Running 1 test using 1 worker
+
+R2 live server responses: ["/auth/v1/signup 429 over_email_send_rate_limit","/auth/v1/signup 200","/auth/v1/recover 200","/auth/v1/recover 429 over_email_send_rate_limit"]
+R2 live register outcomes: ["Check your email | GuardScope\n\nKnow what's included. Charge for what's extra.\n\nCheck your email\n\nSuccess:\nIf this email can be registered, we've sent a link to confirm your account. Open it, then sign in.\n\nGo to sign in","Check your email | GuardScope\n\nKnow what's included. Charge for what's extra.\n\nCheck your email\n\nSuccess:\nIf this email can be registered, we've sent a link to confirm your account. Open it, then sign in.\n\nGo to sign in"]
+R2 live forgot outcomes: ["Success:\nIf an account exists for that email, we've sent a link to reset the password. | GuardScope\n\nKnow what's included. Charge for what's extra.\n\nReset your password\n\nSuccess:\nIf an account exists for that email, we've sent a link to reset the password.\n\nBack to sign in","Success:\nIf an account exists for that email, we've sent a link to reset the password. | GuardScope\n\nKnow what's included. Charge for what's extra.\n\nReset your password\n\nSuccess:\nIf an account exists for that email, we've sent a link to reset the password.\n\nBack to sign in"]
+  ✓  1 [desktop] › tests/e2e/retest2-d5-enumeration.spec.ts:195:3 › D-5 live (dev project) › register and forgot-password: real server status vs UI outcome (1.1m)
+
+  1 passed (1.3m)
