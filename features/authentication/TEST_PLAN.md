@@ -1,6 +1,6 @@
 # Phase 1 — Authentication & App Shell — Test Plan
 
-**Version:** 0.1 · **Status:** DRAFT · **Spec:** FEATURE_SPEC v0.1 · **Executed by:** Tester Specialist in a separate subagent/session from the implementers.
+**Version:** 0.1 · **Status:** APPROVED (HA-002) · **Spec:** FEATURE_SPEC v0.1 · **Executed by:** Tester Specialist in a separate subagent/session from the implementers.
 
 ## 1. Environments & fixtures
 - Local: `supabase start` (Docker) + `npm run dev`. Fallback if Docker is unavailable: an approved dev Supabase cloud project (R-14).

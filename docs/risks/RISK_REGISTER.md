@@ -17,6 +17,6 @@ Seeded from PRD §18 (product risks R-01–R-12), plus delivery and technical ri
 | R-11 | Currency confusion | M/M | Per-record currency; group-by-currency totals only | Backend | Open |
 | R-12 | Scope creep in the build | M/H | Out-of-scope list; one feature at a time; human gates | Team Lead | Open |
 | R-13 | No access to target GitHub repo (ISS-001) | H/H | Work staged locally; supervisor to grant access. **Staged work is lost if the container is reclaimed before push** | Product owner | **Active** |
-| R-14 | Local Supabase stack needs Docker. **Confirmed 16 Nov: Docker CLI present but daemon unavailable in the AI environment**, so DB/RLS tests cannot run locally here | H/H | Use a dedicated Supabase *staging/dev* cloud project for tests if Docker is unavailable (needs approval) | Team Lead | **Active** |
+| R-14 | Local Supabase stack needs Docker; the daemon is unavailable in the AI environment | H/H | **Mitigated:** `guardscope-dev` cloud project approved (HA-003) and used for DB/RLS/E2E tests | Team Lead | Mitigated |
 | R-15 | 3-day target pressure vs. gates | H/M | PRD §13.1: extend schedule rather than skip tests | Team Lead | Open |
-| R-16 | Auth emails (confirmation/reset) rely on Supabase's built-in sender, which has low rate limits (VERIFY) | M/M | Acceptable for beta; custom SMTP would be a provider decision (needs approval) | Backend | Open |
+| R-16 | **Confirmed:** Supabase's default sender only emails org team members, at low hourly limits. Real users cannot confirm accounts until custom SMTP exists | H/H | OD-13 custom SMTP before any real-user beta; dev tests use SQL-confirmed fixtures | Product owner | **Active** |

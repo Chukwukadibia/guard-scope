@@ -1,6 +1,6 @@
 # GuardScope — Architecture
 
-**Version:** 0.2 (revised after independent review) — **DRAFT, awaiting human approval (HA-002).** Nothing in §3–§6 is implemented yet.
+**Version:** 0.2 — **APPROVED (HA-002)**, region eu-west-2 (HA-003). Implementation proceeds phase by phase; vendor facts are confirmed in §9.
 **Date:** 16 Nov 2026 · **Author role:** Team Lead with the Backend Agent role
 **Implements:** `MASTER_PRD.md` §9 (data model), §10 (technical direction), §11 (privacy/security), §12 (NFRs)
 
@@ -210,3 +210,16 @@ Business rules live in `lib/domain`, not in components (PRD §12). Money is form
 ## 8. Open decisions referenced here
 
 OD-3 auth method · OD-4 link expiry · OD-6 clarification flow · OD-7 "active" definitions · OD-9 currencies/default · OD-10 retention · OD-12 region/provider. See `docs/decisions/DECISION_LOG.md` for each recommendation and status.
+
+## 9. Vendor facts verified (16 Nov 2026, official docs)
+
+| Item | Finding | Impact |
+|---|---|---|
+| Supabase Free: pausing | Free projects may be paused after 7 days of low activity; restorable for 90 days ([docs](https://supabase.com/docs/guides/platform/free-project-pausing)) | Production on Free carries a pause risk (R-09). A paid plan or a keep-alive is a later spend/ops decision |
+| Supabase Free: size | Database becomes read-only above 500 MB ([docs](https://supabase.com/docs/guides/platform/database-size)) | Ample for beta; monitor |
+| Supabase Free: backups | No downloadable backups on Free; Supabase recommends `supabase db dump` for off-site backups ([docs](https://supabase.com/docs/guides/platform/backups)) | Confirms the §6 scheduled-dump proposal (still needs approval before production) |
+| Supabase default SMTP | **Sends only to the org's team-member addresses**, with low hourly limits; not for production ([docs](https://supabase.com/docs/guides/auth/auth-smtp)) | Dev: E2E test users are created confirmed via SQL fixtures. **Production needs a custom SMTP provider: new decision OD-13** (provider change, needs approval) |
+| Supabase auth rate limits | Signup/recover limited per 60 s per request; verify 360/h per IP; token refresh 1800/h per IP ([docs](https://supabase.com/docs/guides/deployment/going-into-prod)) | Map `over_*_rate_limit` errors to friendly messages |
+| Project | `guardscope-dev`, ref `eqozjuaaajstrewygqxr`, eu-west-2, Postgres 17, Free ($0 quote) | HA-003 |
+| Cloudflare Pages Free | 500 builds/month, 1 concurrent, 20-minute timeout; 20,000 files, 25 MiB per asset; `_headers` up to 100 rules ([limits](https://developers.cloudflare.com/pages/platform/limits/), [headers](https://developers.cloudflare.com/pages/configuration/headers/)) | Fine for MVP. Bandwidth figure not confirmed: re-check before production |
+| Trusted client-IP header for the Phase 5 throttle | Not yet verified | Phase 5 task; the global circuit-breaker fallback is already designed |

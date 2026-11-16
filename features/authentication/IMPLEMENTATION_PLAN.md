@@ -1,6 +1,6 @@
 # Phase 1 — Authentication & App Shell — Implementation Plan
 
-**Version:** 0.1 · **Status:** DRAFT — awaiting approval (HA-002) · **Spec:** [FEATURE_SPEC.md](FEATURE_SPEC.md) v0.1 · **Architecture:** ARCHITECTURE.md §2, §3.1 profiles, §5.1, §5.3, §7
+**Version:** 0.1 · **Status:** APPROVED (HA-002) · **Spec:** [FEATURE_SPEC.md](FEATURE_SPEC.md) v0.1 · **Architecture:** ARCHITECTURE.md §2, §3.1 profiles, §5.1, §5.3, §7
 
 ## 1. Approach
 This is a thin vertical slice. Supabase Auth handles identity. A `profiles` table with RLS is the isolation template for later tables. A React Router layout puts a session guard on the protected routes. Accessible UI primitives are built once and reused.

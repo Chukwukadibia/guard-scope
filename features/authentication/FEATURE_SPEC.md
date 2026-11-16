@@ -1,6 +1,6 @@
 # Phase 1 — Authentication & App Shell — Feature Specification
 
-**Version:** 0.1 · **Status:** DRAFT — awaiting approval (HA-002) · **PRD refs:** §4.1 Account and workspace, §6.1, §8, §10.2, §10.4, §12, §13 Phase 1
+**Version:** 0.1 · **Status:** APPROVED (HA-002) · **PRD refs:** §4.1 Account and workspace, §6.1, §8, §10.2, §10.4, §12, §13 Phase 1
 
 ## 1. User problem
 A freelancer needs a private, secure workspace before they can record any client agreement. Without trustworthy sign-in and account isolation, nothing later in GuardScope can be trusted.

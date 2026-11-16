@@ -1,6 +1,6 @@
 # GuardScope — AI Team Operating Protocol
 
-**Version:** 1.0 (draft — submitted for human approval with the Phase 0 report)
+**Version:** 1.0 — **APPROVED (HA-002)**
 **Date:** 16 Nov 2026
 **Adapted from:** [AI Multi-Agent Project Delivery Playbook v1.0](docs/AI_MULTI_AGENT_PROJECT_DELIVERY_PLAYBOOK.md), as required by `MASTER_PRD.md` §14 and §22.2.
 **Rule of adaptation:** This file may make the Playbook more specific to GuardScope. It may never weaken it. Where this file and the Playbook disagree, the stricter rule applies until the human supervisor decides.
