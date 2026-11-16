@@ -1,0 +1,6 @@
+# T-10 / AC-10 post-deletion row counts (execute_sql as superuser, guardscope-dev), after e2e-p2-account-deletion.log
+# Throwaway user p2-delete-throwaway@guardscope.test (id a717f176-3620-42b7-ba67-8aef7be0be16), created via SQL with a
+# bcrypt hash computed locally (password generated in the shell, passed to Playwright via env only, never written to a file).
+# Seeded before deletion: 2 projects (one with confirmed baseline v1 + draft v2, 2 items each), profile name + default currency.
+users=0 identities=0 sessions=0 refresh_tokens=0 profiles=0 projects=0 scope_versions=0 orphan_items(global)=0 orphan_projects(global)=0
+# Observation: the user's already-issued access token still authenticates PostgREST until expiry (HTTP 200 []) but sees no data.

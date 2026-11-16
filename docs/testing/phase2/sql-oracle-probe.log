@@ -1,0 +1,7 @@
+# Tester probe (execute_sql, ROLLBACK) at 309d83c: does B learn anything about A's confirmed version via scope_items insert errors?
+# A creates project, adds deliverable, confirms v1. As B (authenticated, sub=B):
+B -> A confirmed v1                 : 42501 new row violates row-level security policy for table "scope_items"
+B -> random uuid                    : 42501 new row violates row-level security policy for table "scope_items"
+B -> A confirmed v1 with flag on    : 42501 new row violates row-level security policy for table "scope_items"
+# Result: identical errors -> no existence/state oracle. The guard trigger's lookup runs as invoker, so RLS hides A's version from it.
+# Setting guardscope.account_deletion=on as a client role does not bypass RLS (also pgTAP tester #58/#59).

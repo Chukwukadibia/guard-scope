@@ -1,0 +1,83 @@
+
+Running 6 tests using 2 workers
+
+axe serious/critical per page (desktop): {"dashboard":0,"projects-list":0,"projects-archived":0,"projects-completed":0,"project-form":0,"project-form-errors":0,"project-edit":0,"detail-draft-editor":0,"confirm-dialog":0,"confirm-dialog-error":0,"detail-baseline-current-draft-long-text":0,"detail-archived":0,"project-not-found":0,"settings-delete-open-error":0}
+overflow (desktop): {}
+  ✓  2 [desktop] › tests/e2e/p2-a11y.spec.ts:10:1 › T-11 axe + overflow on every Phase 2 page and state (39.3s)
+axe serious/critical per page (mobile): {"dashboard":0,"projects-list":0,"projects-archived":0,"projects-completed":0,"project-form":0,"project-form-errors":0,"project-edit":0,"detail-draft-editor":0,"confirm-dialog":0,"confirm-dialog-error":0,"detail-baseline-current-draft-long-text":0,"detail-archived":0,"project-not-found":0,"settings-delete-open-error":0}
+overflow (mobile): {
+ "detail-baseline-current-draft-long-text": {
+  "scrollWidth": 70716,
+  "clientWidth": 375,
+  "offenders": [
+   "div>section>dl>div>dt width=70683 text=\"Agreed price…\"",
+   "div>section>dl>div>dd width=70683 text=\"EUR 5.00…\"",
+   "div>section>dl>div>dt width=70683 text=\"Currency…\"",
+   "div>section>dl>div>dd width=70683 text=\"EUR…\"",
+   "div>section>dl>div>dt width=70683 text=\"Start date…\"",
+   "div>section>dl>div>dd width=70683 text=\"1 Nov 2026…\"",
+   "div>section>dl>div>dt width=70683 text=\"Deadline (cu…\"",
+   "div>section>dl>div>dd width=70683 text=\"31 Dec 2026…\""
+  ]
+ }
+}
+  ✘  1 [mobile] › tests/e2e/p2-a11y.spec.ts:10:1 › T-11 axe + overflow on every Phase 2 page and state (40.7s)
+  ✓  3 [desktop] › tests/e2e/p2-a11y.spec.ts:109:1 › T-11 keyboard: add item with Enter, remove via keyboard, confirm via keyboard (6.5s)
+realistic long text (desktop): {"list":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]},"detail":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]}}
+  ✓  5 [desktop] › tests/e2e/p2-a11y.spec.ts:149:1 › §6 realistic long text: spaced words wrap; a long URL in client contact / description (3.3s)
+  ✓  4 [mobile] › tests/e2e/p2-a11y.spec.ts:109:1 › T-11 keyboard: add item with Enter, remove via keyboard, confirm via keyboard (7.4s)
+realistic long text (mobile): {"list":{"scrollWidth":2095,"clientWidth":375,"offenders":["div>ul>li>a>div>div>h2 width=1746 text=\"word0 word1 …\"","div>ul>li>a>div>div>p width=1746 text=\"word0 word1 …\"","div>ul>li>a>div>span>svg>circle width=1 text=\"…\"","div>ul>li>a>div>span>svg>circle width=12 text=\"…\"","div>ul>li>a>dl>div width=2045 text=\"Agreed price…\"","div>ul>li>a>dl>div width=2045 text=\"Deadline:Not…\"","div>ul>li>a>div>div>h2 width=1746 text=\"word0 word1 …\"","div>ul>li>a>div>div>p width=1746 text=\"word0 word1 …\""]},"detail":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}
+  ✘  6 [mobile] › tests/e2e/p2-a11y.spec.ts:149:1 › §6 realistic long text: spaced words wrap; a long URL in client contact / description (3.6s)
+
+
+  1) [mobile] › tests/e2e/p2-a11y.spec.ts:10:1 › T-11 axe + overflow on every Phase 2 page and state 
+
+    Error: horizontal overflow {"scrollWidth":70716,"clientWidth":375,"offenders":["div>section>dl>div>dt width=70683 text=\"Agreed price…\"","div>section>dl>div>dd width=70683 text=\"EUR 5.00…\"","div>section>dl>div>dt width=70683 text=\"Currency…\"","div>section>dl>div>dd width=70683 text=\"EUR…\"","div>section>dl>div>dt width=70683 text=\"Start date…\"","div>section>dl>div>dd width=70683 text=\"1 Nov 2026…\"","div>section>dl>div>dt width=70683 text=\"Deadline (cu…\"","div>section>dl>div>dd width=70683 text=\"31 Dec 2026…\""]}
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 375
+    Received:    70716
+
+       at p2-helpers.ts:137
+
+      135 |   });
+      136 |   const e = soft ? expect.soft : expect;
+    > 137 |   e(o.scrollWidth, `horizontal overflow ${JSON.stringify(o)}`).toBeLessThanOrEqual(o.clientWidth);
+          |                                                                ^
+      138 |   return o;
+      139 | }
+      140 |
+        at noOverflow (/home/user/guard-scope/tests/e2e/p2-helpers.ts:137:64)
+        at check (/home/user/guard-scope/tests/e2e/p2-a11y.spec.ts:16:15)
+        at /home/user/guard-scope/tests/e2e/p2-a11y.spec.ts:88:3
+
+    Error Context: test-results/p2-a11y-T-11-axe-overflow-on-every-Phase-2-page-and-state-mobile/error-context.md
+
+  2) [mobile] › tests/e2e/p2-a11y.spec.ts:149:1 › §6 realistic long text: spaced words wrap; a long URL in client contact / description 
+
+    Error: horizontal overflow {"scrollWidth":2095,"clientWidth":375,"offenders":["div>ul>li>a>div>div>h2 width=1746 text=\"word0 word1 …\"","div>ul>li>a>div>div>p width=1746 text=\"word0 word1 …\"","div>ul>li>a>div>span>svg>circle width=1 text=\"…\"","div>ul>li>a>div>span>svg>circle width=12 text=\"…\"","div>ul>li>a>dl>div width=2045 text=\"Agreed price…\"","div>ul>li>a>dl>div width=2045 text=\"Deadline:Not…\"","div>ul>li>a>div>div>h2 width=1746 text=\"word0 word1 …\"","div>ul>li>a>div>div>p width=1746 text=\"word0 word1 …\""]}
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 375
+    Received:    2095
+
+       at p2-helpers.ts:137
+
+      135 |   });
+      136 |   const e = soft ? expect.soft : expect;
+    > 137 |   e(o.scrollWidth, `horizontal overflow ${JSON.stringify(o)}`).toBeLessThanOrEqual(o.clientWidth);
+          |                                                                ^
+      138 |   return o;
+      139 | }
+      140 |
+        at noOverflow (/home/user/guard-scope/tests/e2e/p2-helpers.ts:137:64)
+        at /home/user/guard-scope/tests/e2e/p2-a11y.spec.ts:165:14
+
+    Error Context: test-results/p2-a11y-§6-realistic-long--28aae--client-contact-description-mobile/error-context.md
+
+  2 failed
+    [mobile] › tests/e2e/p2-a11y.spec.ts:10:1 › T-11 axe + overflow on every Phase 2 page and state 
+    [mobile] › tests/e2e/p2-a11y.spec.ts:149:1 › §6 realistic long text: spaced words wrap; a long URL in client contact / description 
+  4 passed (1.1m)

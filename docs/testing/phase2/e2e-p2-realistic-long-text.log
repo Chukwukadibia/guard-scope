@@ -1,0 +1,9 @@
+
+Running 2 tests using 1 worker
+
+realistic long text (desktop): {"list":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]},"detail":{"scrollWidth":1280,"clientWidth":1280,"offenders":[]}}
+  ✓  1 [desktop] › tests/e2e/p2-a11y.spec.ts:149:1 › §6 realistic long text: spaced words wrap; a long URL in client contact / description (3.5s)
+realistic long text (mobile): {"list":{"scrollWidth":375,"clientWidth":375,"offenders":[]},"detail":{"scrollWidth":375,"clientWidth":375,"offenders":[]}}
+  ✓  2 [mobile] › tests/e2e/p2-a11y.spec.ts:149:1 › §6 realistic long text: spaced words wrap; a long URL in client contact / description (3.8s)
+
+  2 passed (21.5s)

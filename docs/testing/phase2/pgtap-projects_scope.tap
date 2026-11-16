@@ -1,0 +1,35 @@
+# Developer suite tests/db/projects_scope.test.sql, re-run by Tester at commit 309d83c
+# python3 -I scripts/pgtap-wrap.py tests/db/projects_scope.test.sql -> executed via Supabase execute_sql (guardscope-dev), ends in ROLLBACK
+1..32
+ok 1 - A creates a project
+ok 2 - owner_id comes from the session
+ok 3 - A cannot set owner_id
+ok 4 - initial draft created by server
+ok 5 - lowercase currency rejected
+ok 6 - deadline before start rejected
+ok 7 - negative price rejected
+ok 8 - blank title rejected
+ok 9 - A edits draft
+ok 10 - number allowance needs a count
+ok 11 - confirm without deliverable rejected
+ok 12 - A adds items
+ok 13 - A confirms v1
+ok 14 - v1 is baseline with snapshotted terms
+ok 15 - v2 draft copies items
+ok 16 - double confirm rejected
+ok 17 - cannot add items to confirmed version (guard trigger fires before RLS check)
+ok 18 - A confirms v2
+ok 19 - baseline unchanged after later edits
+ok 20 - baseline items unchanged
+ok 21 - v2 confirmed, not baseline, new terms
+ok 22 - trigger blocks even privileged update of confirmed version
+ok 23 - trigger blocks privileged delete of baseline items
+ok 24 - B sees no projects of A
+ok 25 - B sees no scope versions of A
+ok 26 - B cannot confirm (no visible id)
+ok 27 - B confirming A's draft by id -> not_found
+ok 28 - B could not update A's project
+ok 29 - anon cannot read projects
+ok 30 - anon cannot execute RPCs
+ok 31 - A deletes own account
+ok 32 - no rows of A remain

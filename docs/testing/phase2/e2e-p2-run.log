@@ -1,0 +1,376 @@
+
+Running 38 tests using 2 workers
+
+  ✓   1 [desktop] › tests/e2e/p2-projects.spec.ts:14:3 › T-01 / AC-1 create and persist › required fields only: saves, defaults shown as "Not specified"/"Not set", persists on reload (5.1s)
+  ✓   3 [desktop] › tests/e2e/p2-projects.spec.ts:36:3 › T-01 / AC-1 create and persist › all fields: values save and reload exactly in detail and edit form (3.7s)
+  ✓   4 [desktop] › tests/e2e/p2-projects.spec.ts:68:3 › T-01 / AC-1 create and persist › default currency from Settings is pre-selected (then reset) (2.5s)
+  ✓   5 [desktop] › tests/e2e/p2-projects.spec.ts:90:3 › T-02 / AC-2 validation › UI: missing required fields -> field errors + summary, nothing sent (2.0s)
+  ✓   6 [desktop] › tests/e2e/p2-projects.spec.ts:109:3 › T-02 / AC-2 validation › UI: over-length, negative price, deadline before start -> field errors + summary, nothing sent (2.3s)
+missing title: HTTP 400 23502
+blank title: HTTP 400 23514
+missing client: HTTP 400 23502
+missing currency: HTTP 400 23502
+title 201: HTTP 400 23514
+client 201: HTTP 400 23514
+contact 321: HTTP 400 23514
+description 5001: HTTP 400 23514
+negative price: HTTP 400 23514
+lowercase currency: HTTP 400 23514
+deadline before start: HTTP 400 23514
+owner_id spoof: HTTP 403 42501
+status on insert: HTTP 403 42501
+3-decimal price 10.555: HTTP 201 [{"id":"95f06db7-901b-44be-b8a3-20064c6dd9ff","agreed_price":10.56}]
+  ✓   7 [desktop] › tests/e2e/p2-projects.spec.ts:141:3 › T-02 / AC-2 validation › API: the same invalid payloads are rejected by the server (5.1s)
+  ✘   8 [desktop] › tests/e2e/p2-projects.spec.ts:179:3 › T-03 / AC-3 edit, complete, archive, reopen › lifecycle with list filters and read-only archived view (15.1s)
+axe serious/critical per page (desktop): {"dashboard":0,"projects-list":0,"projects-archived":0,"projects-completed":0,"project-form":0,"project-form-errors":0,"project-edit":0,"detail-draft-editor":0,"confirm-dialog":0,"confirm-dialog-error":0,"detail-baseline-current-draft-long-text":0,"detail-archived":0,"project-not-found":0,"settings-delete-open-error":0}
+  ✓   2 [desktop] › tests/e2e/p2-a11y.spec.ts:10:1 › T-11 axe + overflow on every Phase 2 page and state (39.3s)
+  ✓  10 [desktop] › tests/e2e/p2-a11y.spec.ts:106:1 › T-11 keyboard: add item with Enter, remove via keyboard, confirm via keyboard (5.9s)
+  ✘   9 [desktop] › tests/e2e/p2-projects.spec.ts:251:3 › §6 not found / not yours › random id and another user's project show the same "Project not found" page (9.6s)
+  ✘  12 [desktop] › tests/e2e/p2-projects.spec.ts:276:3 › §6 not found / not yours › malformed id also shows "Project not found" (6.4s)
+  ✓  11 [desktop] › tests/e2e/p2-scope.spec.ts:55:3 › T-04 / AC-4 draft editing › add, edit, reorder, remove items; three allowance modes; summary/notes persist (17.7s)
+  ✓  13 [desktop] › tests/e2e/p2-projects.spec.ts:285:3 › T-09 / AC-9 dashboard › active count before/after create, completed and archived excluded; New project action; max 5 listed (9.9s)
+  ✘  14 [desktop] › tests/e2e/p2-scope.spec.ts:134:3 › T-05 / AC-5 confirm › UI: confirming with no deliverable is rejected with the empty-scope message (7.6s)
+  ✓  16 [desktop] › tests/e2e/p2-scope.spec.ts:154:3 › T-05 / AC-5 confirm › UI: valid confirm shows date, baseline label, "Not specified" revisions; API flags baseline (4.3s)
+  ✘  15 [mobile] › tests/e2e/p2-a11y.spec.ts:10:1 › T-11 axe + overflow on every Phase 2 page and state (20.3s)
+  ✘  17 [desktop] › tests/e2e/p2-scope.spec.ts:187:3 › T-05 / AC-5 confirm › UI: stale tab confirming an already-confirmed draft gets the safe "already confirmed" message (13.1s)
+  ✓  19 [desktop] › tests/e2e/p2-scope.spec.ts:210:3 › T-05 / AC-5 confirm › API: double confirm (sequential and concurrent) -> exactly one confirmation, other already_confirmed (3.0s)
+  ✓  18 [mobile] › tests/e2e/p2-a11y.spec.ts:106:1 › T-11 keyboard: add item with Enter, remove via keyboard, confirm via keyboard (6.6s)
+  ✓  21 [mobile] › tests/e2e/p2-projects.spec.ts:14:3 › T-01 / AC-1 create and persist › required fields only: saves, defaults shown as "Not specified"/"Not set", persists on reload (3.5s)
+  ✓  22 [mobile] › tests/e2e/p2-projects.spec.ts:36:3 › T-01 / AC-1 create and persist › all fields: values save and reload exactly in detail and edit form (4.1s)
+  ✓  20 [desktop] › tests/e2e/p2-scope.spec.ts:260:3 › T-06 / AC-6 baseline unchanged after later edits › edit price/deadline + scope, confirm v2; baseline identical; UI shows original/current/draft (11.0s)
+  -  23 [mobile] › tests/e2e/p2-projects.spec.ts:68:3 › T-01 / AC-1 create and persist › default currency from Settings is pre-selected (then reset)
+  ✓  25 [mobile] › tests/e2e/p2-projects.spec.ts:90:3 › T-02 / AC-2 validation › UI: missing required fields -> field errors + summary, nothing sent (2.2s)
+  ✓  26 [mobile] › tests/e2e/p2-projects.spec.ts:109:3 › T-02 / AC-2 validation › UI: over-length, negative price, deadline before start -> field errors + summary, nothing sent (2.1s)
+missing title: HTTP 400 23502
+blank title: HTTP 400 23514
+missing client: HTTP 400 23502
+missing currency: HTTP 400 23502
+title 201: HTTP 400 23514
+client 201: HTTP 400 23514
+contact 321: HTTP 400 23514
+description 5001: HTTP 400 23514
+negative price: HTTP 400 23514
+lowercase currency: HTTP 400 23514
+deadline before start: HTTP 400 23514
+owner_id spoof: HTTP 403 42501
+status on insert: HTTP 403 42501
+3-decimal price 10.555: HTTP 201 [{"id":"4e2b3107-58b8-4535-bee6-034cc7353e65","agreed_price":10.56}]
+  ✓  27 [mobile] › tests/e2e/p2-projects.spec.ts:141:3 › T-02 / AC-2 validation › API: the same invalid payloads are rejected by the server (4.0s)
+  ✓  24 [desktop] › tests/e2e/p2-scope.spec.ts:340:3 › T-07 / T-08 API (AC-7, AC-8) › owner cannot change confirmed versions/items; B and anon cannot touch A; archived draft locked (10.3s)
+  ✘  28 [mobile] › tests/e2e/p2-projects.spec.ts:179:3 › T-03 / AC-3 edit, complete, archive, reopen › lifecycle with list filters and read-only archived view (16.6s)
+  ✓  29 [mobile] › tests/e2e/p2-scope.spec.ts:55:3 › T-04 / AC-4 draft editing › add, edit, reorder, remove items; three allowance modes; summary/notes persist (17.0s)
+  ✘  31 [mobile] › tests/e2e/p2-scope.spec.ts:134:3 › T-05 / AC-5 confirm › UI: confirming with no deliverable is rejected with the empty-scope message (7.6s)
+  ✘  30 [mobile] › tests/e2e/p2-projects.spec.ts:251:3 › §6 not found / not yours › random id and another user's project show the same "Project not found" page (9.5s)
+  ✓  32 [mobile] › tests/e2e/p2-scope.spec.ts:154:3 › T-05 / AC-5 confirm › UI: valid confirm shows date, baseline label, "Not specified" revisions; API flags baseline (4.5s)
+  ✘  33 [mobile] › tests/e2e/p2-projects.spec.ts:276:3 › §6 not found / not yours › malformed id also shows "Project not found" (7.0s)
+  -  35 [mobile] › tests/e2e/p2-projects.spec.ts:285:3 › T-09 / AC-9 dashboard › active count before/after create, completed and archived excluded; New project action; max 5 listed
+  ✘  34 [mobile] › tests/e2e/p2-scope.spec.ts:187:3 › T-05 / AC-5 confirm › UI: stale tab confirming an already-confirmed draft gets the safe "already confirmed" message (12.7s)
+  -  36 [mobile] › tests/e2e/p2-scope.spec.ts:210:3 › T-05 / AC-5 confirm › API: double confirm (sequential and concurrent) -> exactly one confirmation, other already_confirmed
+  ✓  37 [mobile] › tests/e2e/p2-scope.spec.ts:260:3 › T-06 / AC-6 baseline unchanged after later edits › edit price/deadline + scope, confirm v2; baseline identical; UI shows original/current/draft (11.3s)
+  -  38 [mobile] › tests/e2e/p2-scope.spec.ts:340:3 › T-07 / T-08 API (AC-7, AC-8) › owner cannot change confirmed versions/items; B and anon cannot touch A; archived draft locked
+
+
+  1) [desktop] › tests/e2e/p2-projects.spec.ts:179:3 › T-03 / AC-3 edit, complete, archive, reopen › lifecycle with list filters and read-only archived view 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('This project is archived. Reopen it to make changes.')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "soft toBeVisible" getByText('This project is archived. Reopen it to make changes.') with timeout 5000ms
+      - waiting for getByText('This project is archived. Reopen it to make changes.')
+
+
+      235 |     await expect(page.getByRole('main').getByRole('alert').first()).toBeVisible();
+      236 |     // soft: a wrong message here is a defect, but the reopen steps below must still run
+    > 237 |     await expect.soft(page.getByText('This project is archived. Reopen it to make changes.')).toBeVisible();
+          |                                                                                               ^
+      238 |     await expect(page.getByLabel('Project title')).toHaveCount(0);
+      239 |     await shot(page, testInfo, 'T03-archived-edit-url');
+      240 |
+        at /home/user/guard-scope/tests/e2e/p2-projects.spec.ts:237:95
+
+    Error Context: test-results/p2-projects-T-03-AC-3-edit-7f8a1-and-read-only-archived-view-desktop/error-context.md
+
+  2) [desktop] › tests/e2e/p2-projects.spec.ts:251:3 › §6 not found / not yours › random id and another user's project show the same "Project not found" page 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByRole('heading', { level: 1 })
+    Expected: "Project not found"
+    Received: "Something went wrong"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByRole('heading', { level: 1 }) with timeout 5000ms
+      - waiting for getByRole('heading', { level: 1 })
+        14 × locator resolved to <h1 class="text-2xl font-semibold text-slate-900">Something went wrong</h1>
+           - unexpected value "Something went wrong"
+
+
+      271 |     await shot(page, testInfo, 'S6-not-found');
+      272 |     expect(texts[0]).toBe(texts[1]); // no existence leak
+    > 273 |     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Project not found');
+          |                                                           ^
+      274 |   });
+      275 |
+      276 |   test('malformed id also shows "Project not found"', async ({ page }, testInfo) => {
+        at /home/user/guard-scope/tests/e2e/p2-projects.spec.ts:273:59
+
+    Error Context: test-results/p2-projects-§6-not-found-n-c8029-same-Project-not-found-page-desktop/error-context.md
+
+  3) [desktop] › tests/e2e/p2-projects.spec.ts:276:3 › §6 not found / not yours › malformed id also shows "Project not found" 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByRole('heading', { level: 1 })
+    Expected: "Project not found"
+    Received: "Something went wrong"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByRole('heading', { level: 1 }) with timeout 5000ms
+      - waiting for getByRole('heading', { level: 1 })
+        14 × locator resolved to <h1 class="text-2xl font-semibold text-slate-900">Something went wrong</h1>
+           - unexpected value "Something went wrong"
+
+
+      278 |     await expect(page.getByRole('main').getByRole('alert').first()).toBeVisible();
+      279 |     await shot(page, testInfo, 'S6-malformed-id');
+    > 280 |     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Project not found');
+          |                                                           ^
+      281 |   });
+      282 | });
+      283 |
+        at /home/user/guard-scope/tests/e2e/p2-projects.spec.ts:280:59
+
+    Error Context: test-results/p2-projects-§6-not-found-n-152f1-so-shows-Project-not-found--desktop/error-context.md
+
+  4) [desktop] › tests/e2e/p2-scope.spec.ts:134:3 › T-05 / AC-5 confirm › UI: confirming with no deliverable is rejected with the empty-scope message 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByRole('group', { name: 'Confirm original scope?' }).getByRole('alert')
+    Expected: "Add at least one deliverable before confirming the scope."
+    Received: "Error: Something went wrong. Please try again."
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByRole('group', { name: 'Confirm original scope?' }).getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('group', { name: 'Confirm original scope?' }).getByRole('alert')
+        14 × locator resolved to <div role="alert" class="flex gap-2 rounded-md border p-3 text-sm border-red-200 bg-red-50 text-red-900">…</div>
+           - unexpected value "Error: Something went wrong. Please try again."
+
+
+      146 |     await expect(dlg.getByRole('alert')).toBeVisible();
+      147 |     await shot(page, testInfo, 'T05-empty-scope');
+    > 148 |     await expect(dlg.getByRole('alert')).toHaveText('Add at least one deliverable before confirming the scope.');
+          |                                          ^
+      149 |     // nothing confirmed
+      150 |     const vs = await getVersions(page, tokenOf(sessionA), id);
+      151 |     expect(vs.filter((v) => v.confirmed_at)).toHaveLength(0);
+        at /home/user/guard-scope/tests/e2e/p2-scope.spec.ts:148:42
+
+    Error Context: test-results/p2-scope-T-05-AC-5-confirm-c3198-ith-the-empty-scope-message-desktop/error-context.md
+
+  5) [desktop] › tests/e2e/p2-scope.spec.ts:187:3 › T-05 / AC-5 confirm › UI: stale tab confirming an already-confirmed draft gets the safe "already confirmed" message 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByRole('group', { name: 'Confirm original scope?' }).getByRole('alert')
+    Expected: "This scope was already confirmed. Refresh the page to see the latest version."
+    Received: "Error: Something went wrong. Please try again."
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByRole('group', { name: 'Confirm original scope?' }).getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('group', { name: 'Confirm original scope?' }).getByRole('alert')
+        14 × locator resolved to <div role="alert" class="flex gap-2 rounded-md border p-3 text-sm border-red-200 bg-red-50 text-red-900">…</div>
+           - unexpected value "Error: Something went wrong. Please try again."
+
+
+      201 |     await expect(dlg2.getByRole('alert')).toBeVisible();
+      202 |     await shot(page2, testInfo, 'T05-stale-confirm');
+    > 203 |     await expect(dlg2.getByRole('alert')).toHaveText(
+          |                                           ^
+      204 |       'This scope was already confirmed. Refresh the page to see the latest version.',
+      205 |     );
+      206 |     const vs = await getVersions(page, token, id);
+        at /home/user/guard-scope/tests/e2e/p2-scope.spec.ts:203:43
+
+    Error Context: test-results/p2-scope-T-05-AC-5-confirm-b0e07-e-already-confirmed-message-desktop/error-context.md
+
+  6) [mobile] › tests/e2e/p2-a11y.spec.ts:10:1 › T-11 axe + overflow on every Phase 2 page and state 
+
+    Error: horizontal overflow {"scrollWidth":70716,"clientWidth":375}
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 375
+    Received:    70716
+
+       at p2-helpers.ts:122
+
+      120 |     clientWidth: document.documentElement.clientWidth,
+      121 |   }));
+    > 122 |   expect(o.scrollWidth, `horizontal overflow ${JSON.stringify(o)}`).toBeLessThanOrEqual(o.clientWidth);
+          |                                                                     ^
+      123 | }
+      124 |
+      125 | /** Opens a project's detail page and waits for it to load. */
+        at noOverflow (/home/user/guard-scope/tests/e2e/p2-helpers.ts:122:69)
+        at check (/home/user/guard-scope/tests/e2e/p2-a11y.spec.ts:15:5)
+        at /home/user/guard-scope/tests/e2e/p2-a11y.spec.ts:86:3
+
+    Error Context: test-results/p2-a11y-T-11-axe-overflow-on-every-Phase-2-page-and-state-mobile/error-context.md
+
+  7) [mobile] › tests/e2e/p2-projects.spec.ts:179:3 › T-03 / AC-3 edit, complete, archive, reopen › lifecycle with list filters and read-only archived view 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('This project is archived. Reopen it to make changes.')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "soft toBeVisible" getByText('This project is archived. Reopen it to make changes.') with timeout 5000ms
+      - waiting for getByText('This project is archived. Reopen it to make changes.')
+
+
+      235 |     await expect(page.getByRole('main').getByRole('alert').first()).toBeVisible();
+      236 |     // soft: a wrong message here is a defect, but the reopen steps below must still run
+    > 237 |     await expect.soft(page.getByText('This project is archived. Reopen it to make changes.')).toBeVisible();
+          |                                                                                               ^
+      238 |     await expect(page.getByLabel('Project title')).toHaveCount(0);
+      239 |     await shot(page, testInfo, 'T03-archived-edit-url');
+      240 |
+        at /home/user/guard-scope/tests/e2e/p2-projects.spec.ts:237:95
+
+    Error Context: test-results/p2-projects-T-03-AC-3-edit-7f8a1-and-read-only-archived-view-mobile/error-context.md
+
+  8) [mobile] › tests/e2e/p2-projects.spec.ts:251:3 › §6 not found / not yours › random id and another user's project show the same "Project not found" page 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByRole('heading', { level: 1 })
+    Expected: "Project not found"
+    Received: "Something went wrong"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByRole('heading', { level: 1 }) with timeout 5000ms
+      - waiting for getByRole('heading', { level: 1 })
+        14 × locator resolved to <h1 class="text-2xl font-semibold text-slate-900">Something went wrong</h1>
+           - unexpected value "Something went wrong"
+
+
+      271 |     await shot(page, testInfo, 'S6-not-found');
+      272 |     expect(texts[0]).toBe(texts[1]); // no existence leak
+    > 273 |     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Project not found');
+          |                                                           ^
+      274 |   });
+      275 |
+      276 |   test('malformed id also shows "Project not found"', async ({ page }, testInfo) => {
+        at /home/user/guard-scope/tests/e2e/p2-projects.spec.ts:273:59
+
+    Error Context: test-results/p2-projects-§6-not-found-n-c8029-same-Project-not-found-page-mobile/error-context.md
+
+  9) [mobile] › tests/e2e/p2-projects.spec.ts:276:3 › §6 not found / not yours › malformed id also shows "Project not found" 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByRole('heading', { level: 1 })
+    Expected: "Project not found"
+    Received: "Something went wrong"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByRole('heading', { level: 1 }) with timeout 5000ms
+      - waiting for getByRole('heading', { level: 1 })
+        14 × locator resolved to <h1 class="text-2xl font-semibold text-slate-900">Something went wrong</h1>
+           - unexpected value "Something went wrong"
+
+
+      278 |     await expect(page.getByRole('main').getByRole('alert').first()).toBeVisible();
+      279 |     await shot(page, testInfo, 'S6-malformed-id');
+    > 280 |     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Project not found');
+          |                                                           ^
+      281 |   });
+      282 | });
+      283 |
+        at /home/user/guard-scope/tests/e2e/p2-projects.spec.ts:280:59
+
+    Error Context: test-results/p2-projects-§6-not-found-n-152f1-so-shows-Project-not-found--mobile/error-context.md
+
+  10) [mobile] › tests/e2e/p2-scope.spec.ts:134:3 › T-05 / AC-5 confirm › UI: confirming with no deliverable is rejected with the empty-scope message 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByRole('group', { name: 'Confirm original scope?' }).getByRole('alert')
+    Expected: "Add at least one deliverable before confirming the scope."
+    Received: "Error: Something went wrong. Please try again."
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByRole('group', { name: 'Confirm original scope?' }).getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('group', { name: 'Confirm original scope?' }).getByRole('alert')
+        14 × locator resolved to <div role="alert" class="flex gap-2 rounded-md border p-3 text-sm border-red-200 bg-red-50 text-red-900">…</div>
+           - unexpected value "Error: Something went wrong. Please try again."
+
+
+      146 |     await expect(dlg.getByRole('alert')).toBeVisible();
+      147 |     await shot(page, testInfo, 'T05-empty-scope');
+    > 148 |     await expect(dlg.getByRole('alert')).toHaveText('Add at least one deliverable before confirming the scope.');
+          |                                          ^
+      149 |     // nothing confirmed
+      150 |     const vs = await getVersions(page, tokenOf(sessionA), id);
+      151 |     expect(vs.filter((v) => v.confirmed_at)).toHaveLength(0);
+        at /home/user/guard-scope/tests/e2e/p2-scope.spec.ts:148:42
+
+    Error Context: test-results/p2-scope-T-05-AC-5-confirm-c3198-ith-the-empty-scope-message-mobile/error-context.md
+
+  11) [mobile] › tests/e2e/p2-scope.spec.ts:187:3 › T-05 / AC-5 confirm › UI: stale tab confirming an already-confirmed draft gets the safe "already confirmed" message 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByRole('group', { name: 'Confirm original scope?' }).getByRole('alert')
+    Expected: "This scope was already confirmed. Refresh the page to see the latest version."
+    Received: "Error: Something went wrong. Please try again."
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByRole('group', { name: 'Confirm original scope?' }).getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('group', { name: 'Confirm original scope?' }).getByRole('alert')
+        14 × locator resolved to <div role="alert" class="flex gap-2 rounded-md border p-3 text-sm border-red-200 bg-red-50 text-red-900">…</div>
+           - unexpected value "Error: Something went wrong. Please try again."
+
+
+      201 |     await expect(dlg2.getByRole('alert')).toBeVisible();
+      202 |     await shot(page2, testInfo, 'T05-stale-confirm');
+    > 203 |     await expect(dlg2.getByRole('alert')).toHaveText(
+          |                                           ^
+      204 |       'This scope was already confirmed. Refresh the page to see the latest version.',
+      205 |     );
+      206 |     const vs = await getVersions(page, token, id);
+        at /home/user/guard-scope/tests/e2e/p2-scope.spec.ts:203:43
+
+    Error Context: test-results/p2-scope-T-05-AC-5-confirm-b0e07-e-already-confirmed-message-mobile/error-context.md
+
+  11 failed
+    [desktop] › tests/e2e/p2-projects.spec.ts:179:3 › T-03 / AC-3 edit, complete, archive, reopen › lifecycle with list filters and read-only archived view 
+    [desktop] › tests/e2e/p2-projects.spec.ts:251:3 › §6 not found / not yours › random id and another user's project show the same "Project not found" page 
+    [desktop] › tests/e2e/p2-projects.spec.ts:276:3 › §6 not found / not yours › malformed id also shows "Project not found" 
+    [desktop] › tests/e2e/p2-scope.spec.ts:134:3 › T-05 / AC-5 confirm › UI: confirming with no deliverable is rejected with the empty-scope message 
+    [desktop] › tests/e2e/p2-scope.spec.ts:187:3 › T-05 / AC-5 confirm › UI: stale tab confirming an already-confirmed draft gets the safe "already confirmed" message 
+    [mobile] › tests/e2e/p2-a11y.spec.ts:10:1 › T-11 axe + overflow on every Phase 2 page and state 
+    [mobile] › tests/e2e/p2-projects.spec.ts:179:3 › T-03 / AC-3 edit, complete, archive, reopen › lifecycle with list filters and read-only archived view 
+    [mobile] › tests/e2e/p2-projects.spec.ts:251:3 › §6 not found / not yours › random id and another user's project show the same "Project not found" page 
+    [mobile] › tests/e2e/p2-projects.spec.ts:276:3 › §6 not found / not yours › malformed id also shows "Project not found" 
+    [mobile] › tests/e2e/p2-scope.spec.ts:134:3 › T-05 / AC-5 confirm › UI: confirming with no deliverable is rejected with the empty-scope message 
+    [mobile] › tests/e2e/p2-scope.spec.ts:187:3 › T-05 / AC-5 confirm › UI: stale tab confirming an already-confirmed draft gets the safe "already confirmed" message 
+  4 skipped
+  23 passed (3.2m)

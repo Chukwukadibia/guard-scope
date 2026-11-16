@@ -1,0 +1,37 @@
+--- T-07 owner (A) against confirmed v1 ---
+PATCH v1 summary: HTTP 200 []
+PATCH v1 confirmed_at=null: HTTP 403 {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT UPDATE ON public.scope_versions TO authenticated;","message
+PATCH v1 is_original_baseline=false: HTTP 403 {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT UPDATE ON public.scope_versions TO authenticated;","message
+PATCH v2 confirmed_at=now (self-confirm): HTTP 403 {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT UPDATE ON public.scope_versions TO authenticated;","message
+DELETE v1: HTTP 403 {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT DELETE ON public.scope_versions TO authenticated;","message
+PATCH v1 item: HTTP 200 []
+DELETE v1 items: HTTP 200 []
+POST item into v1: HTTP 400 {"code":"P0001","details":null,"hint":null,"message":"scope_version_immutable"}
+PATCH v2 item scope_version_id -> v1: HTTP 403 {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT UPDATE ON public.scope_items TO authenticated;","message":"
+DELETE project (no hard delete, C-4): HTTP 403 {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT DELETE ON public.projects TO authenticated;","message":"per
+--- T-08 user B against A ---
+B GET A project: HTTP 200 []
+B GET A versions: HTTP 200 []
+B GET A items: HTTP 200 []
+B POST item into A draft: HTTP 403 {"code":"42501","details":null,"hint":null,"message":"new row violates row-level security policy for table \"scope_items\""}
+B PATCH A project status: HTTP 200 []
+B PATCH A project title: HTTP 200 []
+B PATCH A draft: HTTP 200 []
+B DELETE A draft items: HTTP 200 []
+B RPC confirm_scope(A draft): HTTP 400 {"code":"P0001","details":null,"hint":null,"message":"not_found"}
+B RPC confirm_scope(A confirmed v1): HTTP 400 {"code":"P0001","details":null,"hint":null,"message":"not_found"}
+--- anon (publishable key only) ---
+anon GET /rest/v1/projects: HTTP 401 {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT SELECT ON public.projects TO anon;","message":"permission d
+anon GET /rest/v1/scope_versions: HTTP 401 {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT SELECT ON public.scope_versions TO anon;","message":"permis
+anon GET /rest/v1/scope_items: HTTP 401 {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT SELECT ON public.scope_items TO anon;","message":"permissio
+anon POST /rest/v1/projects: HTTP 401 {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT SELECT, INSERT ON public.projects TO anon;","message":"perm
+anon POST /rest/v1/rpc/confirm_scope: HTTP 401 {"code":"42501","details":null,"hint":null,"message":"permission denied for function confirm_scope"}
+anon POST /rest/v1/rpc/delete_my_account: HTTP 401 {"code":"42501","details":null,"hint":null,"message":"permission denied for function delete_my_account"}
+--- bypass flag reachability via API ---
+A RPC set_config (pg_catalog): HTTP 404 {"code":"PGRST202","details":"Searched for the function public.set_config with parameters is_local, new_value, setting_name or with a single unnamed json/jsonb 
+A data after all attempts: identical to before (deep-equal of versions + items)
+--- archived project via API (owner) ---
+PATCH archived draft summary: HTTP 200 []
+POST item to archived draft: HTTP 403 {"code":"42501","details":null,"hint":null,"message":"new row violates row-level security policy for table \"scope_items\""}
+RPC confirm archived draft: HTTP 400 {"code":"P0001","details":null,"hint":null,"message":"project_archived"}
+PATCH archived project title (observation: allowed; BR-6 is UI-only): HTTP 200 [{"id":"414d8c7d-077e-4e29-980f-50d7a7bd1e31","owner_id":"d79005b2-c3c3-4e52-ae27-ca6342043e42","title":"P2T edited while archived","client_name":"C","client_co

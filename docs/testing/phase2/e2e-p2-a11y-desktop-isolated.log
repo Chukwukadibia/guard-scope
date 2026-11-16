@@ -1,0 +1,49 @@
+
+Running 1 test using 1 worker
+
+axe serious/critical per page (desktop): {"dashboard":0,"projects-list":0,"projects-archived":0,"projects-completed":0,"project-form":0,"project-form-errors":0,"project-edit":0,"detail-draft-editor":0,"confirm-dialog":0,"confirm-dialog-error":0,"detail-baseline-current-draft-long-text":0,"detail-archived":0,"project-not-found":0,"settings-delete-open-error":0}
+overflow (desktop): {
+ "projects-list": {
+  "scrollWidth": 2223,
+  "clientWidth": 1280,
+  "offenders": [
+   "div>ul>li>a>div>span>svg>circle width=1 text=\"…\"",
+   "div>ul>li>a>div>span>svg>circle width=12 text=\"…\"",
+   "div>ul>li>a>dl>div>dd width=48 text=\"Not set…\"",
+   "div>ul>li>a>div>div>h2 width=2045 text=\"LLLLLLLLLLLL…\"",
+   "div>ul>li>a>div>div>p width=2045 text=\"CCCCCCCCCCCC…\"",
+   "div>ul>li>a>dl>div>dd width=84 text=\"31 Dec 2026…\"",
+   "div>ul>li>a>div>div>h2 width=1746 text=\"word0 word1 …\"",
+   "div>ul>li>a>div>div>p width=1746 text=\"word0 word1 …\""
+  ]
+ }
+}
+  ✘  1 [desktop] › tests/e2e/p2-a11y.spec.ts:10:1 › T-11 axe + overflow on every Phase 2 page and state (40.4s)
+
+
+  1) [desktop] › tests/e2e/p2-a11y.spec.ts:10:1 › T-11 axe + overflow on every Phase 2 page and state 
+
+    Error: horizontal overflow {"scrollWidth":2223,"clientWidth":1280,"offenders":["div>ul>li>a>div>span>svg>circle width=1 text=\"…\"","div>ul>li>a>div>span>svg>circle width=12 text=\"…\"","div>ul>li>a>dl>div>dd width=48 text=\"Not set…\"","div>ul>li>a>div>div>h2 width=2045 text=\"LLLLLLLLLLLL…\"","div>ul>li>a>div>div>p width=2045 text=\"CCCCCCCCCCCC…\"","div>ul>li>a>dl>div>dd width=84 text=\"31 Dec 2026…\"","div>ul>li>a>div>div>h2 width=1746 text=\"word0 word1 …\"","div>ul>li>a>div>div>p width=1746 text=\"word0 word1 …\""]}
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 1280
+    Received:    2223
+
+       at p2-helpers.ts:137
+
+      135 |   });
+      136 |   const e = soft ? expect.soft : expect;
+    > 137 |   e(o.scrollWidth, `horizontal overflow ${JSON.stringify(o)}`).toBeLessThanOrEqual(o.clientWidth);
+          |                                                                ^
+      138 |   return o;
+      139 | }
+      140 |
+        at noOverflow (/home/user/guard-scope/tests/e2e/p2-helpers.ts:137:64)
+        at check (/home/user/guard-scope/tests/e2e/p2-a11y.spec.ts:16:15)
+        at /home/user/guard-scope/tests/e2e/p2-a11y.spec.ts:56:3
+
+    Error Context: test-results/p2-a11y-T-11-axe-overflow-on-every-Phase-2-page-and-state-desktop/error-context.md
+
+  1 failed
+    [desktop] › tests/e2e/p2-a11y.spec.ts:10:1 › T-11 axe + overflow on every Phase 2 page and state 

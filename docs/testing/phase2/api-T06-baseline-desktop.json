@@ -1,0 +1,144 @@
+{
+  "baseline_before_v2": {
+    "id": "b40e0962-240a-487a-bde6-3d53a6ddf325",
+    "project_id": "5111755d-f7fc-4e96-be4e-7864a58625dd",
+    "version_no": 1,
+    "summary": "Original summary",
+    "revision_allowance_type": "number",
+    "revision_allowance_count": 2,
+    "notes": null,
+    "agreed_price": 1000,
+    "currency": "EUR",
+    "deadline": "2026-12-31",
+    "created_by": "d79005b2-c3c3-4e52-ae27-ca6342043e42",
+    "created_at": "2026-11-16T12:13:28.753213+00:00",
+    "updated_at": "2026-11-16T12:13:32.913844+00:00",
+    "confirmed_at": "2026-11-16T12:13:32.913844+00:00",
+    "is_original_baseline": true,
+    "scope_items": [
+      {
+        "id": "310eae13-d86c-4487-b606-9bef5f1d1f51",
+        "kind": "exclusion",
+        "created_at": "2026-11-16T12:13:30.765385+00:00",
+        "sort_order": 1,
+        "description": "E1 original",
+        "scope_version_id": "b40e0962-240a-487a-bde6-3d53a6ddf325"
+      },
+      {
+        "id": "6e911710-7ea3-4c41-b787-cab8f0735d8c",
+        "kind": "deliverable",
+        "created_at": "2026-11-16T12:13:29.908358+00:00",
+        "sort_order": 1,
+        "description": "D1 original",
+        "scope_version_id": "b40e0962-240a-487a-bde6-3d53a6ddf325"
+      }
+    ]
+  },
+  "versions_after_v2": [
+    {
+      "id": "b40e0962-240a-487a-bde6-3d53a6ddf325",
+      "project_id": "5111755d-f7fc-4e96-be4e-7864a58625dd",
+      "version_no": 1,
+      "summary": "Original summary",
+      "revision_allowance_type": "number",
+      "revision_allowance_count": 2,
+      "notes": null,
+      "agreed_price": 1000,
+      "currency": "EUR",
+      "deadline": "2026-12-31",
+      "created_by": "d79005b2-c3c3-4e52-ae27-ca6342043e42",
+      "created_at": "2026-11-16T12:13:28.753213+00:00",
+      "updated_at": "2026-11-16T12:13:32.913844+00:00",
+      "confirmed_at": "2026-11-16T12:13:32.913844+00:00",
+      "is_original_baseline": true,
+      "scope_items": [
+        {
+          "id": "310eae13-d86c-4487-b606-9bef5f1d1f51",
+          "kind": "exclusion",
+          "created_at": "2026-11-16T12:13:30.765385+00:00",
+          "sort_order": 1,
+          "description": "E1 original",
+          "scope_version_id": "b40e0962-240a-487a-bde6-3d53a6ddf325"
+        },
+        {
+          "id": "6e911710-7ea3-4c41-b787-cab8f0735d8c",
+          "kind": "deliverable",
+          "created_at": "2026-11-16T12:13:29.908358+00:00",
+          "sort_order": 1,
+          "description": "D1 original",
+          "scope_version_id": "b40e0962-240a-487a-bde6-3d53a6ddf325"
+        }
+      ]
+    },
+    {
+      "id": "75ded6ca-56bd-4e21-a2e7-c2faab5f2f8a",
+      "project_id": "5111755d-f7fc-4e96-be4e-7864a58625dd",
+      "version_no": 2,
+      "summary": "Changed summary",
+      "revision_allowance_type": "none",
+      "revision_allowance_count": null,
+      "notes": null,
+      "agreed_price": 2500,
+      "currency": "EUR",
+      "deadline": "2027-02-28",
+      "created_by": "d79005b2-c3c3-4e52-ae27-ca6342043e42",
+      "created_at": "2026-11-16T12:13:32.913844+00:00",
+      "updated_at": "2026-11-16T12:13:37.146673+00:00",
+      "confirmed_at": "2026-11-16T12:13:37.146673+00:00",
+      "is_original_baseline": false,
+      "scope_items": [
+        {
+          "id": "31307339-2bda-4017-98d7-6c99acbb06bb",
+          "kind": "deliverable",
+          "created_at": "2026-11-16T12:13:36.037269+00:00",
+          "sort_order": 2,
+          "description": "D2 new",
+          "scope_version_id": "75ded6ca-56bd-4e21-a2e7-c2faab5f2f8a"
+        },
+        {
+          "id": "b6e6604c-d620-436b-a28a-015be375d79d",
+          "kind": "deliverable",
+          "created_at": "2026-11-16T12:13:32.913844+00:00",
+          "sort_order": 1,
+          "description": "D1 changed",
+          "scope_version_id": "75ded6ca-56bd-4e21-a2e7-c2faab5f2f8a"
+        }
+      ]
+    },
+    {
+      "id": "6da6e688-b21a-450a-b02c-af1c8897b6f0",
+      "project_id": "5111755d-f7fc-4e96-be4e-7864a58625dd",
+      "version_no": 3,
+      "summary": "Changed summary",
+      "revision_allowance_type": "none",
+      "revision_allowance_count": null,
+      "notes": null,
+      "agreed_price": null,
+      "currency": null,
+      "deadline": null,
+      "created_by": "d79005b2-c3c3-4e52-ae27-ca6342043e42",
+      "created_at": "2026-11-16T12:13:37.146673+00:00",
+      "updated_at": "2026-11-16T12:13:37.146673+00:00",
+      "confirmed_at": null,
+      "is_original_baseline": false,
+      "scope_items": [
+        {
+          "id": "6b09cb83-c3ab-4954-9435-b7369f49fe68",
+          "kind": "deliverable",
+          "created_at": "2026-11-16T12:13:37.146673+00:00",
+          "sort_order": 1,
+          "description": "D1 changed",
+          "scope_version_id": "6da6e688-b21a-450a-b02c-af1c8897b6f0"
+        },
+        {
+          "id": "7db87069-5589-4d75-aae8-7f9ae91150e1",
+          "kind": "deliverable",
+          "created_at": "2026-11-16T12:13:37.146673+00:00",
+          "sort_order": 2,
+          "description": "D2 new",
+          "scope_version_id": "6da6e688-b21a-450a-b02c-af1c8897b6f0"
+        }
+      ]
+    }
+  ]
+}

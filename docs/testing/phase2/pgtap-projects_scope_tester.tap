@@ -1,0 +1,83 @@
+# Tester suite tests/db/projects_scope_tester.test.sql at commit 309d83c
+# python3 -I scripts/pgtap-wrap.py tests/db/projects_scope_tester.test.sql -> execute_sql (guardscope-dev), ends in ROLLBACK
+1..80
+ok 1 - G1 anon has no table privileges on Phase 2 tables
+ok 2 - G2 authenticated cannot DELETE projects (archive only, C-4)
+ok 3 - G3 authenticated cannot INSERT/DELETE scope_versions
+ok 4 - G4 owner_id not insertable/updatable by clients
+ok 5 - G5 status not insertable; archived_at/id not updatable
+ok 6 - G6 confirmation/snapshot columns not client-updatable
+ok 7 - G7 scope_items.scope_version_id/kind not updatable
+ok 8 - G8 authenticated can execute the two intended RPCs
+ok 9 - G9 internal trigger functions not executable by API roles
+ok 10 - G10 every public security definer function pins search_path
+ok 11 - G11 RLS enabled on all Phase 2 tables
+ok 12 - A1 A creates a project with all fields
+ok 13 - A2 new project starts active (BR-2)
+ok 14 - A3 server-created draft is version 1
+ok 15 - A4 client cannot choose status on insert
+ok 16 - A5 client cannot insert scope_versions
+ok 17 - V1 title 201 chars rejected
+ok 18 - V2 title 200 chars accepted
+ok 19 - V3 client 201 chars rejected
+ok 20 - V4 blank client rejected
+ok 21 - V5 missing currency rejected
+ok 22 - V6 client contact 321 chars rejected
+ok 23 - V7 description 5001 chars rejected
+ok 24 - V8 4-letter currency rejected
+ok 25 - V9 non-letter currency rejected
+ok 26 - V10 price above numeric(14,2) rejected
+ok 27 - V11 update deadline before start rejected
+ok 28 - V12 unknown status rejected
+ok 29 - V13 summary 5001 rejected
+ok 30 - V14 notes 5001 rejected
+ok 31 - V15 negative revision count rejected
+ok 32 - V16 count with type none rejected
+ok 33 - V17 item 1001 chars rejected
+ok 34 - V18 unknown item kind rejected
+ok 35 - V19 blank item rejected
+ok 36 - A6 A fills the draft
+ok 37 - B1 B cannot insert items into A's draft
+ok 38 - B2 B sees none of A's items
+ok 39 - B3 B cannot select A's project by id
+ok 40 - B4 B creates own project
+ok 41 - B5 B cannot insert into A's draft via INSERT..SELECT
+ok 42 - B6 A's item unchanged/not deleted by B
+ok 43 - B7 A's draft summary unchanged by B
+ok 44 - B8 B could not change A's project status/title
+ok 45 - B9 B's project owned by B
+ok 46 - C1 A confirms v1
+ok 47 - C2 v1 baseline with snapshot
+ok 48 - C3 v2 draft copies summary/notes/allowance
+ok 49 - C4 v2 draft copies items with kind and order
+ok 50 - I1 owner cannot clear confirmed_at
+ok 51 - I2 owner cannot change is_original_baseline
+ok 52 - I3 owner cannot self-confirm draft by setting confirmed_at
+ok 53 - I4 owner cannot change snapshotted price
+ok 54 - I5 owner cannot move draft items into the baseline
+ok 55 - I6 owner cannot delete the baseline version
+ok 56 - C5 A confirms v2 after edits
+ok 57 - C6 confirming v2 again -> already_confirmed
+ok 58 - C7 baseline row byte-for-byte unchanged (AC-6)
+ok 59 - C8 baseline items byte-for-byte unchanged (AC-6)
+ok 60 - C9 v2 snapshots the new terms and is not baseline
+ok 61 - C10 exactly one baseline
+ok 62 - C11 exactly one draft (v3)
+ok 63 - R1 archived_at set by server
+ok 64 - R2 confirm blocked on archived project
+ok 65 - R3 cannot add items to an archived project's draft
+ok 66 - R4 archived project's draft not editable via API
+ok 67 - R5 reopen clears archived_at
+ok 68 - X1 B confirming A's draft -> not_found
+ok 69 - X2 B confirming A's confirmed version -> not_found (no state leak)
+ok 70 - X3 random id -> not_found
+ok 71 - U1 confirm without sub -> not_authenticated
+ok 72 - U2 delete_my_account without sub -> not_authenticated
+ok 73 - U3 anon cannot call confirm_scope
+ok 74 - U4 anon cannot insert projects
+ok 75 - D1 B deletes own account
+ok 76 - D2 no rows of B remain
+ok 77 - D3 A's account and data untouched by B's deletion
+ok 78 - D4 A (with confirmed baseline + v2) deletes own account
+ok 79 - D5 no project, version, item or identity rows of A remain
+ok 80 - D6 bypass flag is off after delete_my_account returns

@@ -1,0 +1,13 @@
+# get_advisors(type=security), guardscope-dev, 2026-11-16 (observed_at 12:35Z), commit 309d83c
+WARN authenticated_security_definer_function_executable: public.confirm_scope(uuid), public.delete_my_account()
+     -> already dispositioned "Intentional" in docs/security/ADVISOR_NOTES.md (both pin search_path='', check auth.uid(),
+        not executable by anon: pgTAP dev #30, tester G8/G9/U3, API anon 401 in api-T07-T08.log)
+WARN auth_leaked_password_protection -> already dispositioned (ISS-008, dashboard setting)
+No new findings (no RLS-disabled tables, no mutable search_path, no exposed tables).
+
+# Final cleanup (execute_sql, superuser; test-only bypass: set_config('guardscope.account_deletion','on',true) + delete projects of a@/b@)
+auth.users emails: a@guardscope.test,b@guardscope.test
+projects=0 scope_versions=0 scope_items=0 ; profiles=2, profiles with non-null display_name/default_currency=0
+Throwaway user p2-delete-throwaway@guardscope.test deleted through the UI (see sql-T10-deletion-rowcounts.log).
+pgTAP suites inserted their own synthetic users inside a transaction that ended in ROLLBACK.
+Phase 1 evidence files overwritten by the regression run were restored with `git checkout -- docs/testing/phase1`.
