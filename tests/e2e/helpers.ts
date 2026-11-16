@@ -18,8 +18,14 @@ const env = { ...loadEnvFile('.env.local'), ...loadEnvFile('.env.test.local'), .
 
 export const SUPABASE_URL = env.VITE_SUPABASE_URL as string;
 export const SUPABASE_KEY = env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
-export const USER_A = { email: env.TEST_USER_A_EMAIL as string, password: env.TEST_USER_A_PASSWORD as string };
-export const USER_B = { email: env.TEST_USER_B_EMAIL as string, password: env.TEST_USER_B_PASSWORD as string };
+export const USER_A = {
+  email: env.TEST_USER_A_EMAIL as string,
+  password: env.TEST_USER_A_PASSWORD as string,
+};
+export const USER_B = {
+  email: env.TEST_USER_B_EMAIL as string,
+  password: env.TEST_USER_B_PASSWORD as string,
+};
 export const STORAGE_KEY = `sb-${new URL(SUPABASE_URL).hostname.split('.')[0]}-auth-token`;
 export const APP_ORIGIN = 'http://localhost:4173';
 

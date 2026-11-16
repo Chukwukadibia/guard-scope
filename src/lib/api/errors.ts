@@ -46,7 +46,7 @@ export function toApiError(err: unknown): ApiError {
 
 export const errorMessages: Record<ApiErrorCode, string> = {
   invalid_credentials: 'Email or password is incorrect.',
-  email_not_confirmed: 'Please confirm your email address first. Check your inbox for the link.',
+  email_not_confirmed: 'Check your email to confirm your account, then sign in.',
   weak_password: 'Choose a stronger password (at least 8 characters).',
   rate_limited: 'Too many attempts. Please wait a minute and try again.',
   not_authenticated: 'Your session has ended. Please sign in again.',

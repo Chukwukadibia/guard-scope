@@ -8,8 +8,13 @@ async function saveSettings(page: import('@playwright/test').Page) {
 }
 
 test.describe('T-11 / AC-8 settings persist (BR-4)', () => {
-  test('currency starts "Not set"; name + EUR persist after reload; then reset', async ({ page }, testInfo) => {
-    test.skip(isMobile(testInfo), 'mutates user A profile; run once (desktop) to avoid cross-project races');
+  test('currency starts "Not set"; name + EUR persist after reload; then reset', async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      isMobile(testInfo),
+      'mutates user A profile; run once (desktop) to avoid cross-project races',
+    );
     await page.goto('/settings');
     const name = page.getByLabel(/Display or business name/);
     const currency = page.getByLabel(/Default currency/);
@@ -41,7 +46,9 @@ test.describe('T-11 / AC-8 settings persist (BR-4)', () => {
 });
 
 test.describe('T-12 / AC-8 settings validation', () => {
-  test('121-character name gives a field error linked via aria-describedby; nothing is sent', async ({ page }, testInfo) => {
+  test('121-character name gives a field error linked via aria-describedby; nothing is sent', async ({
+    page,
+  }, testInfo) => {
     await page.goto('/settings');
     const name = page.getByLabel(/Display or business name/);
     await expect(name).toBeVisible();
@@ -62,7 +69,9 @@ test.describe('T-12 / AC-8 settings validation', () => {
     await screenshot(page, testInfo, 'T12-name-too-long');
   });
 
-  test('currency not in the list gives a field error linked via aria-describedby', async ({ page }) => {
+  test('currency not in the list gives a field error linked via aria-describedby', async ({
+    page,
+  }) => {
     await page.goto('/settings');
     const currency = page.getByLabel(/Default currency/);
     await expect(currency).toBeVisible();
@@ -78,7 +87,9 @@ test.describe('T-12 / AC-8 settings validation', () => {
     const err = page.getByText('Choose a currency from the list.');
     await expect(err).toBeVisible();
     await expect(currency).toHaveAttribute('aria-invalid', 'true');
-    expect((await currency.getAttribute('aria-describedby'))?.split(' ')).toContain(await err.getAttribute('id'));
+    expect((await currency.getAttribute('aria-describedby'))?.split(' ')).toContain(
+      await err.getAttribute('id'),
+    );
   });
 
   test('§6: validation errors are summarised on submit', async ({ page }) => {
@@ -87,7 +98,10 @@ test.describe('T-12 / AC-8 settings validation', () => {
     await page.getByRole('button', { name: 'Save settings' }).click();
     await expect(page.getByText('Use 120 characters or fewer.')).toBeVisible();
     // A submit summary is an alert/status region in addition to the inline field message.
-    const summary = page.getByRole('alert').or(page.locator('[role="status"]')).filter({ hasText: /120 characters|check|error/i });
+    const summary = page
+      .getByRole('alert')
+      .or(page.locator('[role="status"]'))
+      .filter({ hasText: /120 characters|check|error/i });
     await expect(summary).toHaveCount(1, { timeout: 2000 });
   });
 });
@@ -97,13 +111,17 @@ test.describe('T-16 / AC-12 empty states, no dead actions', () => {
     ['/', 'Dashboard', 'No projects yet'],
     ['/projects', 'Projects', 'Projects will appear here'],
   ] as const) {
-    test(`${path} shows "${emptyTitle}" and no non-functional actions`, async ({ page }, testInfo) => {
+    test(`${path} shows "${emptyTitle}" and no non-functional actions`, async ({
+      page,
+    }, testInfo) => {
       await page.goto(path);
       await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
       await expect(page.getByRole('heading', { level: 2, name: emptyTitle })).toBeVisible();
       const main = page.locator('main');
       await expect(main.getByRole('button')).toHaveCount(0);
-      const hrefs = await main.getByRole('link').evaluateAll((els) => els.map((e) => e.getAttribute('href')));
+      const hrefs = await main
+        .getByRole('link')
+        .evaluateAll((els) => els.map((e) => e.getAttribute('href')));
       for (const h of hrefs) expect(h && h !== '#' && !h.startsWith('javascript:')).toBeTruthy();
       await screenshot(page, testInfo, `T16-${heading.toLowerCase()}`);
     });

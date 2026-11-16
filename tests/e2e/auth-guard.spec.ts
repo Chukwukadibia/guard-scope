@@ -17,7 +17,8 @@ const watchProtectedDom = () => {
     const seen = (window as unknown as { __protectedSeen: string[] }).__protectedSeen;
     if (document.querySelector('nav[aria-label="Main"]')) seen.push('nav');
     for (const h of Array.from(document.querySelectorAll('h1'))) {
-      if (['Dashboard', 'Projects', 'Settings'].includes(h.textContent ?? '')) seen.push(h.textContent!);
+      if (['Dashboard', 'Projects', 'Settings'].includes(h.textContent ?? ''))
+        seen.push(h.textContent!);
     }
   };
   new MutationObserver(check).observe(document, { childList: true, subtree: true });
@@ -25,12 +26,16 @@ const watchProtectedDom = () => {
 
 test.describe('T-04 / AC-3 route guard', () => {
   for (const path of ['/', '/projects', '/settings']) {
-    test(`signed out, ${path} redirects to /sign-in?next=… with no protected DOM`, async ({ page }) => {
+    test(`signed out, ${path} redirects to /sign-in?next=… with no protected DOM`, async ({
+      page,
+    }) => {
       await page.addInitScript(watchProtectedDom);
       await page.goto(path);
       await expect(page).toHaveURL(`/sign-in?next=${encodeURIComponent(path)}`);
       await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
-      const seen = await page.evaluate(() => (window as unknown as { __protectedSeen: string[] }).__protectedSeen);
+      const seen = await page.evaluate(
+        () => (window as unknown as { __protectedSeen: string[] }).__protectedSeen,
+      );
       expect(seen).toEqual([]);
     });
   }
@@ -44,7 +49,9 @@ test.describe('T-04 / AC-3 route guard', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Projects' })).toBeVisible();
   });
 
-  test('AC-3: off-site next (//evil.example) is ignored after sign-in', async ({ page }, testInfo) => {
+  test('AC-3: off-site next (//evil.example) is ignored after sign-in', async ({
+    page,
+  }, testInfo) => {
     test.skip(isMobile(testInfo), 'desktop only; keeps auth rate limits low');
     await page.goto('/sign-in?next=%2F%2Fevil.example%2Fsteal');
     await signInViaUi(page, USER_A);
@@ -90,7 +97,9 @@ test.describe('T-06 / AC-4 invalid or expired session', () => {
     await screenshot(page, testInfo, 'T06-session-ended');
   });
 
-  test('expired access token with invalid refresh token → "session has ended"', async ({ page }) => {
+  test('expired access token with invalid refresh token → "session has ended"', async ({
+    page,
+  }) => {
     await page.goto('/projects');
     await expect(page.getByRole('heading', { level: 1, name: 'Projects' })).toBeVisible();
     await page.evaluate((k) => {
@@ -104,7 +113,9 @@ test.describe('T-06 / AC-4 invalid or expired session', () => {
     await expect(page.getByText(SESSION_ENDED)).toBeVisible();
   });
 
-  test('stored token removed, then reload → sign-in with "session has ended" (AC-4 wording)', async ({ page }) => {
+  test('stored token removed, then reload → sign-in with "session has ended" (AC-4 wording)', async ({
+    page,
+  }) => {
     await page.goto('/settings');
     await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
     await page.evaluate((k) => localStorage.removeItem(k), STORAGE_KEY);

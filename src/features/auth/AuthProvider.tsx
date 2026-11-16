@@ -11,6 +11,12 @@ import {
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../../lib/supabase';
 import { signOut as apiSignOut } from '../../lib/api/auth';
+import {
+  clearSessionMarker,
+  hasSessionMarker,
+  sessionEndedOnStartup,
+  setSessionMarker,
+} from '../../lib/domain/sessionMarker';
 
 type AuthState = {
   session: Session | null;
@@ -51,6 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let active = true;
     const key = storageKey();
     const hadSession = hadStoredSession(key);
+    // Read before any auth event can update it. Covers a token that was removed (AC-4, D-2).
+    const hadMarker = hasSessionMarker();
 
     (async () => {
       const { data } = await supabase.auth.getSession();
@@ -63,12 +71,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await supabase.auth.signOut({ scope: 'local' });
           deliberateSignOut.current = false;
           current = null;
-          if (active) setSessionEnded(true);
         }
-      } else if (hadSession) {
-        if (active) setSessionEnded(true);
       }
+      const ended = sessionEndedOnStartup({
+        hasValidSession: current !== null,
+        hadMarker,
+        hadStoredToken: hadSession,
+      });
+      // Marker reflects the verified state; once a lost session is reported it is not repeated.
+      if (current) setSessionMarker();
+      else clearSessionMarker();
       if (active) {
+        if (ended) setSessionEnded(true);
         setSession(current);
         setLoading(false);
       }
@@ -78,6 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!active) return;
       if (event === 'SIGNED_OUT' && !deliberateSignOut.current) setSessionEnded(true);
       if (event === 'SIGNED_IN') setSessionEnded(false);
+      if (event === 'SIGNED_OUT') clearSessionMarker();
+      else if (next) setSessionMarker();
       setSession(next);
     });
 
@@ -102,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await apiSignOut();
     } finally {
+      clearSessionMarker(); // deliberate sign-out: show "You've signed out.", not "session ended"
       setSession(null);
       setSessionEnded(false);
       deliberateSignOut.current = false;

@@ -15,11 +15,16 @@ import {
  * Calls that hit rate-limited auth endpoints (signup, recover, password grant) run on desktop only.
  */
 
-const desktopOnly = (testInfo: import('@playwright/test').TestInfo, why = 'rate-limited auth endpoint; run once') =>
-  test.skip(isMobile(testInfo), why);
+const desktopOnly = (
+  testInfo: import('@playwright/test').TestInfo,
+  why = 'rate-limited auth endpoint; run once',
+) => test.skip(isMobile(testInfo), why);
 
 test.describe('T-17 / §6 offline', () => {
-  test('sign-in page offline: banner shown, submit disabled; back online re-enables', async ({ page, context }, testInfo) => {
+  test('sign-in page offline: banner shown, submit disabled; back online re-enables', async ({
+    page,
+    context,
+  }, testInfo) => {
     await page.goto('/sign-in');
     await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
     await context.setOffline(true);
@@ -58,11 +63,14 @@ test.describe('T-17 / §6 offline', () => {
 });
 
 test.describe('T-18 / §6 double submit', () => {
-  test('double-clicking Sign in sends exactly one password-grant request', async ({ page }, testInfo) => {
+  test('double-clicking Sign in sends exactly one password-grant request', async ({
+    page,
+  }, testInfo) => {
     desktopOnly(testInfo);
     const grants: string[] = [];
     page.on('request', (r) => {
-      if (r.url().includes('/auth/v1/token') && r.url().includes('grant_type=password')) grants.push(r.method());
+      if (r.url().includes('/auth/v1/token') && r.url().includes('grant_type=password'))
+        grants.push(r.method());
     });
     await page.goto('/sign-in');
     await page.getByLabel('Email').fill(USER_A.email);
@@ -101,7 +109,9 @@ test.describe('T-19 / §6 multiple tabs', () => {
 });
 
 test.describe('T-15 / AC-11 / BR-5 no enumeration in the UI', () => {
-  test('wrong password for existing vs non-existing email shows the identical generic message', async ({ page }, testInfo) => {
+  test('wrong password for existing vs non-existing email shows the identical generic message', async ({
+    page,
+  }, testInfo) => {
     desktopOnly(testInfo);
     const messages: string[] = [];
     for (const email of [USER_A.email, 'nobody-t15@guardscope.test']) {
@@ -116,7 +126,9 @@ test.describe('T-15 / AC-11 / BR-5 no enumeration in the UI', () => {
     await screenshot(page, testInfo, 'T15-generic-error');
   });
 
-  test('registering an already-registered email shows the same outcome as a new email (T-01 UI part)', async ({ page }, testInfo) => {
+  test('registering an already-registered email shows the same outcome as a new email (T-01 UI part)', async ({
+    page,
+  }, testInfo) => {
     desktopOnly(testInfo);
     test.setTimeout(180_000);
     const outcomes: string[] = [];
@@ -127,9 +139,15 @@ test.describe('T-15 / AC-11 / BR-5 no enumeration in the UI', () => {
       await page.getByLabel('Password', { exact: true }).fill('Long-enough-pass-1');
       await page.getByRole('button', { name: 'Create account' }).click();
       const h1 = page.getByRole('heading', { level: 1 });
-      await expect(h1).not.toHaveText('Create your account', { timeout: 15_000 }).catch(() => {});
+      await expect(h1)
+        .not.toHaveText('Create your account', { timeout: 15_000 })
+        .catch(() => {});
       outcomes.push(`${await h1.innerText()} | ${(await page.locator('main').innerText()).trim()}`);
-      await screenshot(page, testInfo, `T15-register-${email.startsWith('t-e2e') ? 'new' : 'existing'}`);
+      await screenshot(
+        page,
+        testInfo,
+        `T15-register-${email.startsWith('t-e2e') ? 'new' : 'existing'}`,
+      );
       if (email.startsWith('t-e2e')) await page.waitForTimeout(61_000); // signup rate limit spacing
     }
     console.log('register outcomes:', JSON.stringify(outcomes));
@@ -139,7 +157,9 @@ test.describe('T-15 / AC-11 / BR-5 no enumeration in the UI', () => {
 });
 
 test.describe('BR-1 client-side password rule', () => {
-  test('register with a 7-character password shows a field error and sends nothing', async ({ page }) => {
+  test('register with a 7-character password shows a field error and sends nothing', async ({
+    page,
+  }) => {
     let signups = 0;
     page.on('request', (r) => {
       if (r.url().includes('/auth/v1/signup')) signups++;
@@ -152,13 +172,17 @@ test.describe('BR-1 client-side password rule', () => {
     const err = page.getByText('Use at least 8 characters.');
     await expect(err).toBeVisible();
     await expect(pw).toHaveAttribute('aria-invalid', 'true');
-    expect((await pw.getAttribute('aria-describedby'))?.split(' ')).toContain(await err.getAttribute('id'));
+    expect((await pw.getAttribute('aria-describedby'))?.split(' ')).toContain(
+      await err.getAttribute('id'),
+    );
     expect(signups).toBe(0);
   });
 });
 
 test.describe('T-02 / BR-2 unconfirmed user (UI)', () => {
-  test('unconfirmed user with the correct password is blocked with the confirm-email message', async ({ page }, testInfo) => {
+  test('unconfirmed user with the correct password is blocked with the confirm-email message', async ({
+    page,
+  }, testInfo) => {
     desktopOnly(testInfo);
     const pw = process.env.TESTER_PW;
     test.skip(!pw, 'unconfirmed fixture password not provided');
@@ -177,7 +201,9 @@ test.describe('T-02 / BR-2 unconfirmed user (UI)', () => {
 });
 
 test.describe('T-20 / AC-13 password reset request (UI part)', () => {
-  test('forgot-password shows the same neutral confirmation for registered and unknown emails', async ({ page }, testInfo) => {
+  test('forgot-password shows the same neutral confirmation for registered and unknown emails', async ({
+    page,
+  }, testInfo) => {
     desktopOnly(testInfo);
     test.setTimeout(180_000);
     const outcomes: string[] = [];
@@ -188,7 +214,11 @@ test.describe('T-20 / AC-13 password reset request (UI part)', () => {
       const result = page.getByRole('status').or(page.getByRole('alert')).first();
       await expect(result).toBeVisible({ timeout: 15_000 });
       outcomes.push((await result.innerText()).trim());
-      await screenshot(page, testInfo, `T20-forgot-${email.startsWith('nobody') ? 'unknown' : 'existing'}`);
+      await screenshot(
+        page,
+        testInfo,
+        `T20-forgot-${email.startsWith('nobody') ? 'unknown' : 'existing'}`,
+      );
       if (email.startsWith('nobody')) await page.waitForTimeout(61_000);
     }
     console.log('forgot-password outcomes:', JSON.stringify(outcomes));
@@ -196,9 +226,16 @@ test.describe('T-20 / AC-13 password reset request (UI part)', () => {
     expect(outcomes[1]).toBe(outcomes[0]);
   });
 
-  test('/reset-password without a recovery session shows "Reset link not valid"', async ({ page }) => {
+  test('/reset-password without a recovery session shows "Reset link not valid"', async ({
+    page,
+  }) => {
     await page.goto('/reset-password');
-    await expect(page.getByRole('heading', { level: 1, name: 'Reset link not valid' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Request a new link' })).toHaveAttribute('href', '/forgot-password');
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Reset link not valid' }),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Request a new link' })).toHaveAttribute(
+      'href',
+      '/forgot-password',
+    );
   });
 });

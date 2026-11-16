@@ -4,10 +4,14 @@ import { AuthLayout } from '../../components/layout/AuthLayout';
 import { TextField } from '../../components/ui/Field';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
+import { ErrorSummary } from '../../components/ui/ErrorSummary';
+import { summaryErrors } from '../../lib/domain/formErrors';
 import { signUp } from '../../lib/api/auth';
 import { errorMessages, toApiError } from '../../lib/api/errors';
 import { PASSWORD_MIN, validateEmail, validateNewPassword } from '../../lib/domain/validation';
 import { useOnline } from '../../hooks/useOnline';
+
+const FIELD_IDS = { email: 'register-email', password: 'register-password' };
 
 export function RegisterPage() {
   const online = useOnline();
@@ -16,6 +20,7 @@ export function RegisterPage() {
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [done, setDone] = useState(false);
 
   async function onSubmit(e: FormEvent) {
@@ -24,7 +29,10 @@ export function RegisterPage() {
     const errs = { email: validateEmail(email), password: validateNewPassword(password) };
     setFieldErrors(errs);
     setFormError(null);
-    if (errs.email || errs.password) return;
+    if (errs.email || errs.password) {
+      setAttempt((n) => n + 1);
+      return;
+    }
     setBusy(true);
     try {
       await signUp(email.trim(), password);
@@ -56,8 +64,10 @@ export function RegisterPage() {
     <AuthLayout title="Create your account">
       <div className="space-y-4">
         {formError && <Alert tone="error">{formError}</Alert>}
+        <ErrorSummary errors={summaryErrors(fieldErrors, FIELD_IDS)} attempt={attempt} />
         <form noValidate onSubmit={onSubmit} className="space-y-4">
           <TextField
+            id={FIELD_IDS.email}
             label="Email"
             type="email"
             autoComplete="email"
@@ -67,6 +77,7 @@ export function RegisterPage() {
             required
           />
           <TextField
+            id={FIELD_IDS.password}
             label="Password"
             type="password"
             autoComplete="new-password"

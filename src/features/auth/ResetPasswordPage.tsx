@@ -4,12 +4,16 @@ import { AuthLayout } from '../../components/layout/AuthLayout';
 import { TextField } from '../../components/ui/Field';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
+import { ErrorSummary } from '../../components/ui/ErrorSummary';
+import { summaryErrors } from '../../lib/domain/formErrors';
 import { FullPageSpinner } from '../../components/layout/FullPageSpinner';
 import { updatePassword } from '../../lib/api/auth';
 import { errorMessages, toApiError } from '../../lib/api/errors';
 import { PASSWORD_MIN, validateNewPassword } from '../../lib/domain/validation';
 import { useOnline } from '../../hooks/useOnline';
 import { useAuth } from './AuthProvider';
+
+const FIELD_IDS = { password: 'reset-password-new' };
 
 /** Reached from the emailed recovery link; supabase-js turns the link into a short-lived session. */
 export function ResetPasswordPage() {
@@ -20,6 +24,7 @@ export function ResetPasswordPage() {
   const [error, setError] = useState<string>();
   const [formError, setFormError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   if (loading) return <FullPageSpinner />;
 
@@ -42,7 +47,10 @@ export function ResetPasswordPage() {
     const err = validateNewPassword(password);
     setError(err);
     setFormError(null);
-    if (err) return;
+    if (err) {
+      setAttempt((n) => n + 1);
+      return;
+    }
     setBusy(true);
     try {
       await updatePassword(password);
@@ -58,8 +66,10 @@ export function ResetPasswordPage() {
     <AuthLayout title="Choose a new password">
       <div className="space-y-4">
         {formError && <Alert tone="error">{formError}</Alert>}
+        <ErrorSummary errors={summaryErrors({ password: error }, FIELD_IDS)} attempt={attempt} />
         <form noValidate onSubmit={onSubmit} className="space-y-4">
           <TextField
+            id={FIELD_IDS.password}
             label="New password"
             type="password"
             autoComplete="new-password"

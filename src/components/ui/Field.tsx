@@ -51,17 +51,20 @@ export function TextField({
   error,
   hint,
   optional,
+  id: idProp,
   ...rest
 }: Common & InputHTMLAttributes<HTMLInputElement>) {
-  const id = useId();
+  // The label, the control and any ErrorSummary link must all use the same id.
+  const generatedId = useId();
+  const id = idProp ?? generatedId;
   const hintId = `${id}-hint`;
   const errId = `${id}-err`;
   return (
     <div>
       <Label id={id} label={label} optional={optional} />
       <input
-        id={id}
         {...rest}
+        id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(hintId, errId, hint, error)}
         className={`${control} ${error ? 'border-red-600' : 'border-slate-300'}`}
@@ -77,17 +80,19 @@ export function SelectField({
   hint,
   optional,
   children,
+  id: idProp,
   ...rest
 }: Common & SelectHTMLAttributes<HTMLSelectElement>) {
-  const id = useId();
+  const generatedId = useId();
+  const id = idProp ?? generatedId;
   const hintId = `${id}-hint`;
   const errId = `${id}-err`;
   return (
     <div>
       <Label id={id} label={label} optional={optional} />
       <select
-        id={id}
         {...rest}
+        id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(hintId, errId, hint, error)}
         className={`${control} ${error ? 'border-red-600' : 'border-slate-300'}`}

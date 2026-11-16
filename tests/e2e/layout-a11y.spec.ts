@@ -31,10 +31,19 @@ async function runAxe(page: import('@playwright/test').Page, project: string, na
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'])
     .analyze();
   mkdirSync('docs/testing/phase1/axe', { recursive: true });
-  const summary = results.violations.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length, help: v.help }));
+  const summary = results.violations.map((v) => ({
+    id: v.id,
+    impact: v.impact,
+    nodes: v.nodes.length,
+    help: v.help,
+  }));
   writeFileSync(
     `docs/testing/phase1/axe/${project}-${name}.json`,
-    JSON.stringify({ url: page.url(), violations: summary, passes: results.passes.length }, null, 2),
+    JSON.stringify(
+      { url: page.url(), violations: summary, passes: results.passes.length },
+      null,
+      2,
+    ),
   );
   return results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
 }
@@ -43,7 +52,9 @@ const slug = (p: string) => (p === '/' ? 'dashboard' : p.replace(/^\//, '').repl
 
 test.describe('signed out pages', () => {
   for (const [path, h1] of publicPages) {
-    test(`T-13/T-14 ${path}: no overflow, 0 serious/critical axe, labelled inputs, heading order`, async ({ page }, testInfo) => {
+    test(`T-13/T-14 ${path}: no overflow, 0 serious/critical axe, labelled inputs, heading order`, async ({
+      page,
+    }, testInfo) => {
       await page.goto(path);
       await expect(page.getByRole('heading', { level: 1, name: h1 })).toBeVisible();
       const o = await hasHorizontalOverflow(page);
@@ -52,7 +63,9 @@ test.describe('signed out pages', () => {
       assertHeadingOrder(await headingLevels(page));
       // Every form control has an accessible name.
       for (const input of await page.locator('input, select, textarea').all()) {
-        expect(await input.evaluate((el) => (el as HTMLInputElement).labels?.length ?? 0)).toBeGreaterThan(0);
+        expect(
+          await input.evaluate((el) => (el as HTMLInputElement).labels?.length ?? 0),
+        ).toBeGreaterThan(0);
       }
     });
   }
@@ -62,10 +75,13 @@ test.describe('signed in pages', () => {
   test.use({ signedInAs: 'A' });
 
   for (const [path, h1] of appPages) {
-    test(`T-13/T-14 ${path}: no overflow, 0 serious/critical axe, heading order`, async ({ page }, testInfo) => {
+    test(`T-13/T-14 ${path}: no overflow, 0 serious/critical axe, heading order`, async ({
+      page,
+    }, testInfo) => {
       await page.goto(path);
       await expect(page.getByRole('heading', { level: 1, name: h1 })).toBeVisible();
-      if (path === '/settings') await expect(page.getByRole('button', { name: 'Save settings' })).toBeVisible();
+      if (path === '/settings')
+        await expect(page.getByRole('button', { name: 'Save settings' })).toBeVisible();
       const o = await hasHorizontalOverflow(page);
       expect(o.scrollWidth, JSON.stringify(o)).toBeLessThanOrEqual(o.clientWidth);
       expect(await runAxe(page, testInfo.project.name, slug(path))).toEqual([]);
@@ -80,7 +96,9 @@ test.describe('signed in pages', () => {
     });
   }
 
-  test('T-13 / AC-9: main navigation is keyboard-operable, with visible focus (AC-10)', async ({ page }, testInfo) => {
+  test('T-13 / AC-9: main navigation is keyboard-operable, with visible focus (AC-10)', async ({
+    page,
+  }, testInfo) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
     const mobile = isMobile(testInfo);
@@ -101,7 +119,10 @@ test.describe('signed in pages', () => {
       return page.evaluate(() => {
         const el = document.activeElement as HTMLElement;
         const cs = getComputedStyle(el);
-        return { outline: `${cs.outlineStyle} ${cs.outlineWidth}`, matches: el.matches(':focus-visible') };
+        return {
+          outline: `${cs.outlineStyle} ${cs.outlineWidth}`,
+          matches: el.matches(':focus-visible'),
+        };
       });
     }
 
@@ -110,7 +131,10 @@ test.describe('signed in pages', () => {
       await tabTo(/open menu/i);
       expect((await focusVisible()).outline).not.toMatch(/^none/);
       await page.keyboard.press('Enter');
-      await expect(page.getByRole('button', { name: /close menu/i })).toHaveAttribute('aria-expanded', 'true');
+      await expect(page.getByRole('button', { name: /close menu/i })).toHaveAttribute(
+        'aria-expanded',
+        'true',
+      );
     }
     await tabTo(/^Projects$/);
     const f = await focusVisible();
@@ -133,15 +157,20 @@ test.describe('signed in pages', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
     await page.keyboard.press('Tab');
     await expect(page.locator(':focus')).toHaveText('Skip to main content');
-    await page.screenshot({ path: `docs/testing/phase1/screenshots/${testInfo.project.name}-T13-skip-link-focus.png` });
+    await page.screenshot({
+      path: `docs/testing/phase1/screenshots/${testInfo.project.name}-T13-skip-link-focus.png`,
+    });
   });
 
   test('AC-9: mobile nav reachable, desktop nav visible', async ({ page }, testInfo) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
     const nav = await mainNav(page, isMobile(testInfo));
-    for (const name of ['Dashboard', 'Projects', 'Settings']) await expect(nav.getByRole('link', { name })).toBeVisible();
+    for (const name of ['Dashboard', 'Projects', 'Settings'])
+      await expect(nav.getByRole('link', { name })).toBeVisible();
     await expect(nav.getByRole('button', { name: 'Sign out' })).toBeVisible();
-    await page.screenshot({ path: `docs/testing/phase1/screenshots/${testInfo.project.name}-AC09-nav.png` });
+    await page.screenshot({
+      path: `docs/testing/phase1/screenshots/${testInfo.project.name}-AC09-nav.png`,
+    });
   });
 });

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { TextField, SelectField } from '../../components/ui/Field';
 import { Button, Spinner } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
+import { ErrorSummary } from '../../components/ui/ErrorSummary';
+import { summaryErrors } from '../../lib/domain/formErrors';
 import { getMyProfile, updateMyProfile } from '../../lib/api/profile';
 import { errorMessages, toApiError } from '../../lib/api/errors';
 import {
@@ -13,6 +15,11 @@ import {
 import { useOnline } from '../../hooks/useOnline';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { useAuth } from '../auth/AuthProvider';
+
+const FIELD_IDS = {
+  display_name: 'settings-display-name',
+  default_currency: 'settings-default-currency',
+};
 
 function currencyLabel(code: string): string {
   try {
@@ -35,6 +42,7 @@ export function SettingsPage() {
   const [errors, setErrors] = useState<ProfileFieldErrors>({});
   const [status, setStatus] = useState<{ tone: 'success' | 'error'; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   async function load() {
     setLoadState('loading');
@@ -63,7 +71,10 @@ export function SettingsPage() {
     const errs = validateProfileInput(input);
     setErrors(errs);
     setStatus(null);
-    if (Object.keys(errs).length > 0) return;
+    if (Object.keys(errs).length > 0) {
+      setAttempt((n) => n + 1);
+      return;
+    }
     setBusy(true);
     try {
       const p = await updateMyProfile(input);
@@ -116,7 +127,13 @@ export function SettingsPage() {
         )}
         {loadState === 'ready' && (
           <form noValidate onSubmit={onSubmit} className="mt-4 max-w-md space-y-4">
+            <ErrorSummary
+              errors={summaryErrors(errors, FIELD_IDS)}
+              attempt={attempt}
+              headingLevel={3}
+            />
             <TextField
+              id={FIELD_IDS.display_name}
               label="Display or business name"
               optional
               maxLength={DISPLAY_NAME_MAX + 1}
@@ -127,6 +144,7 @@ export function SettingsPage() {
               autoComplete="organization"
             />
             <SelectField
+              id={FIELD_IDS.default_currency}
               label="Default currency"
               optional
               value={currency}
