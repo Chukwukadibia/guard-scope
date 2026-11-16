@@ -27,7 +27,7 @@ Records technical and process decisions, plus recommendations for PRD §20 open 
 | 6 | Clarification workflow | Terminal for the version; the freelancer sends a new version (ARCHITECTURE §4.4) | Phase 4/5 | Open |
 | 7 | "Active" definitions | Active project = status `active`. Active change request = change order whose current version is `draft`, `pending` or `clarification_requested` | Phase 7 | Open |
 | 8 | Payment provider | Deferred; Phase 7 uses admin-set entitlements only (BILL-008) | Phase 7+ | Open |
-| 9 | Currencies / default | Offer all ISO 4217 codes via `Intl.supportedValuesOf('currency')`. User picks a default during onboarding; there is no hidden default; the project currency is required | **Phase 1** (profile field) | Open |
+| 9 | Currencies / default | Offer all ISO 4217 codes via `Intl.supportedValuesOf('currency')`. Optional default currency in Settings, with no pre-filled value. Project currency is required on each project, pre-selected from the default if set, otherwise chosen by the user | **Phase 1** (profile field) | Open |
 | 10 | Retention | Keep until the user deletes the project/account; account deletion removes everything; backups age out within N days (set N when the backup plan is approved) | Phase 1 if AUTH-004 is in Phase 1; else Phase 8 | Open |
 | 11 | PDFs | Three separate PDFs (scope, proposal, decision record); the decision record is included in the proposal PDF once decided | Phase 6 | Open |
 | 12 | Region / hosting | Supabase region nearest the expected users (supervisor to choose); Cloudflare Pages; verify free-tier limits before production | **Phase 1** (project creation) | Open |

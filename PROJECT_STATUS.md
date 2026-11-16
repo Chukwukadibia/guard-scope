@@ -1,6 +1,6 @@
 # Project Status
 
-**Updated:** 2026-11-16 · **Current phase:** 0 — Foundation & governance · **State:** ✅ Phase 0 deliverables complete → ⏳ **awaiting human approval (HA-002)**. Phase 1 has **not** started.
+**Updated:** 2026-11-16 · **Current phase:** 0 — Foundation & governance · **State:** Phase 0 deliverables **submitted to the human gate** (not self-approved). ⏳ Awaiting HA-002. Phase 1 has **not** started.
 
 ## Repository
 - Target: `github.com/Chukwukadibia/guard-scope`. **No access (ISS-001)**, so nothing is pushed.
@@ -12,7 +12,7 @@
 |---|---|
 | MASTER_PRD.md v1.0.1 (name change only) | ✅ |
 | Playbook in repo + AI_TEAM_OPERATING_PROTOCOL.md | ✅ draft for approval |
-| ARCHITECTURE.md v0.1 | ✅ draft for approval |
+| ARCHITECTURE.md v0.2 | ✅ draft for approval (vendor facts marked VERIFY: BLOCKED until OD-12) |
 | Status, changelog, approval, decision, risk and issue logs | ✅ |
 | Feature template (`features/_TEMPLATE/`) | ✅ |
 | `.env.example` (no secrets) | ✅ |
@@ -25,7 +25,7 @@
 - `PW_CHROMIUM_PATH=/opt/pw-browsers/chromium npx playwright test --trace off`: **PASS**, 2/2 (desktop 1280 px and mobile 375 px placeholder smoke, no horizontal overflow).
 - `npm audit --omit=dev --audit-level=high`: **0 vulnerabilities**. Full audit: 1 moderate, dev-only (ISS-002).
 - `docker info`: daemon **unavailable**, so local Supabase/pgTAP cannot run in this environment (R-14).
-- These are scaffold checks only. There is no product functionality to accept yet, so no independent Tester run was required for Phase 0. The documentation review was done by a separate review subagent (see below).
+- Independent documentation review: a separate reviewer subagent found 4 HIGH, 6 MEDIUM and several LOW issues. All were fixed or flagged; see `features/foundation/ACCEPTANCE_REPORT.md`. A re-review of the fixes is still pending.
 
 ## Decisions needed to start Phase 1
 See `features/authentication/START_REPORT.md` §7: OD-3 auth method, OD-12 Supabase region/project + test environment, OD-9 currency field, AUTH-004 placement, AUTH-005 inclusion. Approval of the architecture and protocol is also needed.

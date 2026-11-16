@@ -8,7 +8,7 @@ Phase 1 covers authentication and the app shell (PRD §13). Objective: freelance
 ## 2. Documents submitted for approval
 | Doc | Version |
 |---|---|
-| `ARCHITECTURE.md` | 0.1 draft |
+| `ARCHITECTURE.md` | 0.2 draft (revised after independent review; see `features/foundation/ACCEPTANCE_REPORT.md`) |
 | `AI_TEAM_OPERATING_PROTOCOL.md` | 1.0 draft |
 | `features/authentication/FEATURE_SPEC.md`, `IMPLEMENTATION_PLAN.md`, `TEST_PLAN.md` | 0.1 drafts |
 | Proposed team decisions DEC-001 to DEC-008 (`docs/decisions/DECISION_LOG.md`) | — |
@@ -36,6 +36,10 @@ R-13 (staged work not pushed), R-14 (no local DB), R-16 (auth email rate limits)
 | 3 | **OD-9 Default currency** | Optional ISO 4217 picker in Settings, no pre-filled default (never assume USD) |
 | 4 | **AUTH-004 account deletion placement** | Build it in Phase 2, when user data first exists. Still required before release. Retention (OD-10) is decided then |
 | 5 | **AUTH-005 password recovery** (P1) | Include it in Phase 1 |
+| 6 | **Dashboard create-project action** (PRD §8) | Defer to Phase 2, when projects exist (avoids a dead button) |
+| 7 | **Test targets** | WCAG 2.2 AA; 375 px and 1280 px minimum viewports |
+
+Also a gate condition: before ARCHITECTURE.md is marked *final*, the Team Lead verifies the current Supabase and Cloudflare free-tier limits, backups, pausing and terms for the region you choose (PRD §10). Those items are marked VERIFY today.
 
 ## 8. Test approach
 Unit (Vitest), DB/RLS (pgTAP, two users plus anon), E2E with axe (Playwright, 375 px and 1280 px). Run by an independent Tester subagent. Evidence goes to `docs/testing/phase1/` and `ACCEPTANCE_REPORT.md`.

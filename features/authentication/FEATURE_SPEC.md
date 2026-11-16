@@ -22,7 +22,7 @@ A freelancer needs a private, secure workspace before they can record any client
 | AUTH-005 (P1) | ⚠ Decision D-P1-5 | See §7 |
 | Basic settings (§4.1) | ✅ | Display/business name; default currency (⚠ OD-9) |
 | App shell / nav (§8) | ✅ | Dashboard, Projects, Settings/Account |
-| Dashboard empty state (§8) | ✅ | "No projects yet". The create-project action is left out until Phase 2, so the UI shows no non-working actions |
+| Dashboard empty state (§8) | ✅ | "No projects yet". **Deviation for approval (D-P1-6):** PRD §8 lists a create-project action on the Dashboard. Projects only exist from Phase 2, so the action is proposed to arrive in Phase 2, avoiding a non-working button |
 | Projects page | ✅ empty state only | Placeholder text "Projects will appear here", with no create action until Phase 2 |
 
 ## 4. User stories
@@ -37,9 +37,9 @@ A freelancer needs a private, secure workspace before they can record any client
 - BR-1: Passwords are handled only by Supabase Auth. Minimum length is 8 characters (Supabase setting). No complexity rules beyond what Supabase enforces (VERIFY current options).
 - BR-2: If email confirmation is on (⚠ OD-3), an unconfirmed user cannot sign in. The UI says "Check your email to confirm your account" and does not reveal whether an email is already registered.
 - BR-3: A `profiles` row is created server-side by a trigger on `auth.users` insert. The client never inserts it.
-- BR-4: `default_currency` starts empty. The UI must not pre-fill USD. If it is empty, Settings shows "Not set".
+- BR-4: `default_currency` is optional and starts empty. The UI must not pre-fill USD. If it is empty, Settings shows "Not set". (From Phase 2, the project form requires a currency. It pre-selects the default if one is set; otherwise the user must choose.)
 - BR-5: Auth error messages are generic ("Email or password is incorrect"), with no account enumeration.
-- BR-6: Public routes are `/sign-in`, `/register`, `/p` (reserved for Phase 5; it renders "Link not available" until then) and static legal placeholders. Every other route requires a session.
+- BR-6: Public routes are `/sign-in`, `/register`, `/reset-password` (if D-P1-5) and `/p` (reserved for Phase 5; it renders "Link not available" until then). Every other route requires a session.
 
 ## 6. States & edge cases
 - Loading: the session check on app start shows a full-page spinner with an `aria-live` label, with no flash of protected content.
@@ -56,6 +56,8 @@ A freelancer needs a private, secure workspace before they can record any client
 - **D-P1-9 = OD-9 default currency field.** Recommendation: optional ISO 4217 picker, no default.
 - **D-P1-4 = Is account deletion (AUTH-004) in Phase 1?** PRD §13 Phase 1 doesn't list it, but §4.1/§6.1 make it P0 and it depends on OD-10 retention. Recommendation: build it in **Phase 2**, when user data first exists, so deletion is tested against real records. It must still ship before release.
 - **D-P1-5 = Password recovery (AUTH-005, P1).** Recommendation: include it in Phase 1. It is small with Supabase, and leaving users locked out is costly.
+- **D-P1-6 = Dashboard create-project action deferred to Phase 2** (see §3).
+- **D-P1-7 = Test targets.** Proposed: WCAG 2.2 AA as the accessibility target (PRD §12 names no level), and 375 px / 1280 px as the minimum test viewports.
 
 ## 8. Acceptance criteria
 | ID | Criterion |

@@ -10,7 +10,7 @@ This is a thin vertical slice. Supabase Auth handles identity. A `profiles` tabl
 | # | Role | Task | Files owned | Depends on |
 |---|---|---|---|---|
 | B1 | Backend | Migration: `profiles` table, `handle_new_user` trigger (`security definer`, `search_path=''`), RLS (select/update own; no insert/delete from clients), `revoke all from anon`, `updated_at` trigger | `supabase/migrations/<ts>_profiles.sql` | Approved D-P1-12 |
-| B2 | Backend | Supabase Auth config: email provider, confirmation per D-P1-3, site URL / redirect allow-list, min password length 8 | `supabase/config.toml` (local); cloud settings recorded in `docs/deployment/SUPABASE_SETTINGS.md` | B1 |
+| B2 | Backend | Supabase Auth config: email provider, confirmation per D-P1-3, site URL / redirect allow-list (`http://localhost:5173`), min password length 8. These change the `supabase init` defaults (6 / off / port 3000), which were deliberately left untouched in Phase 0 | `supabase/config.toml` (local); cloud settings recorded in `docs/deployment/SUPABASE_SETTINGS.md` | B1 |
 | B3 | Backend | Typed API wrapper: `getMyProfile`, `updateMyProfile({display_name, default_currency})`, auth helpers. Error-code mapping | `src/lib/api/profile.ts`, `src/lib/api/auth.ts`, `src/lib/api/errors.ts` | B1 |
 | F1 | Frontend | Supabase client singleton + `AuthProvider` (session, `onAuthStateChange`, cross-tab sign-out) | `src/lib/supabase.ts`, `src/features/auth/AuthProvider.tsx` | B3 contract |
 | F2 | Frontend | Routes: public (`/sign-in`, `/register`, `/reset-password`*, `/p`) and protected layout with `RequireAuth` (safe `next` param) | `src/routes.tsx`, `src/features/auth/RequireAuth.tsx`, `src/lib/domain/safeNext.ts` | F1 |

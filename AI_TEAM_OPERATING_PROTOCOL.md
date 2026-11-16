@@ -52,6 +52,8 @@ GuardScope is built with Claude Code. One session acts as **Team Lead**. Special
 
 The Playbook's store-specific checks apply unchanged if native apps are ever approved. Findings are classified **BLOCKER / HIGH / MEDIUM / LOW**, with evidence, the affected surface, the fix and retest status. The audit records the date and the sources consulted.
 
+**Release gate (Playbook §13):** no unresolved BLOCKER or HIGH policy or security issue may proceed to release without a documented human decision. Critical security or data-integrity issues cannot be waived at all (§7). Approval by any host or platform can never be guaranteed.
+
 **Never** claim that an agent, test or review ran when it did not.
 
 ## 4. Human supervisor approval (Playbook §4, PRD §14.2)
@@ -85,7 +87,7 @@ Use the tree in PRD §15. Each feature folder holds `FEATURE_SPEC.md`, `IMPLEMEN
 
 > **Progression gate:** No next-feature implementation may begin without explicit human approval. If the current feature is blocked, stay on it and report the blocker.
 
-**Branching:** one branch per feature, named `feature/<phase>-<slug>` (for example `feature/p1-authentication`), merged into `main` only after review and the gate. Where the execution environment mandates a branch name, use it and record that in `PROJECT_STATUS.md`.
+**Branching:** one branch per feature, named `feature/<phase>-<slug>` (for example `feature/p1-authentication`; Phase 0 used `phase-0/foundation`, created before this convention was written), merged into `main` only after review and the gate. Where the execution environment mandates a branch name, use it and record that in `PROJECT_STATUS.md`.
 
 ## 7. Defects and escalation (Playbook §7, PRD §14.4)
 
@@ -172,7 +174,9 @@ AT HANDOFF:
 - Follow `ARCHITECTURE.md`. Propose material changes with rationale, trade-offs, migration impact and cost.
 - Least privilege, secure defaults, server-side validation and explicit authorisation. The browser is never authoritative for access, limits, approval state or timestamps (PRD §10.2).
 - Secrets only in managed secret stores (Supabase/Cloudflare/GitHub secrets). Never in source, prompts, logs or client bundles. The service-role key never reaches the browser.
-- Minimise personal data. Use encryption in transit, idempotency for repeatable operations, audit trails and immutability for sent versions and decisions.
+- Minimise personal data. **Document the purpose, retention, deletion and third-party sharing** of every personal-data field (in `docs/security/DATA_INVENTORY.md`, created in Phase 1 and updated each phase).
+- Use encryption in transit and appropriate encryption at rest (provider-managed; VERIFY). Protect backups and exports. Use idempotency for repeatable operations, audit trails, and immutability for sent versions and decisions.
+- Review dependencies, known vulnerabilities and **supported versions**. Avoid unnecessary packages.
 - Review dependencies. No real customer data in dev or test. Never claim compliance from a checklist. Never claim "legally binding", "court-proof" or "certified signature" (PRD §11).
 
 ## 13. Required Team Lead reports (Playbook §15, PRD §16)
@@ -187,7 +191,8 @@ AT HANDOFF:
 - Environments: local (Supabase CLI), staging (a separate Supabase project plus a Cloudflare Pages preview) and production. Staging and production are created only after human approval.
 - CI runs format, lint, typecheck, tests, build and a dependency audit.
 - Migrations are tested on staging before production.
-- Backups, restore test, monitoring, rollback plan, release owner and smoke tests go in `docs/deployment/` before release.
+- Backups, restore test, monitoring, error reporting (privacy-proportionate, no tokens), rollback plan and **rollback trigger**, release owner, **version/build number**, deployment steps and smoke tests go in `docs/deployment/` before release.
+- After release, monitor errors, latency, failed operations and user reports.
 - Production deployment is a human approval gate.
 
 ## 15. Rules that must never be bypassed (Playbook §17, verbatim)
