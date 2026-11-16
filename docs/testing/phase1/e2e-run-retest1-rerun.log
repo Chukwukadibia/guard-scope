@@ -1,0 +1,12 @@
+
+Running 4 tests using 2 workers
+
+  ✓  1 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:160:3 › BR-1 client-side password rule › register with a 7-character password shows a field error and sends nothing (716ms)
+  ✓  2 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:160:3 › BR-1 client-side password rule › register with a 7-character password shows a field error and sends nothing (726ms)
+  -  3 [mobile] › tests/e2e/session-and-auth-ui.spec.ts:185:3 › T-02 / BR-2 unconfirmed user (UI) › unconfirmed user with the correct password is blocked with the confirm-email message
+T-02 message: Error:
+Check your email to confirm your account, then sign in.
+  ✓  4 [desktop] › tests/e2e/session-and-auth-ui.spec.ts:185:3 › T-02 / BR-2 unconfirmed user (UI) › unconfirmed user with the correct password is blocked with the confirm-email message (1.3s)
+
+  1 skipped
+  3 passed (14.7s)

@@ -1,0 +1,64 @@
+
+> guardscope@0.0.0 check
+> npm run format:check && npm run lint && npm run typecheck && npm test && npm run build && npm run check:secrets
+
+
+> guardscope@0.0.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+
+> guardscope@0.0.0 lint
+> eslint .
+
+
+> guardscope@0.0.0 typecheck
+> tsc -b --noEmit
+
+
+> guardscope@0.0.0 test
+> vitest run
+
+
+ RUN  v5.1.0 /tmp/claude-0/-home-user-Legit-Predict/6a8ddc8f-b74e-5cc4-a1f8-4c2778fd4e59/scratchpad/guard-scope
+
+
+ Test Files  6 passed (6)
+      Tests  33 passed (33)
+   Start at  10:35:48
+   Duration  2.23s (environment 71%, import 11%, setup 11%, tests 5%, transform 2%)
+
+Environment  jsdom was created 6 times · 3.75s total, 71% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+
+> guardscope@0.0.0 build
+> tsc -b && vite build
+
+vite v6.4.6 building for production...
+transforming...
+✓ 2183 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/registerSW.js                  0.13 kB
+dist/manifest.webmanifest           0.46 kB
+dist/index.html                     1.00 kB │ gzip:  0.48 kB
+dist/assets/index-DitAsW5M.css     16.56 kB │ gzip:  4.25 kB
+dist/assets/index-DRNJ6cns.js      37.94 kB │ gzip: 11.63 kB
+dist/assets/supabase-D5xPhma_.js  228.75 kB │ gzip: 59.50 kB
+dist/assets/react-BGdDQm9H.js     236.86 kB │ gzip: 77.64 kB
+✓ built in 2.99s
+
+PWA v2.0.0
+mode      generateSW
+precache  18 entries (543.89 KiB)
+files generated
+  dist/sw.js
+  dist/workbox-abeb32eb.js
+
+> guardscope@0.0.0 check:secrets
+> node scripts/check-bundle-secrets.mjs
+
+check:secrets: no privileged credentials in dist/

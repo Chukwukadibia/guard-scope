@@ -2,6 +2,24 @@ import { test, expect, USER_A, isMobile, screenshot } from './helpers';
 
 test.use({ signedInAs: 'A' });
 
+/**
+ * The inline error for `field`: the element referenced by its aria-describedby that has `text`.
+ * Scoped this way because the §6 error summary repeats the message as a link (GOV.UK pattern),
+ * so a page-wide getByText would match twice. Asserts the field is invalid first.
+ */
+async function inlineError(
+  page: import('@playwright/test').Page,
+  field: import('@playwright/test').Locator,
+  text: string,
+) {
+  await expect(field).toHaveAttribute('aria-invalid', 'true');
+  const ids = ((await field.getAttribute('aria-describedby')) ?? '').split(' ').filter(Boolean);
+  expect(ids.length).toBeGreaterThan(0);
+  const err = page.locator(ids.map((id) => `[id="${id}"]`).join(',')).filter({ hasText: text });
+  await expect(err).toHaveCount(1);
+  return err;
+}
+
 async function saveSettings(page: import('@playwright/test').Page) {
   await page.getByRole('button', { name: 'Save settings' }).click();
   await expect(page.getByText('Settings saved.')).toBeVisible();
@@ -59,9 +77,8 @@ test.describe('T-12 / AC-8 settings validation', () => {
     await name.fill('x'.repeat(121));
     await expect(name).toHaveValue('x'.repeat(121));
     await page.getByRole('button', { name: 'Save settings' }).click();
-    const err = page.getByText('Use 120 characters or fewer.');
+    const err = await inlineError(page, name, 'Use 120 characters or fewer.');
     await expect(err).toBeVisible();
-    await expect(name).toHaveAttribute('aria-invalid', 'true');
     const errId = await err.getAttribute('id');
     expect(errId).toBeTruthy();
     expect((await name.getAttribute('aria-describedby'))?.split(' ')).toContain(errId);
@@ -84,9 +101,8 @@ test.describe('T-12 / AC-8 settings validation', () => {
     });
     await currency.selectOption('ZZZ');
     await page.getByRole('button', { name: 'Save settings' }).click();
-    const err = page.getByText('Choose a currency from the list.');
+    const err = await inlineError(page, currency, 'Choose a currency from the list.');
     await expect(err).toBeVisible();
-    await expect(currency).toHaveAttribute('aria-invalid', 'true');
     expect((await currency.getAttribute('aria-describedby'))?.split(' ')).toContain(
       await err.getAttribute('id'),
     );
@@ -94,9 +110,10 @@ test.describe('T-12 / AC-8 settings validation', () => {
 
   test('§6: validation errors are summarised on submit', async ({ page }) => {
     await page.goto('/settings');
-    await page.getByLabel(/Display or business name/).fill('x'.repeat(121));
+    const name = page.getByLabel(/Display or business name/);
+    await name.fill('x'.repeat(121));
     await page.getByRole('button', { name: 'Save settings' }).click();
-    await expect(page.getByText('Use 120 characters or fewer.')).toBeVisible();
+    await expect(await inlineError(page, name, 'Use 120 characters or fewer.')).toBeVisible();
     // A submit summary is an alert/status region in addition to the inline field message.
     const summary = page
       .getByRole('alert')

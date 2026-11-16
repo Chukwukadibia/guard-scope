@@ -1,0 +1,14 @@
+# Retest 1 API checks (2026-11-16T10:45:47Z). Fixtures created by SQL; passwords redacted; tokens not logged.
+## BR-2: unconfirmed user t-unconfirmed@ correct password
+{"code":400,"error_code":"email_not_confirmed","msg":"Email not confirmed"}
+HTTP 400
+## BR-1: t-pwlen@ sign in, then PUT /auth/v1/user with 7 chars
+sign-in ok: yes
+--- 7 chars:
+HTTP 422
+{'email': None, 'updated_at': None, 'code': 422, 'error_code': 'weak_password', 'msg': 'Password should be at least 8 characters.'}
+--- 5 chars:
+{"code":422,"error_code":"weak_password","msg":"Password should be at least 8 characters.","weak_password":{"reasons":["length"]}}
+HTTP 422
+--- 8 chars (boundary, should be accepted):
+HTTP 200

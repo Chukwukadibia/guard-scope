@@ -101,3 +101,77 @@ Removed scratch files `tester.env`, `pw7.json`, `pgtap.sql` from the parent scra
 
 ## Decision
 **Not accepted yet.** Core security (RLS, route guard, no enumeration, no secrets) and accessibility pass. Before acceptance: fix or waive D-1 and D-2, apply the BR-1 dashboard setting (D-3) and re-run the BR-1 check, decide on the D-4 wording, and re-run T-01/T-20 once OD-13 and the URL settings are resolved.
+
+---
+
+# Retest 1 (commit 006c7da)
+
+**Tester run mode:** independent general-purpose subagent, fresh context · **Date:** 2026-11-16 · **Backend:** `guardscope-dev` (`eqozjuaaajstrewygqxr`)
+**Product change reviewed:** `git diff 1e2a34c 006c7da -- src` (ErrorSummary + stable field ids; `guardscope.hadSession` marker; BR-2 copy). Tooling diff (`tests eslint.config.js .prettierignore`) reviewed: E2E changes are formatting only; the `react-hooks/rules-of-hooks` override is scoped to `tests/e2e/**/*.ts` (Playwright `use()` false positive); `.prettierignore` only adds `docs/testing`. No assertion was weakened by those changes.
+
+## Retest evidence
+| File | Content |
+|---|---|
+| `check-retest1.log` | `npm run check`: format, lint, typecheck, unit **33/33**, build, `check:secrets` clean. Exit 0 |
+| `e2e-run-retest1.log` | Full E2E, 1280 + 375: **89 passed, 4 failed, 9 skipped** (skips = deliberate desktop-only) |
+| `e2e-run-retest1-rerun.log` | Re-run after the BR-1 client test locator fix + T-02: 3 passed, 1 skipped (mobile, by design) |
+| `axe-retest1/*.json` | axe with the **error summary visible**: sign-in, register, forgot-password, reset-password, settings × 1280/375 = 10 scans, **0 violations of any impact** |
+| `axe/*.json` | regression: 21 scans regenerated, all still 0 violations (files byte-identical to the committed ones) |
+| `screenshots/*-R1-*-summary.png` | 10 screenshots of the summary state |
+| `api-retest1-br1-br2.log` | BR-1 server check (7 → 422, 8 → 200) and BR-2 API (`email_not_confirmed`) |
+| `supabase-retest1-email-rate-limit.log` | edge logs for the T-15/T-20 failures (D-5), advisors, cleanup |
+
+E2E command: `set -a && . ./.env.test.local && set +a && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium npm run test:e2e -- --trace off --workers=2 --reporter=list` (with `TESTER_PW` for an SQL-created unconfirmed fixture, shell only, never written to the repo).
+
+## Defect status
+| Defect | Verdict | Evidence |
+|---|---|---|
+| D-1 / ISS-003 §6 error summary | **Verified fixed** | On all five forms, 1280 and 375: a `role="alert"` box headed "There is a problem" appears on failed submit, takes focus, is re-focused on each failed submit, lists errors in form order as links to `#fieldId`; Tab → first link, Enter → the field receives focus; inline errors remain, `aria-invalid` + `aria-describedby` intact; no request sent; summary removed after a valid resubmit. Heading order valid (h2 on auth pages, h3 under Settings h2). axe 0 violations with the summary visible. Tests: `retest1-error-summary-a11y.spec.ts`, `debug-d1-d2-regression.spec.ts`, `settings-and-empty-states.spec.ts` §6 |
+| D-2 / ISS-004 removed token → message | **Verified fixed** | `auth-guard.spec.ts` "stored token removed, then reload" passes at 1280 and 375; first-time visitor sees no message; marker holds only `"1"` (no token/PII) and is cleared after it is reported, so a later fresh visit shows no message; deliberate sign-out still shows "You've signed out." (T-03), T-19 multi-tab still passes |
+| D-3 / ISS-005 BR-1 server minimum | **Verified fixed (config applied)** | `PUT /auth/v1/user` with a throwaway user: 7 chars → **422 `weak_password` "Password should be at least 8 characters."**; 8 chars → 200. User A's password was not touched. ISS-005 can be closed by the owner |
+| D-4 / ISS-006 BR-2 wording | **Verified fixed** | UI (T-02, desktop, real unconfirmed user): "Check your email to confirm your account, then sign in." Test strengthened to assert the BR-2 sentence. Server still returns `email_not_confirmed` |
+
+### The 6 settings failures reported by the developer
+Test locator issue, not a product problem. The GOV.UK error-summary pattern intentionally repeats each inline message as a summary link; a page-wide `getByText` then matches two elements (strict mode). Duplicated text is acceptable for accessibility: the summary is a separate landmark-like alert with its own heading, links have unique targets, and axe reports nothing. The same issue affected the BR-1 client-side test (`session-and-auth-ui.spec.ts`), which the developer did not list. Fix: the inline error is now located **through the field's own `aria-describedby` ids** (settings) or the `*-err` inline element (BR-1), with `toHaveCount(1)` and the existing `aria-invalid`/`aria-describedby` assertions kept. Assertion strength is unchanged or stronger.
+
+### `state.ended` survives a reload of the sign-in page
+Not a defect against the spec. AC-4 requires the message on the redirect; it does not require it to disappear on reload, and after a reload the user still has no session, so the statement remains true. It disappears on any fresh navigation, after a successful sign-in, and is suppressed after a deliberate sign-out. Recorded as an observation (cosmetic, optional: clear the history state after first render).
+
+## New defect
+**D-5 — Email-send rate limit reveals whether an email is registered (AC-11 / BR-5). Suggested severity: Medium (security; conditional).**
+Steps: exhaust the project's email-send quota (small on the default SMTP; any visitor can trigger sends), then (a) register a new address vs an existing address, and (b) request a reset for an unknown vs a registered address.
+Expected (AC-11): identical outcomes. Actual (edge logs, `supabase-retest1-email-rate-limit.log`): only requests that would send an email get **429 `over_email_send_rate_limit`**; the others get 200. The UI maps 429 to "Too many attempts. Please wait a minute and try again." while the other case shows the neutral "Check your email" / "If an account exists…" message, so the visible outcome differs by registration state.
+Failing tests: `session-and-auth-ui.spec.ts` T-15 "registering an already-registered email…" and T-20 "forgot-password shows the same neutral confirmation…" (desktop). Not introduced by 006c7da (the 429 mapping predates it; in the first run SMTP 400s happened to map to the neutral message). Suggested fix: on `signUp` and `resetPasswordForEmail`, treat `over_email_send_rate_limit` like success (neutral outcome), keep the rate-limit message only for sign-in; plus custom SMTP/higher quota and CAPTCHA when OD-13 is resolved. Owner decision needed.
+
+## Retest acceptance criteria
+| Criterion | Result | Change vs first run |
+|---|---|---|
+| AC-1 register → confirm → sign in | **BLOCKED** (OD-13) | unchanged; this run the new-address signup got 429 (D-5) instead of SMTP 400 |
+| AC-2 sign out → redirect | PASS | — |
+| AC-3 guard / `next` / no open redirect | PASS | — |
+| AC-4 expired/invalid session message | **PASS** | was FAIL (D-2 fixed) |
+| AC-5 profile by trigger | PASS | SQL fixtures got profiles automatically this run as well |
+| AC-6 RLS isolation | PASS (not re-run; no `supabase/` change since `9bf2cfa`) | — |
+| AC-7 no passwords / no service key in bundle | PASS | `check:secrets` clean on the new build |
+| AC-8 settings persist + validation | PASS | T-11, T-12 (locators scoped) |
+| AC-9 375/1280, keyboard nav | PASS | — |
+| AC-10 axe / focus / labels / headings | PASS | 0 violations incl. 10 new summary-visible scans |
+| AC-11 no account enumeration | **FAIL** (D-5) | was PASS; password-grant messages still identical (T-15 sign-in PASS) |
+| AC-12 empty states | PASS | — |
+| AC-13 password reset | **BLOCKED** (OD-13) | — |
+| §6 error summary | **PASS** | was FAIL (D-1 fixed) |
+| BR-1 server minimum 8 | **PASS** | was FAIL (D-3; dashboard setting now applied) |
+| BR-2 wording | **PASS** | D-4 fixed |
+| T-02 | PASS · T-06 PASS · T-12 PASS · T-15 sign-in PASS / register FAIL (D-5) · T-20 UI FAIL (D-5) | |
+
+## Tester changes (retest 1)
+- `tests/e2e/settings-and-empty-states.spec.ts`: `inlineError()` helper locates the inline error via the field's `aria-describedby`; used in the two T-12 tests and the §6 test.
+- `tests/e2e/session-and-auth-ui.spec.ts`: BR-1 client test locator scoped to the inline `*-err` element; T-02 now also asserts the exact BR-2 sentence.
+- Added `tests/e2e/retest1-error-summary-a11y.spec.ts` (summary focus, links, keyboard, form order, removal, heading order, overflow, axe at 1280/375 on all five forms).
+- `src/` and `supabase/` not modified. Nothing committed.
+
+## Cleanup (retest 1)
+Temporary SQL fixtures `t-unconfirmed@` and `t-pwlen@` deleted (no `t-e2e-new@`/`valid-r1@` row was ever created). Final `auth.users`: `a@guardscope.test`, `b@guardscope.test`; both profiles have `display_name` and `default_currency` null. Scratch files removed. Security advisor unchanged (1 WARN, leaked password protection).
+
+## Decision (retest 1)
+**Not accepted yet.** D-1, D-2, D-3 and D-4 are verified fixed and no regressions were found. Remaining before acceptance: decide and fix **D-5** (AC-11 enumeration through the email rate limit), then re-run T-15/T-20 once the email quota resets; AC-1/T-01 and AC-13/T-20 email steps remain **BLOCKED by OD-13** and the Site/Redirect URL settings.

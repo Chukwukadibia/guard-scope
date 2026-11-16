@@ -1,0 +1,22 @@
+# Retest 1: auth edge logs for the T-15 (register) and T-20 (forgot-password) UI tests, 2026-11-16.
+# Source: mcp__Supabase__query_logs (edge_logs) on eqozjuaaajstrewygqxr. Headers trimmed.
+2026-11-16T10:49:20Z POST 429 /auth/v1/signup   x_sb_error_code=over_email_send_rate_limit   (NEW address t-e2e-new@)       -> UI: "Too many attempts. Please wait a minute and try again."
+2026-11-16T10:50:36Z POST 200 /auth/v1/signup                                                (EXISTING address a@; obfuscated) -> UI: "Check your email"
+2026-11-16T10:50:44Z POST 200 /auth/v1/recover                                               (UNKNOWN address nobody-t20@)    -> UI: "If an account exists for that email, we've sent a link..."
+2026-11-16T10:51:45Z POST 429 /auth/v1/recover  x_sb_error_code=over_email_send_rate_limit   (EXISTING address a@)            -> UI: "Too many attempts. Please wait a minute and try again."
+
+Finding (D-5): while the project's email-send quota is exhausted, the server answers 429 only for requests
+that would send an email (new signup, recover for a registered address) and 200 for those that would not
+(existing-address signup, unknown-address recover). The UI maps 429 to a distinct message, so the outcome
+reveals whether an email is registered (AC-11 / BR-5). The quota is project-wide and small on the default
+SMTP, so an attacker can exhaust it deliberately.
+
+## Advisors (security), retest 1
+1 finding: WARN auth_leaked_password_protection (unchanged).
+
+## Cleanup, retest 1
+delete from auth.users where email in ('t-pwlen@','t-unconfirmed@','t-e2e-new@','valid-r1@' guardscope.test);
+select u.email, p.display_name, p.default_currency ... ->
+ a@guardscope.test | null | null
+ b@guardscope.test | null | null
+Scratch files removed: ../tester.env, ../br1.json. User A's password was not changed (BR-1 used the throwaway t-pwlen@ fixture).

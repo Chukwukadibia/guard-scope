@@ -169,9 +169,11 @@ test.describe('BR-1 client-side password rule', () => {
     const pw = page.getByLabel('Password', { exact: true });
     await pw.fill('Abc1234');
     await page.getByRole('button', { name: 'Create account' }).click();
-    const err = page.getByText('Use at least 8 characters.');
-    await expect(err).toBeVisible();
+    // Scoped to the inline error: the §6 error summary repeats the message as a link.
     await expect(pw).toHaveAttribute('aria-invalid', 'true');
+    const err = page.locator('[id$="-err"]').filter({ hasText: 'Use at least 8 characters.' });
+    await expect(err).toHaveCount(1);
+    await expect(err).toBeVisible();
     expect((await pw.getAttribute('aria-describedby'))?.split(' ')).toContain(
       await err.getAttribute('id'),
     );
@@ -194,6 +196,8 @@ test.describe('T-02 / BR-2 unconfirmed user (UI)', () => {
     console.log('T-02 message:', text);
     expect(text).toMatch(/confirm/i);
     expect(text).toMatch(/email|inbox/i);
+    // BR-2 wording (D-4 retest).
+    expect(text).toContain('Check your email to confirm your account');
     await expect(page).toHaveURL(/\/sign-in/);
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toHaveCount(0);
     await screenshot(page, testInfo, 'T02-unconfirmed');
