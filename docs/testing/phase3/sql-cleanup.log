@@ -1,0 +1,7 @@
+Cleanup 2026-11-16 (superuser, execute_sql, test-only bypass):
+begin; select set_config('guardscope.account_deletion','on',true);
+delete from public.projects where owner_id in (select id from auth.users where email in ('a@guardscope.test','b@guardscope.test')); commit;
+Post-check: users=2 (a@guardscope.test, b@guardscope.test), projects=0, scope_versions=0, scope_items=0, requests=0,
+activity_events=0, revision_usages=0, profiles with display_name/default_currency set=0.
+Note: the D-2 evidence request (a1c1dd52-...) was deleted by this cleanup; its rows are preserved in sql-D2-concurrency-history.log
+and screenshots/desktop-D2-history-vs-badge.png.

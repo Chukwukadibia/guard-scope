@@ -1,0 +1,13 @@
+
+Running 1 test using 1 worker
+
+LAST ENTRY: Marked "Race" as Needs clarification
+16 Nov 2026, 18:01 UTC
+BADGE AREA: Race
+
+Received 16 Nov 2026
+
+Included
+  ✓  1 [desktop] › tests/e2e/p3-d2-evidence.spec.ts:6:1 › D-2 evidence screenshot (2.4s)
+
+  1 passed (15.9s)

@@ -224,7 +224,21 @@ test.describe('T-03 / AC-3 classify and history', () => {
     );
     const finalValue = (row.body as { classification: string }[])[0].classification;
     const chain = ev.map((e) => [e.metadata.from as string, e.metadata.to as string]);
-    logEvidence('api-T03-concurrency.jsonl', testInfo, 'chain', { same, mixed, chain, finalValue });
+    logEvidence('api-T03-concurrency.jsonl', testInfo, 'chain', {
+      requestId: rid,
+      same,
+      mixed,
+      sent: Array.from({ length: 12 }, (_, i) => vals[i % 3]),
+      historyRows: ev.map((e) => ({
+        id: e.id,
+        created_at: e.created_at,
+        from: e.metadata.from,
+        to: e.metadata.to,
+        summary: e.summary,
+      })),
+      chain,
+      finalValue,
+    });
     // Integrity (hard): no self-transitions, and the transitions form one unbroken path
     // unclassified -> ... -> stored value (Eulerian path check, order-independent).
     for (const [f, t] of chain) expect(f).not.toBe(t);

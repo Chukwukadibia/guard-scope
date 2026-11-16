@@ -1,0 +1,6 @@
+get_advisors(project_id=eqozjuaaajstrewygqxr, type=security) @ 6184f91, 2026-11-16 18:12 UTC
+WARN authenticated_security_definer_function_executable: public.classify_request(uuid,text), public.confirm_scope(uuid), public.delete_my_account()
+WARN auth_leaked_password_protection: Auth
+Both already dispositioned in docs/security/ADVISOR_NOTES.md (classify_request listed as intentional, Phase 3; ISS-008). No new findings.
+Tester verification for classify_request: SECURITY DEFINER with search_path='' (pgTAP tester G16), no anon/PUBLIC execute (G12, G14, N3),
+explicit auth.uid() ownership check returning not_found for foreign/archived-foreign ids (dev 26, tester B9, R7b).

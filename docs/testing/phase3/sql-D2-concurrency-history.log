@@ -1,0 +1,23 @@
+# D-2 evidence. Request a1c1dd52-4428-474b-aeed-97a16978dd24 (run 8 of 10 in e2e-p3-concurrency-repeat10.log).
+# 12 parallel classify_request calls by the owner, values cycling additional, needs_clarification, included.
+# Query (superuser, execute_sql):
+#   select r.classification stored, e.created_at, from, to, e.xmin from requests r join activity_events e ... order by e.created_at;
+stored    | created_at (UTC)            | from                -> to                  | xmin
+included  | 18:01:49.295777             | unclassified        -> included            | 4674
+included  | 18:01:50.032561             | included            -> needs_clarification | 4684
+included  | 18:01:50.049514             | needs_clarification -> additional          | 4685
+included  | 18:01:50.220948             | additional          -> included            | 4687
+included  | 18:01:50.225546             | included            -> needs_clarification | 4688
+included  | 18:01:50.241529             | needs_clarification -> included            | 4690
+included  | 18:01:50.24191              | included            -> additional          | 4691
+included  | 18:01:50.244621             | needs_clarification -> included            | 4695   <- "from" does not match previous "to"
+included  | 18:01:50.247318             | additional          -> included            | 4693
+included  | 18:01:50.24935              | included            -> needs_clarification | 4694   <- newest history entry says Needs clarification; stored value is Included
+# Ordered by xmin (4691, 4693, 4694, 4695) the chain is consistent and ends at "included":
+#   included->additional, additional->included, included->needs_clarification, needs_clarification->included.
+# Cause: activity_events.created_at defaults to now() = transaction START time. classify_request serialises on
+# SELECT ... FOR UPDATE, so a transaction that started earlier can apply its change later. The history (UI and
+# API ordered by created_at) then shows an order of changes that never happened and a "latest" entry that
+# contradicts the stored classification. Every row's from/to is individually true (multiset forms a valid path,
+# hard assertion passed in all 10 runs); the timestamps/order are wrong.
+# Reproduction rate: 4 of 10 runs (repeat10 log), 3 of 5 (repeat5 log), 1 of 2 in the full P3 runs (attempt 1).

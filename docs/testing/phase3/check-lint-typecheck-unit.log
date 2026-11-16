@@ -1,0 +1,31 @@
+
+> guardscope@0.0.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+
+> guardscope@0.0.0 lint
+> eslint .
+
+
+> guardscope@0.0.0 typecheck
+> tsc -b --noEmit
+
+
+> guardscope@0.0.0 test
+> vitest run
+
+
+ RUN  v5.1.0 /home/user/guard-scope
+
+
+ Test Files  11 passed (11)
+      Tests  110 passed (110)
+   Start at  18:12:38
+   Duration  3.82s (environment 68%, setup 11%, import 10%, tests 5%, transform 4%, worker 1%)
+
+Environment  jsdom was created 11 times · 6.43s total, 68% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
