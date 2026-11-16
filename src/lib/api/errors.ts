@@ -11,6 +11,7 @@ export type ApiErrorCode =
   | 'empty_scope'
   | 'project_archived'
   | 'scope_locked'
+  | 'invalid_classification'
   | 'network'
   | 'unknown';
 
@@ -64,6 +65,7 @@ const p0001Codes = new Map<string, ApiErrorCode>([
   ['project_archived', 'project_archived'],
   ['scope_version_immutable', 'scope_locked'],
   ['not_authenticated', 'not_authenticated'],
+  ['invalid_classification', 'invalid_classification'],
 ]);
 
 export const errorMessages: Record<ApiErrorCode, string> = {
@@ -79,6 +81,7 @@ export const errorMessages: Record<ApiErrorCode, string> = {
   empty_scope: 'Add at least one deliverable before confirming the scope.',
   project_archived: 'This project is archived. Reopen it to make changes.',
   scope_locked: 'Confirmed scope cannot be changed. Edit the draft instead.',
+  invalid_classification: 'Choose one of the listed classifications.',
   network: "Can't reach GuardScope. Check your connection and try again.",
   unknown: 'Something went wrong. Please try again.',
 };

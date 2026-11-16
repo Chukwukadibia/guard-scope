@@ -22,6 +22,9 @@ import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { StatusBadge } from './StatusBadge';
 import { ScopeView } from '../scope/ScopeView';
 import { DraftEditor } from '../scope/DraftEditor';
+import { RequestsSection } from '../requests/RequestsSection';
+import { RevisionsPanel } from '../requests/RevisionsPanel';
+import type { ClientRequest } from '../../lib/api/requests';
 
 const statusActions: Record<
   ProjectStatus,
@@ -51,6 +54,7 @@ export function ProjectDetailPage() {
   const location = useLocation();
   const online = useOnline();
   const [project, setProject] = useState<Project | null>(null);
+  const [requests, setRequests] = useState<ClientRequest[]>([]);
   const [scope, setScope] = useState<ProjectScope | null>(null);
   const [loadError, setLoadError] = useState<ApiErrorCode | null>(null);
   const [notice, setNotice] = useState<{ tone: 'success' | 'error'; text: string } | null>(() => {
@@ -300,6 +304,14 @@ export function ProjectDetailPage() {
           </article>
         )}
       </section>
+
+      <RequestsSection projectId={project.id} archived={archived} onChanged={setRequests} />
+      <RevisionsPanel
+        projectId={project.id}
+        currentScope={current}
+        archived={archived}
+        requests={requests}
+      />
     </div>
   );
 }

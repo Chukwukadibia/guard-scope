@@ -9,6 +9,7 @@ import { DashboardPage } from './features/dashboard/DashboardPage';
 import { ProjectsPage } from './features/projects/ProjectsPage';
 import { ProjectFormPage } from './features/projects/ProjectFormPage';
 import { ProjectDetailPage } from './features/projects/ProjectDetailPage';
+import { RequestDetailPage } from './features/requests/RequestDetailPage';
 import { SettingsPage } from './features/settings/SettingsPage';
 import { PublicProposalPage } from './features/public/PublicProposalPage';
 import { NotFoundPage } from './features/NotFoundPage';
@@ -53,6 +54,7 @@ export const router = createBrowserRouter([
           { path: 'projects/new', element: <ProjectFormPage /> },
           { path: 'projects/:id', element: <ProjectDetailPage /> },
           { path: 'projects/:id/edit', element: <ProjectFormPage /> },
+          { path: 'projects/:id/requests/:requestId', element: <RequestDetailPage /> },
           { path: 'settings', element: <SettingsPage /> },
         ],
       },

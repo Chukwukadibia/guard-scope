@@ -6,11 +6,20 @@ import {
   revisionAllowanceLabel,
 } from '../../lib/domain/format';
 
-export function ItemList({ version, kind }: { version: ScopeVersion; kind: ScopeItemKind }) {
+export function ItemList({
+  version,
+  kind,
+  headingLevel = 4,
+}: {
+  version: ScopeVersion;
+  kind: ScopeItemKind;
+  headingLevel?: 3 | 4;
+}) {
+  const Heading = headingLevel === 3 ? 'h3' : 'h4';
   const items = version.scope_items.filter((i) => i.kind === kind);
   return (
     <div>
-      <h4 className="text-sm font-semibold text-slate-800">{kindHeading[kind]}</h4>
+      <Heading className="text-sm font-semibold text-slate-800">{kindHeading[kind]}</Heading>
       {items.length === 0 ? (
         <p className="mt-1 text-sm text-slate-600">None recorded.</p>
       ) : (
