@@ -73,7 +73,11 @@ The freelancer needs the client to see exactly one proposal version and answer i
 | AC-7 | Expired, revoked, replaced, cancelled and already-decided links can't record a decision and show a safe explanation |
 | AC-8 | Issuing a new link revokes the old one; sending a new version replaces the old pending one and its link stops working; cancel revokes the link |
 | AC-9 | Throttle: repeated failed guesses from one source return `rate_limited`; a valid token from another source is unaffected |
-| AC-10 | The freelancer can't decide, and the client can't access any other table or RPC: anon has no table privileges and only the two public RPCs are executable; direct REST access to links, decisions and versions is denied |
+| AC-10 | The freelancer has no owner-only path to record a decision (no table write, no owner RPC), and a client can't reach any other table or RPC: anon has no table privileges and only the two public RPCs are executable; direct REST access to links, decisions and versions is denied |
 | AC-11 | Wording never claims a legal signature or certification and never calls approval "paid" |
 | AC-12 | Client page: mobile-first, accessible (axe 0 serious/critical, keyboard, no horizontal overflow at 375 and 1280), long comments and long text wrap |
 | AC-13 | Account deletion removes links and decisions; Phase 1–4 regression passes |
+
+## 9. Known limitation (stated openly, PRD §11)
+Possession of the link is the only credential. The freelancer sees the raw link when it is issued, so a dishonest freelancer could open it and submit a response in the client's name; the product cannot tell the two apart (no client identity is collected, OD-5). The record shows *that* a response was made through the link, at what time, on which exact version. It does not prove *who* made it. This matches PRD §11 ("does not guarantee identity, non-repudiation or enforceability") and is why the product never uses the words signature, legally binding or certified. Mitigations available later, if validated as necessary: optional client name/email confirmation, or email-delivered links (both out of MVP scope).
+
