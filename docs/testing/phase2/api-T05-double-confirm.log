@@ -1,4 +1,4 @@
 confirm with no deliverable: HTTP 400 {"code":"P0001","details":null,"hint":null,"message":"empty_scope"}
 sequential: 1st HTTP 200 is_original_baseline=true; 2nd HTTP 400 {"code":"P0001","details":null,"hint":null,"message":"already_confirmed"}
-concurrent x3: 400:already_confirmed, 200:ok v1, 400:already_confirmed
+concurrent x3: 400:already_confirmed, 400:already_confirmed, 200:ok v1
 after concurrent: versions=v1:confirmed:baseline v2:draft

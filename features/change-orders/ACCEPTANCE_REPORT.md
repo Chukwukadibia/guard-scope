@@ -121,11 +121,80 @@ The retest will re-run AC-12 and the D-1/D-2 checks.
 
 ## Retest 1 (commit dde2091)
 
-> Status: IN PROGRESS (regression runs, pgTAP and advisor pending). Verified so far: `npm run check`, D-1, D-2, ISS-020 test changes.
+> Status: **CHUNK A DONE; chunks B/C (full regression x2, flake stabilisation evidence) PENDING.** No final decision yet.
 
-**Tester run mode:** separate general-purpose subagent, fresh context (Tester Specialist). · **Commit tested:** `dde2091` (`feature/p4-change-orders`); product diff vs `0bc06fe`: `src/lib/domain/request.ts` (copy), `src/lib/domain/changeOrder.ts` (`headerVersion`, `versionCountLabel`), `src/features/changes/ChangeOrderPage.tsx`, two unit-test files. No `supabase/` change. · **Date:** 2026-11-16 · **Backend:** Supabase `guardscope-dev` (`eqozjuaaajstrewygqxr`).
+**Tester run mode:** separate general-purpose subagent (Tester Specialist), resumed after several container restarts; the retest is split into chunks, and the Team Lead commits after each. · **Commit tested:** product code `dde2091` (`feature/p4-change-orders`); the working tree is on WIP commit `0202607`, which holds only tester files. Product diff vs `0bc06fe`: `src/lib/domain/request.ts` (copy), `src/lib/domain/changeOrder.ts` (`headerVersion`, `versionCountLabel`), `src/features/changes/ChangeOrderPage.tsx`, two unit-test files. No `supabase/` change. · **Dates:** 2026-11-16 to 2026-11-17 · **Backend:** Supabase `guardscope-dev` (`eqozjuaaajstrewygqxr`).
 
-### Verified so far
-- `npm run check`: exit 0, format + lint + typecheck + **141/141 unit** (13 files; 136 before + 5 new) + build + secrets check (`docs/testing/phase4/retest1-check.log`).
-- D-2: copy verified in source and in the UI (active and completed project), see below.
-- D-1: verified in the UI on completed and archived projects for both scenarios (`tests/e2e/p4-retest1.spec.ts`, 6/6, `e2e-retest1-D1-D2.log`, `retest1-D1.jsonl`).
+### Results (chunk A)
+| Item | Result | Evidence (`docs/testing/phase4/`) |
+|---|---|---|
+| `npm run check` | **PASS**: format, lint, typecheck, **141/141 unit tests** (13 files: 136 before + 5 new), build, secrets check | `retest1-check.log` (rerun 2026-11-17) |
+| pgTAP, 9 files | **491/491 PASS**: profiles_rls 12, profiles_rls_tester 22, event_ordering 11, projects_scope 32, requests 32, projects_scope_tester 80, requests_tester 138, change_orders (dev) 39, change_orders_tester 125 | `retest1-pgtap-summary.txt` |
+| D-2 / ISS-018 explainer copy | **FIXED**, see verdict below | `e2e-retest1-D1-D2.log`, `retest1-D2.jsonl` |
+| D-1 / ISS-019 closed-project header | **FIXED** on the proposal page, but the same issue remains on two other pages (new **D-3**) | `e2e-retest1-D1-D2.log`, `retest1-D1.jsonl`, `screenshots/*-retest1-D1*` |
+| Updated Phase 3 T-09 (`p3-classification.spec.ts`) | **PASS** at 375 and 1280 | `e2e-retest1-D1-D2.log` |
+| axe + overflow on affected pages, 375 and 1280 | **PASS**: 60 scans in total, 0 violations of any impact and 0 horizontal overflow. Pages: the proposal page (closed project, sent + hidden draft, and draft only), the project page and request page on completed/archived projects, and the request page on active/completed projects | `retest1-a11y.jsonl`, `axe/*-retest1-*.json` |
+| Security advisor | **PASS**: no new findings. 8 × `authenticated_security_definer_function_executable` WARN, all on RPCs listed in `docs/security/ADVISOR_NOTES.md`; 1 × leaked-password WARN (ISS-008); 0 ERROR | `retest1-supabase-advisors.log` |
+| AC-1 to AC-11, T-01 to T-11 | Unchanged from the first run: all PASS. The fix touched only display code; the pgTAP suites still pass. In the partial regression run 1 (below), every Phase 4 spec passed on both viewports except one §6 test on mobile, which timed out | full regression: **PENDING (chunk B/C)** |
+| AC-12 / T-12 Phase 1–3 regression | **PENDING (chunk B/C)** | |
+| ISS-020 flake stabilisation (full-suite proof, two runs) | **PENDING (chunk B/C)**. The test changes are made and the mechanism is evidenced (below) | `retest1-iss020-probe.jsonl` |
+
+### D-2 / ISS-018 verdict: FIXED
+- `classificationExplainer.additional` now reads "You marked this as outside the agreement. You can turn it into a change proposal for your client." No "available / coming soon / next release" wording is left in `src/`. A new unit test guards this.
+- UI on an active project: the decision region shows the new copy; the panel below offers a working "Create change proposal" action. T-09 clicks it, lands on `/projects/{id}/changes/{uuid}`, sees the h1 "Additional one", and finds exactly 1 change order via REST.
+- UI on a completed project: the same explainer, with the panel saying "Reopen the project to create a change proposal." (see O-10).
+
+### D-1 / ISS-019 verdict: FIXED on the proposal page
+Verified on **completed and archived** projects at both viewports (`p4-retest1.spec.ts`):
+- **(a) Sent versions plus a hidden draft** (v1 superseded, v2 pending, v3 draft "Hidden draft three title"):
+  - The h1 and the document title are "Sent two title".
+  - The header shows "Change proposal · 2 sent versions" and the badge "Sent, waiting for the client". "Draft (not sent)", "3 versions" and the draft title appear nowhere in `<main>`.
+  - The cards for Version 2 and Version 1 are shown; Version 3 is not.
+  - The page is read-only: there are no textboxes and no send/save/new/cancel/discard buttons.
+  - Active baseline (unchanged): the header shows the draft, "3 versions".
+  - The data is unchanged.
+- **(b) Never-sent draft only:** the h1 and document title are the draft title, the header shows "Change proposal · Draft only, not sent" and the badge "Draft (not sent)", the read-only notice is shown, and there is no "Sent versions" section and no write control. This matches the developer's description.
+
+### New defects
+**D-3 (LOW, UI, same family as D-1): on a completed/archived project, the project page's proposal list and the request page panel still describe the hidden draft.**
+- **Steps:** as in D-1 (a). Then open the project page (Change proposals section) and the request page.
+- **Actual:**
+  - The project list item reads "Hidden draft three title · Version 3 · Proposed: +EUR 400.00, +3 days · Draft (not sent)".
+  - The request panel badge says "Draft (not sent)".
+  - Both link to a proposal page whose header now says "Sent two title · Sent, waiting for the client · 2 sent versions". The draft's title and proposed amounts are shown on the project page, but its content cannot be viewed anywhere. A sent pending proposal is labelled as an unsent draft.
+- **Cause:** `ChangeProposalsSection.tsx` uses `latestVersion(co)`. `findChangeOrderForRequest` returns the status of the newest version. Neither uses `headerVersion`.
+- **Expected:** the closed-project views agree with the proposal page (C-2 read-only; the D-1 reasoning).
+- **Evidence:** `retest1-D1.jsonl` (both viewports and both states), `screenshots/*-retest1-D1a-*-project.png` and `*-request.png`.
+- **Impact:** display only. No write is possible and no data is lost.
+
+### Observations (new)
+- **O-9:** in case (b), the header names a draft whose content is not rendered on a closed project (only its title is shown). It is labelled "Draft (not sent)" with the read-only notice, which is acceptable under the developer's stated design.
+- **O-10:** the Additional explainer says "You can turn it into a change proposal" even when (i) the project is closed (the panel then says to reopen it first) or (ii) a proposal already exists (the panel then shows "Open the change proposal"). The panel text right below resolves both cases, so the page is not contradictory.
+
+### Test changes made in this retest (authorised by the Team Lead under HA-007 unless noted)
+1. **`tests/e2e/p3-classification.spec.ts` T-09** (ISS-018). The intent is kept: truthful guidance and no dead action. Changes:
+   - It now asserts the new explainer and the absence of any "unavailable / coming later" wording.
+   - It waits for the async panel, which removes the earlier race.
+   - It asserts exactly one change-proposal button, enabled, and no change-proposal link. It then **clicks it** and checks the navigation and the created row.
+   - The money regex is unchanged and still applies to all of `<main>`, except the panel's fixed sentence "Turn this request into a priced and/or timed proposal…". That sentence is checked separately against the same regex with only the word "priced" removed.
+2. **`tests/e2e/p2-a11y.spec.ts`** (ISS-020 F-1).
+   - Before every axe scan, it waits for all finite CSS animations and transitions (`document.getAnimations()`) to finish, and it asserts that "Yes, confirm" is no longer `aria-busy` before the error-state scan. The axe tags and rules are unchanged.
+   - `emulateMedia({ reducedMotion })` would not help, because the Button's `transition-colors` is not gated by `motion-reduce`.
+   - **Evidence** (`retest1-iss020-probe.jsonl`, 8 repeats): at the old scan point, the button background was mid-fade (`oklab(…)`, 1 running transition) in **4/8** repeats. After the settle step it was the final brand-600 `rgb(31,111,104)` in **8/8**. This is a test-timing flake, not a product defect: the settled colour passes contrast.
+3. **`tests/e2e/settings-and-empty-states.spec.ts` T-16** (ISS-020 F-2).
+   - Root cause: a check-then-act race. The old poll saw 0 active projects, then another worker created one before the page rendered.
+   - The precondition is now checked before **and after** the page loads, and the page is reloaded only when another test's project appeared in that window.
+   - If the page lists a project that existed before the check, the test fails, because that would be a product defect rather than a race. The empty-state assertions are unchanged.
+4. **`tests/e2e/p4-proposals.spec.ts` §6 UI test** (my own Phase 4 test, not a Phase 1–3 test): `test.setTimeout(90_000)`. It takes about 15 s unloaded (6/6 isolated passes, `e2e-retest1-S6-isolated.log`) and hit the 30 s default under full-suite load in run 1 (F-3 below). It is a timing change only; the assertions are unchanged.
+5. **New `tests/e2e/p4-retest1.spec.ts`**: D-1 (a), D-1 (b), D-2 and axe/overflow, on both viewports.
+
+### Partial regression run 1 (before the restarts; for the record, not the acceptance run)
+`e2e-run-retest1.log`, with changes 1–3 in place: **235 passed, 1 failed, 34 skipped** (10.9 min).
+- The previous failures (T-09 on both viewports, F-1 P2 a11y desktop, F-2 T-16 mobile) all **passed**.
+- The single failure was **F-3**: `p4-proposals.spec.ts` §6 UI on mobile, a test timeout of 30 s. A pgTAP file ran against the same DB in parallel during this run (my error, since corrected), which may have added load. This led to change 4.
+- The full two-run regression is chunk B/C.
+
+### Hygiene (chunk A)
+- Phase 1–3 evidence restored with `git checkout dde2091 -- docs/testing/phase1 docs/testing/phase2 docs/testing/phase3`, at the start of chunk A (178 files overwritten by the interrupted regression run) and again after the targeted run (4 Phase 3 screenshots `{desktop,mobile}-T09-{included,additional}.png` rewritten by T-09). `git diff --stat dde2091 -- docs/testing/phase{1,2,3}` is empty.
+- The DB was cleaned with the prescribed test-only SQL. Only a@ and b@guardscope.test remain, with 0 projects, requests, change orders and versions, and null profile fields.
+- `src/` and `supabase/` were not modified. Nothing was committed.

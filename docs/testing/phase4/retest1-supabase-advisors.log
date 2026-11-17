@@ -1,0 +1,6 @@
+# get_advisors(security), eqozjuaaajstrewygqxr, 2026-11-17 (retest 1, chunk A)
+WARN authenticated_security_definer_function_executable x8: cancel_change_order_version, classify_request, confirm_scope,
+  create_change_order, delete_my_account, discard_change_order_draft, new_change_order_version, send_change_order_version
+  (all intentional RPCs listed in docs/security/ADVISOR_NOTES.md; _lock_change_order not flagged)
+WARN auth_leaked_password_protection x1 (accepted, ISS-008)
+No ERROR-level lints. No new findings versus the Phase 4 baseline (docs/testing/phase4/supabase-advisors.log).
