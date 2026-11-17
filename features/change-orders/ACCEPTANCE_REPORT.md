@@ -121,7 +121,7 @@ The retest will re-run AC-12 and the D-1/D-2 checks.
 
 ## Retest 1 (commit dde2091)
 
-> Status: **CHUNK A DONE; chunks B/C (full regression x2, flake stabilisation evidence) PENDING.** No final decision yet.
+> Status: **CHUNKS A and B DONE.** Product code under test is now **`c43b082`** (D-3 / ISS-021 fix). Regression run #2 and the final acceptance decision: **PENDING (chunk C)**.
 
 **Tester run mode:** separate general-purpose subagent (Tester Specialist), resumed after several container restarts; the retest is split into chunks, and the Team Lead commits after each. · **Commit tested:** product code `dde2091` (`feature/p4-change-orders`); the working tree is on WIP commit `0202607`, which holds only tester files. Product diff vs `0bc06fe`: `src/lib/domain/request.ts` (copy), `src/lib/domain/changeOrder.ts` (`headerVersion`, `versionCountLabel`), `src/features/changes/ChangeOrderPage.tsx`, two unit-test files. No `supabase/` change. · **Dates:** 2026-11-16 to 2026-11-17 · **Backend:** Supabase `guardscope-dev` (`eqozjuaaajstrewygqxr`).
 
@@ -136,8 +136,8 @@ The retest will re-run AC-12 and the D-1/D-2 checks.
 | axe + overflow on affected pages, 375 and 1280 | **PASS**: 60 scans in total, 0 violations of any impact and 0 horizontal overflow. Pages: the proposal page (closed project, sent + hidden draft, and draft only), the project page and request page on completed/archived projects, and the request page on active/completed projects | `retest1-a11y.jsonl`, `axe/*-retest1-*.json` |
 | Security advisor | **PASS**: no new findings. 8 × `authenticated_security_definer_function_executable` WARN, all on RPCs listed in `docs/security/ADVISOR_NOTES.md`; 1 × leaked-password WARN (ISS-008); 0 ERROR | `retest1-supabase-advisors.log` |
 | AC-1 to AC-11, T-01 to T-11 | Unchanged from the first run: all PASS. The fix touched only display code; the pgTAP suites still pass. In the partial regression run 1 (below), every Phase 4 spec passed on both viewports except one §6 test on mobile, which timed out | full regression: **PENDING (chunk B/C)** |
-| AC-12 / T-12 Phase 1–3 regression | **PENDING (chunk B/C)** | |
-| ISS-020 flake stabilisation (full-suite proof, two runs) | **PENDING (chunk B/C)**. The test changes are made and the mechanism is evidenced (below) | `retest1-iss020-probe.jsonl` |
+| AC-12 / T-12 Phase 1–4 regression | Run #1 on `c43b082` (chunk B): **236 passed, 0 failed, 34 skipped** (10.8 min). Run #2: **PENDING (chunk C)** | `e2e-run-retest1.log` |
+| ISS-020 flake stabilisation (full-suite proof, two runs) | Run #1: both formerly flaky tests passed in the full suite (P2 T-11 axe on desktop and mobile; T-16 empty states, all 4). Run #2: **PENDING (chunk C)** | `e2e-run-retest1.log`, `retest1-iss020-probe.jsonl` |
 
 ### D-2 / ISS-018 verdict: FIXED
 - `classificationExplainer.additional` now reads "You marked this as outside the agreement. You can turn it into a change proposal for your client." No "available / coming soon / next release" wording is left in `src/`. A new unit test guards this.
@@ -188,11 +188,38 @@ Verified on **completed and archived** projects at both viewports (`p4-retest1.s
 4. **`tests/e2e/p4-proposals.spec.ts` §6 UI test** (my own Phase 4 test, not a Phase 1–3 test): `test.setTimeout(90_000)`. It takes about 15 s unloaded (6/6 isolated passes, `e2e-retest1-S6-isolated.log`) and hit the 30 s default under full-suite load in run 1 (F-3 below). It is a timing change only; the assertions are unchanged.
 5. **New `tests/e2e/p4-retest1.spec.ts`**: D-1 (a), D-1 (b), D-2 and axe/overflow, on both viewports.
 
+### Chunk B (product commit c43b082)
+**Fix reviewed** (`git diff 2210f9d c43b082`):
+- `ChangeProposalsSection` now uses `headerVersion(co, projectActive)`, and `ProjectDetailPage` passes `project.status === 'active'`.
+- `findChangeOrderForRequest` returns the version list sorted ascending, and `RequestProposalPanel` shows `headerStatus(versions, projectActive)`. Both helpers share the logic of the proposal page header.
+- Four new unit tests. No `supabase/` change.
+
+**D-3 / ISS-021 verdict: FIXED.** I extended `p4-retest1.spec.ts` with `expectRelatedPagesMatch`, which checks the project-page list item (title, "Version N ·", badge) and the request-page panel badge against what the proposal page header shows, and checks that no hidden-draft text appears. Result: 6/6 at 375 and 1280 (`e2e-retest1-D3.log`, `retest1-D3.jsonl`). Per case:
+- **(a) sent + hidden draft, completed and archived:** the list shows "Sent two title · Version 2 · Sent, waiting for the client" and the panel shows "Sent, waiting for the client". "Hidden draft three title", "Draft (not sent)" and "Version 3" are absent. This matches the header.
+- **(a) active (regression):** the list shows "Hidden draft three title · Version 3 · Draft (not sent)" and the panel shows "Draft (not sent)". This matches the active header.
+- **(b) never-sent draft, active, completed and archived:** the list shows "Never sent title · Version 1 · Draft (not sent)" and the panel shows "Draft (not sent)". This matches the header.
+- **axe:** 24 new D-3 scans (project and request pages, all cases, both viewports) plus the D-1/D-2 scans, with 0 violations of any impact and 0 overflow (`retest1-a11y.jsonl`, `axe/*-retest1-D3-*`). The older `screenshots/*-retest1-D1a-*-{project,request}.png` from chunk A are kept as the "before" evidence for D-3.
+
+**`npm run check` on c43b082:** exit 0, **145/145 unit tests** (13 files), build and secrets check pass (`retest1-check.log`).
+
+**Full regression run #1** (`npm run test:e2e -- --trace off --workers=2`, on a cleaned DB): **236 passed, 0 failed, 34 skipped** (`e2e-run-retest1.log`; this overwrites the partial run-1 log from before the restarts, which is kept in commit `0202607`).
+- The 34 skips are the suites' own `test.skip` conditions (mutating tests that run on desktop only), the same count as the first run.
+- **ISS-020 tests in the full suite:**
+  - `p2-a11y.spec.ts:33` T-11 passed on desktop (49.0 s) and mobile (44.5 s).
+  - `settings-and-empty-states.spec.ts:135` T-16 passed for `/` and `/projects` on both viewports.
+- Updated T-09 passed on both viewports.
+- The §6 UI test (F-3) passed on desktop in 24.9 s and on mobile in 15.1 s. 24.9 s is close to the old 30 s budget, which supports the timing diagnosis.
+
 ### Partial regression run 1 (before the restarts; for the record, not the acceptance run)
 `e2e-run-retest1.log`, with changes 1–3 in place: **235 passed, 1 failed, 34 skipped** (10.9 min).
 - The previous failures (T-09 on both viewports, F-1 P2 a11y desktop, F-2 T-16 mobile) all **passed**.
 - The single failure was **F-3**: `p4-proposals.spec.ts` §6 UI on mobile, a test timeout of 30 s. A pgTAP file ran against the same DB in parallel during this run (my error, since corrected), which may have added load. This led to change 4.
 - The full two-run regression is chunk B/C.
+
+### Hygiene (chunk B)
+- After run #1, the Phase 1–3 evidence (176 files rewritten by the run) was restored again from `dde2091`; `git diff --stat dde2091 -- docs/testing/phase{1,2,3}` is empty.
+- The first-run Phase 4 evidence that the P4 specs regenerated during the regression (80 tracked files such as `api-T0*.jsonl`, `e2e-T0*.jsonl`, `axe/*-T11-*`, `screenshots/*-T0*`) was restored from `HEAD`, so the earlier sections of this report keep their evidence. Only `retest1*` files and `e2e-run-retest1.log` are new or changed.
+- The DB was cleaned with the prescribed test-only SQL. Only a@ and b@guardscope.test remain, with 0 projects, requests, change orders and versions, and null profile fields.
 
 ### Hygiene (chunk A)
 - Phase 1–3 evidence restored with `git checkout dde2091 -- docs/testing/phase1 docs/testing/phase2 docs/testing/phase3`, at the start of chunk A (178 files overwritten by the interrupted regression run) and again after the targeted run (4 Phase 3 screenshots `{desktop,mobile}-T09-{included,additional}.png` rewritten by T-09). `git diff --stat dde2091 -- docs/testing/phase{1,2,3}` is empty.

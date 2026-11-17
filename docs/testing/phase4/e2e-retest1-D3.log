@@ -1,0 +1,11 @@
+
+Running 6 tests using 2 workers
+
+  ✓  1 [mobile] › tests/e2e/p4-retest1.spec.ts:115:1 › D-1 (a): closed project with sent versions and a hidden draft: header describes the latest sent version (20.6s)
+  ✓  2 [desktop] › tests/e2e/p4-retest1.spec.ts:115:1 › D-1 (a): closed project with sent versions and a hidden draft: header describes the latest sent version (21.6s)
+  ✓  3 [mobile] › tests/e2e/p4-retest1.spec.ts:198:1 › D-1 (b): closed project with a never-sent draft only: draft header, labelled not sent, read-only (17.1s)
+  ✓  4 [desktop] › tests/e2e/p4-retest1.spec.ts:198:1 › D-1 (b): closed project with a never-sent draft only: draft header, labelled not sent, read-only (16.6s)
+  ✓  5 [mobile] › tests/e2e/p4-retest1.spec.ts:244:1 › D-2: Additional explainer on active and closed projects is truthful and matches the panel (6.2s)
+  ✓  6 [desktop] › tests/e2e/p4-retest1.spec.ts:244:1 › D-2: Additional explainer on active and closed projects is truthful and matches the panel (6.2s)
+
+  6 passed (57.0s)

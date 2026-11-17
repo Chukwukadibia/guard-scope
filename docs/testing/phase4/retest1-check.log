@@ -25,11 +25,11 @@ All matched files use Prettier code style!
 
 
  Test Files  13 passed (13)
-      Tests  141 passed (141)
-   Start at  06:54:46
-   Duration  4.28s (environment 69%, setup 11%, import 9%, tests 6%, transform 4%, worker 1%)
+      Tests  145 passed (145)
+   Start at  07:05:43
+   Duration  3.86s (environment 69%, setup 12%, import 10%, tests 7%, transform 2%, worker 1%)
 
-Environment  jsdom was created 13 times · 7.32s total, 69% of tracked time
+Environment  jsdom was created 13 times · 6.36s total, 69% of tracked time
              create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
              learn more: https://vitest.dev/guide/improving-performance#test-environments
 
@@ -46,14 +46,14 @@ dist/registerSW.js                  0.13 kB
 dist/manifest.webmanifest           0.46 kB
 dist/index.html                     1.00 kB │ gzip:  0.48 kB
 dist/assets/index-CJ-bCBb9.css     22.28 kB │ gzip:  5.20 kB
-dist/assets/index-DiL18zCp.js     124.24 kB │ gzip: 31.25 kB
+dist/assets/index-ByaRAdIt.js     124.30 kB │ gzip: 31.24 kB
 dist/assets/supabase-D5xPhma_.js  228.75 kB │ gzip: 59.50 kB
 dist/assets/react-BGxjUz0y.js     236.97 kB │ gzip: 77.66 kB
-✓ built in 2.83s
+✓ built in 3.09s
 
 PWA v2.0.0
 mode      generateSW
-precache  18 entries (633.85 KiB)
+precache  18 entries (633.92 KiB)
 files generated
   dist/sw.js
   dist/workbox-abeb32eb.js

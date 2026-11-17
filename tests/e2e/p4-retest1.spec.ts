@@ -61,6 +61,40 @@ async function a11y(page: Page, testInfo: TestInfo, name: string) {
   expect.soft(o.scrollWidth, `${name}: horizontal overflow`).toBeLessThanOrEqual(o.clientWidth);
 }
 
+/**
+ * D-3 / ISS-021: the project-page proposal list and the request-page panel describe the same
+ * version as the proposal page header (title, version number, status badge), and never a hidden draft.
+ */
+async function expectRelatedPagesMatch(
+  page: Page,
+  testInfo: TestInfo,
+  ids: { projectId: string; requestId: string },
+  want: { title: string; versionNo: number; badge: string; absent: string[] },
+  label: string,
+) {
+  await openProject(page, ids.projectId);
+  const section = page.getByRole('region', { name: 'Change proposals' });
+  const item = section.getByRole('listitem');
+  await expect(item).toHaveCount(1);
+  await expect(item).toContainText(want.title);
+  await expect(item).toContainText(`Version ${want.versionNo} ·`);
+  await expect(item).toContainText(want.badge);
+  for (const a of want.absent) await expect(item).not.toContainText(a);
+  const listText = (await item.innerText()).replace(/\s+/g, ' ');
+  await a11y(page, testInfo, `D3-${label}-project`);
+  await openRequest(page, ids.projectId, ids.requestId);
+  const panel = page.getByRole('region', { name: 'Change proposal', exact: true });
+  await expect(panel.getByRole('link', { name: 'Open the change proposal' })).toBeVisible();
+  await expect(panel).toContainText(want.badge);
+  for (const a of want.absent) await expect(panel).not.toContainText(a);
+  const panelText = (await panel.innerText()).replace(/\s+/g, ' ');
+  await a11y(page, testInfo, `D3-${label}-request`);
+  logEvidence4('retest1-D3.jsonl', testInfo, label, {
+    projectList: listText,
+    requestPanel: panelText,
+  });
+}
+
 async function expectReadOnly(page: Page, status: string) {
   await expect(
     page.getByText(
@@ -110,6 +144,14 @@ test('D-1 (a): closed project with sent versions and a hidden draft: header desc
   await expect(header(page)).toContainText('3 versions');
   await expect(header(page)).toContainText('Draft (not sent)');
   await expect(page).toHaveTitle('Hidden draft three title · GuardScope');
+  // D-3 active regression: list and panel follow the newest version (the editable draft).
+  await expectRelatedPagesMatch(
+    page,
+    testInfo,
+    { projectId, requestId },
+    { title: 'Hidden draft three title', versionNo: 3, badge: 'Draft (not sent)', absent: [] },
+    'a-active',
+  );
 
   const obs: Record<string, unknown> = {};
   for (const status of ['completed', 'archived']) {
@@ -130,20 +172,19 @@ test('D-1 (a): closed project with sent versions and a hidden draft: header desc
     await expect(versionCard(page, 3)).toHaveCount(0);
     await a11y(page, testInfo, `D1a-${status}-proposal`);
 
-    // Related pages on the closed project: what do the project list and request panel show?
-    await openProject(page, projectId);
-    const section = page.getByRole('region', { name: 'Change proposals' });
-    await expect(section.getByRole('listitem')).toHaveCount(1);
-    obs[`${status}: project list item`] = (await section.getByRole('listitem').innerText()).replace(
-      /\s+/g,
-      ' ',
+    // D-3: the project list and request panel match the header (v2, pending), never the hidden draft.
+    await expectRelatedPagesMatch(
+      page,
+      testInfo,
+      { projectId, requestId },
+      {
+        title: 'Sent two title',
+        versionNo: 2,
+        badge: 'Sent, waiting for the client',
+        absent: ['Hidden draft three title', 'Draft (not sent)', 'Version 3'],
+      },
+      `a-${status}`,
     );
-    await a11y(page, testInfo, `D1a-${status}-project`);
-    await openRequest(page, projectId, requestId);
-    const panel = page.getByRole('region', { name: 'Change proposal', exact: true });
-    await expect(panel.getByRole('link', { name: 'Open the change proposal' })).toBeVisible();
-    obs[`${status}: request panel`] = (await panel.innerText()).replace(/\s+/g, ' ');
-    await a11y(page, testInfo, `D1a-${status}-request`);
   }
   logEvidence4('retest1-D1.jsonl', testInfo, 'sent + hidden draft, closed', obs);
   // Nothing changed in the data.
@@ -168,6 +209,13 @@ test('D-1 (b): closed project with a never-sent draft only: draft header, labell
   const coId = await apiCreateCO(page, token, requestId);
   const [v1] = await apiVersions(page, token, coId);
   await apiPatchVersion(page, token, v1.id, { title: 'Never sent title' });
+  await expectRelatedPagesMatch(
+    page,
+    testInfo,
+    { projectId, requestId },
+    { title: 'Never sent title', versionNo: 1, badge: 'Draft (not sent)', absent: [] },
+    'b-active',
+  );
   const obs: Record<string, unknown> = {};
   for (const status of ['completed', 'archived']) {
     expect(
@@ -182,6 +230,13 @@ test('D-1 (b): closed project with a never-sent draft only: draft header, labell
     await expect(page.getByRole('heading', { name: 'Sent versions' })).toHaveCount(0);
     obs[`${status}: main text`] = (await page.locator('main').innerText()).replace(/\s+/g, ' ');
     await a11y(page, testInfo, `D1b-${status}-proposal`);
+    await expectRelatedPagesMatch(
+      page,
+      testInfo,
+      { projectId, requestId },
+      { title: 'Never sent title', versionNo: 1, badge: 'Draft (not sent)', absent: ['Sent,'] },
+      `b-${status}`,
+    );
   }
   logEvidence4('retest1-D1.jsonl', testInfo, 'never-sent draft, closed', obs);
 });
