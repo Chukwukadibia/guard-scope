@@ -167,6 +167,18 @@ export function headerVersion<V extends { status: ProposalStatus }>(
   return co.versions.filter((v) => v.status !== 'draft').at(-1) ?? newest;
 }
 
+/**
+ * Status the request-page panel shows for an existing proposal (ISS-021): the same version
+ * the proposal page header describes, so a closed project never labels a sent proposal as
+ * its hidden draft. `versions` must be ascending by version_no.
+ */
+export function headerStatus(
+  versions: { status: ProposalStatus }[],
+  projectActive: boolean,
+): ProposalStatus {
+  return headerVersion({ versions }, projectActive)?.status ?? 'draft';
+}
+
 /** Header version count. On a closed project only sent versions are shown, so only they are counted. */
 export function versionCountLabel(
   versions: { status: ProposalStatus }[],

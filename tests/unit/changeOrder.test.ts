@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import {
   formatPriceImpact,
   formatTimeImpact,
+  headerStatus,
   headerVersion,
   proposalStatusLabel,
   toProposalInput,
@@ -157,5 +158,38 @@ describe('proposal page header on closed projects (ISS-019)', () => {
 
   test('no versions: undefined', () => {
     expect(headerVersion({ versions: [] }, false)).toBeUndefined();
+  });
+});
+
+describe('project list item and request panel agree with the proposal page (ISS-021)', () => {
+  const sv = (version_no: number, status: ProposalStatus) => ({
+    version_no,
+    status,
+    title: `t${version_no}`,
+  });
+  const sentPlusDraft = [sv(1, 'superseded'), sv(2, 'pending'), sv(3, 'draft')];
+
+  test('list item: active project shows the draft, closed project the latest sent version', () => {
+    expect(headerVersion({ versions: sentPlusDraft }, true)?.title).toBe('t3');
+    const closed = headerVersion({ versions: sentPlusDraft }, false);
+    expect(closed?.title).toBe('t2');
+    expect(closed?.version_no).toBe(2);
+    expect(closed?.status).toBe('pending');
+  });
+
+  test('list item: draft-only proposal still shows its draft on a closed project', () => {
+    expect(headerVersion({ versions: [sv(1, 'draft')] }, false)?.status).toBe('draft');
+  });
+
+  test('request panel status: draft on active, sent status on closed', () => {
+    expect(headerStatus(sentPlusDraft, true)).toBe('draft');
+    expect(headerStatus(sentPlusDraft, false)).toBe('pending');
+    expect(headerStatus([sv(1, 'approved')], false)).toBe('approved');
+  });
+
+  test('request panel status: draft only, or no versions, reads as draft', () => {
+    expect(headerStatus([sv(1, 'draft')], false)).toBe('draft');
+    expect(headerStatus([sv(1, 'draft')], true)).toBe('draft');
+    expect(headerStatus([], false)).toBe('draft');
   });
 });

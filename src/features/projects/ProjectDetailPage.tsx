@@ -307,7 +307,7 @@ export function ProjectDetailPage() {
       </section>
 
       <RequestsSection projectId={project.id} archived={archived} onChanged={setRequests} />
-      <ChangeProposalsSection projectId={project.id} />
+      <ChangeProposalsSection projectId={project.id} projectActive={project.status === 'active'} />
       <RevisionsPanel
         projectId={project.id}
         currentScope={current}

@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { createChangeOrder, findChangeOrderForRequest } from '../../lib/api/changeOrders';
 import { errorMessages, toApiError } from '../../lib/api/errors';
 import type { Classification } from '../../lib/domain/request';
-import type { ProposalStatus } from '../../lib/domain/changeOrder';
+import { headerStatus, type ProposalStatus } from '../../lib/domain/changeOrder';
 import { useOnline } from '../../hooks/useOnline';
 import { ProposalStatusBadge } from './ProposalStatusBadge';
 
@@ -24,7 +24,7 @@ export function RequestProposalPanel({
   const navigate = useNavigate();
   const online = useOnline();
   const [existing, setExisting] = useState<
-    { id: string; status: ProposalStatus } | null | undefined
+    { id: string; versions: { version_no: number; status: ProposalStatus }[] } | null | undefined
   >(undefined);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -72,7 +72,7 @@ export function RequestProposalPanel({
           >
             Open the change proposal
           </Link>
-          <ProposalStatusBadge status={existing.status} />
+          <ProposalStatusBadge status={headerStatus(existing.versions, projectActive)} />
         </div>
       ) : projectActive ? (
         <>

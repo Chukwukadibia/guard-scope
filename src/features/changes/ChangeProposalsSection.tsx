@@ -3,12 +3,18 @@ import { Link } from 'react-router-dom';
 import { FileText } from 'lucide-react';
 import { Alert, EmptyState } from '../../components/ui/Alert';
 import { Spinner } from '../../components/ui/Button';
-import { latestVersion, listChangeOrders, type ChangeOrder } from '../../lib/api/changeOrders';
+import { listChangeOrders, type ChangeOrder } from '../../lib/api/changeOrders';
 import { errorMessages, toApiError } from '../../lib/api/errors';
-import { formatPriceImpact, formatTimeImpact } from '../../lib/domain/changeOrder';
+import { formatPriceImpact, formatTimeImpact, headerVersion } from '../../lib/domain/changeOrder';
 import { ProposalStatusBadge } from './ProposalStatusBadge';
 
-export function ChangeProposalsSection({ projectId }: { projectId: string }) {
+export function ChangeProposalsSection({
+  projectId,
+  projectActive,
+}: {
+  projectId: string;
+  projectActive: boolean;
+}) {
   const [items, setItems] = useState<ChangeOrder[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,7 +50,8 @@ export function ChangeProposalsSection({ projectId }: { projectId: string }) {
       {items && items.length > 0 && (
         <ul className="divide-y divide-slate-200 rounded-md border border-slate-200">
           {items.map((co) => {
-            const v = latestVersion(co);
+            // Same version the proposal page header shows (ISS-021): no hidden draft on closed projects.
+            const v = headerVersion(co, projectActive);
             if (!v) return null;
             return (
               <li key={co.id}>

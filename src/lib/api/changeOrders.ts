@@ -88,7 +88,7 @@ export async function getChangeOrder(
 
 export async function findChangeOrderForRequest(
   requestId: string,
-): Promise<{ id: string; status: ProposalStatus } | null> {
+): Promise<{ id: string; versions: { version_no: number; status: ProposalStatus }[] } | null> {
   assertProjectId(requestId);
   const { data, error } = await supabase
     .from('change_orders')
@@ -100,7 +100,7 @@ export async function findChangeOrderForRequest(
   const versions = [
     ...((data as { versions: { version_no: number; status: ProposalStatus }[] }).versions ?? []),
   ].sort((a, b) => a.version_no - b.version_no);
-  return { id: (data as { id: string }).id, status: versions.at(-1)?.status ?? 'draft' };
+  return { id: (data as { id: string }).id, versions };
 }
 
 export async function createChangeOrder(requestId: string): Promise<string> {
