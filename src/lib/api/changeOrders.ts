@@ -2,6 +2,7 @@ import { supabase } from '../supabase';
 import { toApiError } from './errors';
 import { assertProjectId } from './projects';
 import type { ProposalStatus, TimeUnit } from '../domain/changeOrder';
+import type { ClientDecision } from '../domain/publicLink';
 
 export type ProposalVersion = {
   id: string;
@@ -149,4 +150,61 @@ export async function discardProposalDraft(versionId: string): Promise<boolean> 
   });
   if (error) throw toApiError(error);
   return Boolean(data);
+}
+
+export type ApprovalLink = {
+  id: string;
+  version_id: string;
+  expires_at: string;
+  revoked_at: string | null;
+  created_at: string;
+};
+
+export type ClientDecisionRow = {
+  id: string;
+  version_id: string;
+  decision: ClientDecision;
+  comment: string | null;
+  decided_at: string;
+};
+
+/** The raw token is returned once by the database and is not retrievable afterwards. */
+export async function issueApprovalLink(
+  versionId: string,
+): Promise<{ token: string; expiresAt: string }> {
+  const { data, error } = await supabase.rpc('issue_approval_link', { p_version_id: versionId });
+  if (error) throw toApiError(error);
+  const r = data as { token?: unknown; expires_at?: unknown } | null;
+  if (!r || typeof r.token !== 'string' || typeof r.expires_at !== 'string') throw toApiError({});
+  return { token: r.token, expiresAt: r.expires_at };
+}
+
+export async function revokeApprovalLink(versionId: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc('revoke_approval_link', { p_version_id: versionId });
+  if (error) throw toApiError(error);
+  return Boolean(data);
+}
+
+/** Never selects token_hash (column grants forbid it). */
+export async function listApprovalLinks(versionIds: string[]): Promise<ApprovalLink[]> {
+  if (versionIds.length === 0) return [];
+  const { data, error } = await supabase
+    .from('approval_links')
+    .select('id, version_id, expires_at, revoked_at, created_at')
+    .in('version_id', versionIds)
+    .order('created_at', { ascending: false })
+    .limit(500);
+  if (error) throw toApiError(error);
+  return (data ?? []) as ApprovalLink[];
+}
+
+export async function listClientDecisions(versionIds: string[]): Promise<ClientDecisionRow[]> {
+  if (versionIds.length === 0) return [];
+  const { data, error } = await supabase
+    .from('client_decisions')
+    .select('id, version_id, decision, comment, decided_at')
+    .in('version_id', versionIds)
+    .limit(500);
+  if (error) throw toApiError(error);
+  return (data ?? []) as ClientDecisionRow[];
 }

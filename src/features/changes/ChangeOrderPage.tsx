@@ -6,8 +6,12 @@ import { getProject, type Project } from '../../lib/api/projects';
 import {
   cancelProposalVersion,
   getChangeOrder,
+  listApprovalLinks,
+  listClientDecisions,
   newProposalVersion,
+  type ApprovalLink,
   type ChangeOrder,
+  type ClientDecisionRow,
 } from '../../lib/api/changeOrders';
 import { headerVersion, versionCountLabel } from '../../lib/domain/changeOrder';
 import { listEntityEvents, type ActivityEvent } from '../../lib/api/activity';
@@ -18,6 +22,8 @@ import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { ProposalStatusBadge } from './ProposalStatusBadge';
 import { ProposalView } from './ProposalView';
 import { ProposalEditor } from './ProposalEditor';
+import { ClientDecisionBlock, VersionLinkSection } from './ApprovalLinkPanel';
+import type { IssuedLink } from './issueLink';
 import { RequestHistoryList } from '../requests/RequestHistory';
 
 export function ChangeOrderPage() {
@@ -29,20 +35,35 @@ export function ChangeOrderPage() {
   const [events, setEvents] = useState<ActivityEvent[] | null>(null);
   const [loadError, setLoadError] = useState<ApiErrorCode | null>(null);
   const [notice, setNotice] = useState<{ tone: 'success' | 'error'; text: string } | null>(null);
+  const [links, setLinks] = useState<ApprovalLink[]>([]);
+  const [decisions, setDecisions] = useState<ClientDecisionRow[]>([]);
+  // Result of issuing a link right after a send (shown once; state only, never persisted).
+  const [justSent, setJustSent] = useState<{
+    versionId: string;
+    link: IssuedLink | null;
+  } | null>(null);
   const [busy, setBusy] = useState(false);
   const [cancelling, setCancelling] = useState<string | null>(null);
   // On a closed project the draft is hidden, so the header describes the newest sent version (ISS-019).
   const latest = co && project ? headerVersion(co, project.status === 'active') : undefined;
   useDocumentTitle(latest ? latest.title : 'Change proposal');
 
+  const loadExtras = useCallback(async (c: ChangeOrder) => {
+    const ids = c.versions.filter((v) => v.status !== 'draft').map((v) => v.id);
+    const [l, d] = await Promise.all([listApprovalLinks(ids), listClientDecisions(ids)]);
+    setLinks(l);
+    setDecisions(d);
+  }, []);
+
   const reload = useCallback(async () => {
     const [c, ev] = await Promise.all([
       getChangeOrder(id, changeId),
       listEntityEvents('change_order', changeId),
     ]);
+    await loadExtras(c);
     setCo(c);
     setEvents(ev);
-  }, [id, changeId]);
+  }, [id, changeId, loadExtras]);
 
   useEffect(() => {
     let active = true;
@@ -51,7 +72,8 @@ export function ChangeOrderPage() {
       getChangeOrder(id, changeId),
       listEntityEvents('change_order', changeId),
     ])
-      .then(([p, c, ev]) => {
+      .then(async ([p, c, ev]) => {
+        await loadExtras(c);
         if (!active) return;
         setProject(p);
         setCo(c);
@@ -61,7 +83,7 @@ export function ChangeOrderPage() {
     return () => {
       active = false;
     };
-  }, [id, changeId]);
+  }, [id, changeId, loadExtras]);
 
   async function run(fn: () => Promise<unknown>, success: string) {
     if (busy) return;
@@ -150,6 +172,14 @@ export function ChangeOrderPage() {
               await reload();
               setNotice({ tone: 'success', text: message });
             }}
+            onSent={async (versionId, versionNo, link) => {
+              setJustSent({ versionId, link });
+              await reload();
+              setNotice({
+                tone: 'success',
+                text: `Version ${versionNo} sent. Its content is now fixed.`,
+              });
+            }}
             onDiscarded={async (removedWhole) => {
               if (removedWhole) {
                 navigate(`/projects/${project.id}#changes`, { replace: true });
@@ -208,12 +238,36 @@ export function ChangeOrderPage() {
                 . This version can&apos;t be changed.
               </p>
               <ProposalView version={v} />
-              {v.status === 'pending' && active && (
+              {decisions
+                .filter((d) => d.version_id === v.id)
+                .map((d) => (
+                  <ClientDecisionBlock key={d.id} decision={d} />
+                ))}
+              {v.status === 'pending' && (
                 <div className="mt-4 space-y-3 border-t border-slate-200 pt-4">
                   <p className="text-sm text-slate-600">
-                    Waiting for the client. Secure approval links for your client arrive in the next
-                    release.
+                    Waiting for the client. Share the link below yourself; GuardScope doesn&apos;t
+                    send it for you.
                   </p>
+                  <VersionLinkSection
+                    versionId={v.id}
+                    versionNo={v.version_no}
+                    links={links}
+                    projectActive={active}
+                    online={online}
+                    initial={{
+                      link: justSent?.versionId === v.id ? justSent.link : null,
+                      failed: justSent?.versionId === v.id && justSent.link === null,
+                    }}
+                    onChanged={async (message) => {
+                      await reload();
+                      setNotice({ tone: 'success', text: message });
+                    }}
+                  />
+                </div>
+              )}
+              {v.status === 'pending' && active && (
+                <div className="mt-4 space-y-3 border-t border-slate-200 pt-4">
                   {cancelling === v.id ? (
                     <div
                       role="group"

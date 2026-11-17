@@ -9,6 +9,7 @@ import {
   sendProposalVersion,
   type ProposalVersion,
 } from '../../lib/api/changeOrders';
+import { issueLink, type IssuedLink } from './issueLink';
 import { errorMessages, toApiError } from '../../lib/api/errors';
 import { summaryErrors } from '../../lib/domain/formErrors';
 import { supportedCurrencies } from '../../lib/domain/profile';
@@ -43,11 +44,14 @@ export function ProposalEditor({
   draft,
   hasSentVersions,
   onChanged,
+  onSent,
   onDiscarded,
 }: {
   draft: ProposalVersion;
   hasSentVersions: boolean;
   onChanged: (message: string) => Promise<void>;
+  /** Called after a successful send; `link` is null when issuing the link failed (recoverable). */
+  onSent: (versionId: string, versionNo: number, link: IssuedLink | null) => Promise<void>;
   onDiscarded: (removedWhole: boolean) => Promise<void>;
 }) {
   const online = useOnline();
@@ -101,7 +105,9 @@ export function ProposalEditor({
       if (!(await persist(validateProposalForSend(values)))) return;
       await sendProposalVersion(draft.id);
       setConfirm(null);
-      await onChanged(`Version ${draft.version_no} sent. Its content is now fixed.`);
+      // A sent version without a link is a valid, recoverable state: the page offers "Create a link".
+      const link = await issueLink(draft.id).catch(() => null);
+      await onSent(draft.id, draft.version_no, link);
     } catch (err) {
       setFormError(errorMessages[toApiError(err).code]);
       setConfirm(null);
@@ -313,8 +319,8 @@ export function ProposalEditor({
               ' A previously sent version that is still waiting for the client will be marked as replaced.'}
           </p>
           <p className="text-sm">
-            Secure approval links for your client arrive in the next release. For now, sending
-            records the proposal.
+            After sending, you get a private link to share with your client. It is shown once and
+            expires after 30 days; you can issue a new link or revoke it at any time.
           </p>
           {dirty && <p className="text-sm">Unsaved changes will be saved first.</p>}
           <div className="flex flex-wrap gap-2">
