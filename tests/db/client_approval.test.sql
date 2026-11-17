@@ -1,0 +1,249 @@
+-- pgTAP: Phase 5 secure client approval (TEST_PLAN T-01..T-13). Run: npx supabase test db
+begin;
+create extension if not exists pgtap with schema extensions;
+select plan(83);
+
+insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
+values
+  ('00000000-0000-0000-0000-000000000000', 'aaaaaaaa-0000-0000-0000-0000000000a5', 'authenticated', 'authenticated', 'p5-a@guardscope.test', '', now(), '{}', '{}', now(), now()),
+  ('00000000-0000-0000-0000-000000000000', 'bbbbbbbb-0000-0000-0000-0000000000b5', 'authenticated', 'authenticated', 'p5-b@guardscope.test', '', now(), '{}', '{}', now(), now());
+
+-- ===================== setup as A =====================
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-0000000000a5","role":"authenticated"}', true);
+update public.profiles set display_name = 'Alice Studio' where id = 'aaaaaaaa-0000-0000-0000-0000000000a5';
+insert into public.projects (title, client_name, currency) values ('P5 Site', 'Acme Ltd', 'EUR');
+insert into public.requests (project_id, title, description, internal_notes)
+  select id, 'Pricing page', 'Add a pricing page', 'SECRET NOTE' from public.projects where title = 'P5 Site';
+select public.classify_request((select id from public.requests where title = 'Pricing page'), 'additional');
+select public.create_change_order((select id from public.requests where title = 'Pricing page'));
+update public.change_order_versions set description = 'Build a pricing page', price_impact = 400, time_impact_value = 3, time_impact_unit = 'days' where version_no = 1;
+select public.send_change_order_version((select id from public.change_order_versions where version_no = 1));
+select set_config('t.v1', (select id::text from public.change_order_versions where version_no = 1), true);
+select set_config('t.co', (select id::text from public.change_orders), true);
+select set_config('t.proj', (select id::text from public.projects where title = 'P5 Site'), true);
+select set_config('t.tok1', (public.issue_approval_link(current_setting('t.v1')::uuid))->>'token', true);
+
+-- ===================== T-01 issuing =====================
+select is(char_length(current_setting('t.tok1')), 43, 'token is 43 characters');
+select ok(current_setting('t.tok1') ~ '^[A-Za-z0-9_-]{43}$', 'token is base64url');
+select throws_ok($$select token_hash from public.approval_links$$, '42501', null, 'owner cannot read token_hash');
+select lives_ok($$select set_config('t.tok1b', (public.issue_approval_link(current_setting('t.v1')::uuid))->>'token', true)$$, 'reissue succeeds');
+select is((select count(*)::int from public.approval_links), 2, 'two links recorded');
+select is((select count(*)::int from public.approval_links where revoked_at is null), 1, 'only one active link per version');
+select ok(current_setting('t.tok1') <> current_setting('t.tok1b'), 'reissue produces a different token');
+reset role;
+select ok(not exists (select 1 from public.activity_events where summary like '%' || current_setting('t.tok1b') || '%' or metadata::text like '%' || current_setting('t.tok1b') || '%'), 'raw token appears in no history event');
+select ok(exists (select 1 from public.approval_links where token_hash = extensions.digest(current_setting('t.tok1b'), 'sha256')) and not exists (select 1 from public.approval_links where encode(token_hash, 'escape') = current_setting('t.tok1b')), 'only the SHA-256 is stored');
+
+-- ===================== T-02/03 public reads (anon) =====================
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(public.get_public_proposal(current_setting('t.tok1'))->>'state', 'revoked', 'reissued-over link is revoked');
+select is(public.get_public_proposal(current_setting('t.tok1b'))->>'state', 'valid', 'new link is valid');
+select is((select string_agg(k, ',' order by k collate "C") from jsonb_object_keys(public.get_public_proposal(current_setting('t.tok1b'))->'proposal') k),
+  'assumptions,client_name,client_terms,currency,description,exclusions,expires_at,freelancer_name,price_impact,project_title,proposed_deadline,sent_at,time_impact_unit,time_impact_value,title,version_no',
+  'projection has exactly the BR-1 fields');
+select ok(position('SECRET NOTE' in public.get_public_proposal(current_setting('t.tok1b'))::text) = 0, 'private request notes never appear');
+select ok(public.get_public_proposal(current_setting('t.tok1b'))::text !~ '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}', 'no internal ids in the projection');
+select is(public.get_public_proposal(current_setting('t.tok1b'))->'proposal'->>'freelancer_name', 'Alice Studio', 'freelancer display name shown');
+select ok((select bool_and(public.get_public_proposal(t)->>'state' = 'invalid')
+           from unnest(array[null, '', 'abc', repeat('a', 44), repeat('a', 42) || '!', repeat('A', 43), '''; drop table public.projects;--']::text[]) t), 'guessed, malformed, null and injection-like tokens are invalid');
+select is(public.submit_public_decision(current_setting('t.tok1b'), 'maybe', null, '11111111-1111-1111-1111-111111111111')->>'error', 'validation', 'unknown decision value rejected');
+select is(public.submit_public_decision(current_setting('t.tok1b'), 'approved', repeat('x', 2001), '11111111-1111-1111-1111-111111111111')->>'error', 'validation', 'comment over 2000 characters rejected');
+select is(public.submit_public_decision(current_setting('t.tok1b'), 'approved', null, null)->>'error', 'validation', 'missing idempotency key rejected');
+
+-- ===================== T-05/06 decision =====================
+select is(public.submit_public_decision(current_setting('t.tok1b'), 'approved', 'Looks good, thanks', '11111111-1111-1111-1111-111111111111')->>'result', 'recorded', 'approve is recorded');
+select is(public.submit_public_decision(current_setting('t.tok1b'), 'approved', 'Looks good, thanks', '11111111-1111-1111-1111-111111111111')->>'result', 'already_recorded', 'retry with the same key is idempotent');
+select is(public.submit_public_decision(current_setting('t.tok1b'), 'declined', null, '22222222-2222-2222-2222-222222222222')->>'error', 'decided', 'a second, different decision is rejected');
+select is(public.get_public_proposal(current_setting('t.tok1b'))->>'state', 'decided', 'link now reports decided');
+select ok(public.get_public_proposal(current_setting('t.tok1b'))->'decision'->>'decision' = 'approved' and position('Looks good' in public.get_public_proposal(current_setting('t.tok1b'))::text) = 0, 'decided page shows the decision, not the comment');
+reset role;
+select is((select count(*)::int from public.client_decisions where version_id = current_setting('t.v1')::uuid), 1, 'exactly one decision stored');
+select is((select status from public.change_order_versions where id = current_setting('t.v1')::uuid), 'approved', 'version status is approved');
+select ok((select comment = 'Looks good, thanks' and decided_at is not null from public.client_decisions), 'comment and server time stored');
+select ok((select actor_type = 'client' and metadata = '{"has_comment": true}'::jsonb and position('Looks good' in summary) = 0 from public.activity_events where event_type = 'change_order.approved'), 'client event recorded without the comment text');
+
+-- ===================== more versions and link states =====================
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-0000000000a5","role":"authenticated"}', true);
+select throws_ok($$select public.issue_approval_link(current_setting('t.v1')::uuid)$$, 'P0001', 'not_pending', 'no link for a decided (approved) version');
+select set_config('t.v2', (public.new_change_order_version(current_setting('t.co')::uuid))::text, true);
+update public.change_order_versions set price_impact = 500 where id = current_setting('t.v2')::uuid;
+select public.send_change_order_version(current_setting('t.v2')::uuid);
+select throws_ok($$select public.issue_approval_link((select id from public.change_order_versions where version_no = 2 and status = 'draft'))$$, 'P0001', 'not_found', 'sanity: no draft v2 remains');
+select set_config('t.tok2', (public.issue_approval_link(current_setting('t.v2')::uuid))->>'token', true);
+select lives_ok($$select public.cancel_change_order_version(current_setting('t.v2')::uuid)$$, 'cancel v2');
+reset role;
+select ok((select bool_and(revoked_at is not null) from public.approval_links where version_id = current_setting('t.v2')::uuid), 'cancel revokes the link');
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(public.get_public_proposal(current_setting('t.tok2'))->>'state', 'cancelled', 'cancelled link state');
+select is(public.submit_public_decision(current_setting('t.tok2'), 'approved', null, '33333333-3333-3333-3333-333333333333')->>'error', 'cancelled', 'cancelled link cannot decide');
+reset role;
+
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-0000000000a5","role":"authenticated"}', true);
+select set_config('t.v3', (public.new_change_order_version(current_setting('t.co')::uuid))::text, true);
+select public.send_change_order_version(current_setting('t.v3')::uuid);
+select set_config('t.tok3', (public.issue_approval_link(current_setting('t.v3')::uuid))->>'token', true);
+select set_config('t.v4', (public.new_change_order_version(current_setting('t.co')::uuid))::text, true);
+select public.send_change_order_version(current_setting('t.v4')::uuid);
+select set_config('t.tok4', (public.issue_approval_link(current_setting('t.v4')::uuid))->>'token', true);
+reset role;
+select ok((select bool_and(revoked_at is not null) from public.approval_links where version_id = current_setting('t.v3')::uuid), 'sending a newer version revokes the superseded version''s link');
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(public.get_public_proposal(current_setting('t.tok3'))->>'state', 'superseded', 'replaced link state');
+select is(public.submit_public_decision(current_setting('t.tok3'), 'approved', null, '44444444-4444-4444-4444-444444444444')->>'error', 'superseded', 'replaced link cannot decide (CO-008)');
+reset role;
+
+-- revoke / reissue
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-0000000000a5","role":"authenticated"}', true);
+select is(public.revoke_approval_link(current_setting('t.v4')::uuid), true, 'owner revokes the active link');
+select is(public.revoke_approval_link(current_setting('t.v4')::uuid), false, 'revoking again does nothing');
+reset role;
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(public.get_public_proposal(current_setting('t.tok4'))->>'state', 'revoked', 'revoked link state');
+select is(public.submit_public_decision(current_setting('t.tok4'), 'approved', null, '55555555-5555-5555-5555-555555555555')->>'error', 'revoked', 'revoked link cannot decide');
+reset role;
+
+-- expiry (test-only privileged bypass of the guard, then the guard is verified to be back on)
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-0000000000a5","role":"authenticated"}', true);
+select set_config('t.tok4b', (public.issue_approval_link(current_setting('t.v4')::uuid))->>'token', true);
+reset role;
+select ok((select expires_at between now() + interval '29 days 23 hours' and now() + interval '30 days 1 hour' from public.approval_links where token_hash = extensions.digest(current_setting('t.tok4b'), 'sha256')), 'expiry is 30 days from issue (OD-4)');
+select set_config('guardscope.account_deletion', 'on', true);
+update public.approval_links set expires_at = now() - interval '1 second' where token_hash = extensions.digest(current_setting('t.tok4b'), 'sha256');
+select set_config('guardscope.account_deletion', 'off', true);
+select throws_ok($$update public.approval_links set expires_at = now() + interval '1 year'$$, 'P0001', 'approval_link_immutable', 'expiry cannot be extended once the test bypass is off');
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(public.get_public_proposal(current_setting('t.tok4b'))->>'state', 'expired', 'expired link state');
+select is(public.submit_public_decision(current_setting('t.tok4b'), 'approved', null, '66666666-6666-6666-6666-666666666666')->>'error', 'expired', 'expired link cannot decide');
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-0000000000a5","role":"authenticated"}', true);
+select set_config('t.tok4c', (public.issue_approval_link(current_setting('t.v4')::uuid))->>'token', true);
+reset role;
+
+-- ===================== T-09 throttle =====================
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select set_config('request.headers', '{"cf-connecting-ip":"9.9.9.9"}', true);
+select is((select count(*)::int from generate_series(1, 20) g where public.get_public_proposal(repeat('C', 43))->>'state' = 'invalid'), 20, 'first 20 failures from one source are processed');
+select is(public.get_public_proposal(repeat('C', 43))->>'state', 'rate_limited', 'the 21st attempt is rate limited');
+select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'rate_limited', 'a blocked source cannot probe even a valid token');
+select is(public.submit_public_decision(current_setting('t.tok4c'), 'approved', null, '77777777-7777-7777-7777-777777777777')->>'error', 'rate_limited', 'a blocked source cannot decide');
+select set_config('request.headers', '{"cf-connecting-ip":"8.8.8.8"}', true);
+select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'valid', 'a different source is unaffected');
+reset role;
+select ok((select bool_and(octet_length(source_key) in (1, 32)) from public.public_link_attempts), 'throttle rows hold salted hashes, never raw addresses');
+select set_config('request.headers', '{"x-forwarded-for":"6.6.6.6, 5.5.5.5"}', true);
+select set_config('t.k1', encode(public._throttle_key(), 'hex'), true);
+select set_config('request.headers', '{"cf-connecting-ip":"5.5.5.5"}', true);
+select set_config('t.k2', encode(public._throttle_key(), 'hex'), true);
+select set_config('request.headers', '{"x-forwarded-for":"6.6.6.6"}', true);
+select set_config('t.k3', encode(public._throttle_key(), 'hex'), true);
+select set_config('request.headers', '{"cf-connecting-ip":"5.5.5.5","x-forwarded-for":"6.6.6.6"}', true);
+select set_config('t.k4', encode(public._throttle_key(), 'hex'), true);
+select ok(current_setting('t.k1') = current_setting('t.k2') and current_setting('t.k3') <> current_setting('t.k2') and current_setting('t.k4') = current_setting('t.k2'), 'key uses cf-connecting-ip, else the LAST x-forwarded-for entry (spoofed first entry ignored)');
+-- global breaker holds back only sources that have already failed
+select set_config('request.headers', '{"cf-connecting-ip":"7.7.7.7"}', true);
+insert into public.public_link_attempts (source_key, window_start, failures)
+  values ('\x00'::bytea, date_bin('10 minutes', now(), timestamptz '2000-01-01'), 1000)
+  on conflict (source_key, window_start) do update set failures = 1000;
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'valid', 'global breaker: a source with no failures still works');
+select is(public.get_public_proposal(repeat('D', 43))->>'state', 'invalid', 'global breaker: its first failure is processed');
+select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'rate_limited', 'global breaker: after a failure it is held back');
+reset role;
+delete from public.public_link_attempts;
+select set_config('request.headers', '', true);
+
+-- ===================== project locks =====================
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-0000000000a5","role":"authenticated"}', true);
+update public.projects set status = 'completed' where id = current_setting('t.proj')::uuid;
+select throws_ok($$select public.issue_approval_link(current_setting('t.v4')::uuid)$$, 'P0001', 'project_not_active', 'no new link on a completed project');
+select is(public.revoke_approval_link(current_setting('t.v4')::uuid), true, 'revoking is still allowed on a completed project (safety action)');
+update public.projects set status = 'active' where id = current_setting('t.proj')::uuid;
+select set_config('t.tok4d', (public.issue_approval_link(current_setting('t.v4')::uuid))->>'token', true);
+reset role;
+
+-- ===================== decline without comment, clarification =====================
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(public.submit_public_decision(current_setting('t.tok4d'), 'declined', '   ', '88888888-8888-8888-8888-888888888888')->>'result', 'recorded', 'decline without a comment is recorded');
+reset role;
+select ok((select status = 'declined' and comment is null from public.change_order_versions v join public.client_decisions d on d.version_id = v.id where v.id = current_setting('t.v4')::uuid), 'declined, blank comment stored as null');
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-0000000000a5","role":"authenticated"}', true);
+select set_config('t.v5', (public.new_change_order_version(current_setting('t.co')::uuid))::text, true);
+select public.send_change_order_version(current_setting('t.v5')::uuid);
+select set_config('t.tok5', (public.issue_approval_link(current_setting('t.v5')::uuid))->>'token', true);
+reset role;
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(public.submit_public_decision(current_setting('t.tok5'), 'clarification_requested', 'Does this include hosting?', '99999999-9999-9999-9999-999999999999')->>'result', 'recorded', 'clarification request is recorded');
+reset role;
+select is((select status from public.change_order_versions where id = current_setting('t.v5')::uuid), 'clarification_requested', 'clarification is its own terminal status, not approval');
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-0000000000a5","role":"authenticated"}', true);
+select lives_ok($$select public.new_change_order_version(current_setting('t.co')::uuid)$$, 'after a clarification the freelancer can send a new version (OD-6)');
+
+-- ===================== T-10 access control =====================
+select throws_ok($$insert into public.client_decisions (version_id, link_id, decision, idempotency_key) select version_id, id, 'approved', gen_random_uuid() from public.approval_links limit 1$$, '42501', null, 'owner cannot write decisions');
+select throws_ok($$update public.approval_links set revoked_at = null$$, '42501', null, 'owner cannot write links directly');
+select is((select comment from public.client_decisions where decision = 'approved'), 'Looks good, thanks', 'owner reads the client comment against the exact version');
+select throws_ok($$select public.issue_approval_link(gen_random_uuid())$$, 'P0001', 'not_found', 'unknown version id');
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"bbbbbbbb-0000-0000-0000-0000000000b5","role":"authenticated"}', true);
+select is((select count(*)::int from public.approval_links) + (select count(*)::int from public.client_decisions), 0, 'B sees none of A''s links or decisions');
+select throws_ok($$select public.issue_approval_link(current_setting('t.v5')::uuid)$$, 'P0001', 'not_found', 'B cannot issue a link on A''s version');
+select throws_ok($$select public.revoke_approval_link(current_setting('t.v4')::uuid)$$, 'P0001', 'not_found', 'B cannot revoke A''s link');
+reset role;
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select throws_ok($$select * from public.approval_links$$, '42501', null, 'anon cannot read links');
+select throws_ok($$select * from public.client_decisions$$, '42501', null, 'anon cannot read decisions');
+select throws_ok($$select * from public.public_link_attempts$$, '42501', null, 'anon cannot read throttle rows');
+select throws_ok($$select * from public.public_link_config$$, '42501', null, 'anon cannot read the salt');
+select throws_ok($$select * from public.change_order_versions$$, '42501', null, 'anon cannot read versions directly');
+select throws_ok($$select public.issue_approval_link(gen_random_uuid())$$, '42501', null, 'anon cannot issue links');
+reset role;
+select ok(has_function_privilege('anon', 'public.get_public_proposal(text)', 'execute')
+      and has_function_privilege('anon', 'public.submit_public_decision(text,text,text,uuid)', 'execute')
+      and not has_function_privilege('anon', 'public.issue_approval_link(uuid)', 'execute')
+      and not has_function_privilege('anon', 'public.revoke_approval_link(uuid)', 'execute')
+      and has_function_privilege('authenticated', 'public.issue_approval_link(uuid)', 'execute')
+      and has_function_privilege('authenticated', 'public.revoke_approval_link(uuid)', 'execute'), 'grant matrix: only the two public RPCs are executable by anon');
+select ok(not has_function_privilege('anon', 'public._throttle_key()', 'execute')
+      and not has_function_privilege('anon', 'public._throttle_blocked(bytea)', 'execute')
+      and not has_function_privilege('anon', 'public._throttle_record_failure(bytea)', 'execute')
+      and not has_function_privilege('anon', 'public._link_state(text,timestamptz,timestamptz,int,int)', 'execute')
+      and not has_function_privilege('anon', 'public._throttle_limits()', 'execute')
+      and not has_function_privilege('authenticated', 'public._throttle_blocked(bytea)', 'execute'), 'internal helpers are not callable through the API');
+
+-- ===================== immutability (privileged roles too) =====================
+select throws_ok($$update public.client_decisions set decision = 'declined'$$, 'P0001', 'client_decision_immutable', 'decisions cannot be updated');
+select throws_ok($$delete from public.client_decisions$$, 'P0001', 'client_decision_immutable', 'decisions cannot be deleted');
+select throws_ok($$update public.approval_links set token_hash = extensions.digest('x', 'sha256')$$, 'P0001', 'approval_link_immutable', 'token hash cannot change');
+select throws_ok($$update public.approval_links set revoked_at = null where revoked_at is not null$$, 'P0001', 'approval_link_immutable', 'a revoked link cannot be revived');
+select throws_ok($$delete from public.approval_links$$, 'P0001', 'approval_link_immutable', 'links cannot be deleted');
+
+-- ===================== account deletion =====================
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-0000000000a5","role":"authenticated"}', true);
+select public.delete_my_account();
+reset role;
+select is((select count(*)::int from public.approval_links) + (select count(*)::int from public.client_decisions) + (select count(*)::int from public.change_order_versions), 0, 'account deletion removes links, decisions and versions');
+
+select * from finish();
+rollback;
