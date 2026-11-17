@@ -16,6 +16,7 @@ Records technical and process decisions, plus recommendations for PRD §20 open 
 | DEC-009 | 2026-11-16 | Dev/test users are created already confirmed via SQL fixture (`tests/db/fixtures/create_test_users.sql`), **dev project only** | Default SMTP can't email non-team addresses (OD-13); within approved Phase 1 testing scope | Accepted (Team Lead, within HA-002 test scope) |
 | DEC-010 | 2026-11-16 | Sign-out scope is `local` (this browser), not `global` (all devices) | Signing out on a phone shouldn't end a laptop session; spec AC-2 concerns this browser | Accepted (Team Lead, within spec) |
 | DEC-011 | 2026-11-16 | Server accepts `received_on` up to UTC today + 1; the UI enforces local today | Users ahead of UTC (up to +14 h) would otherwise be rejected for a legitimate "today". Spec BR-5 wording clarified (Phase 3 observation O-b) | Accepted (Team Lead, clarification within approved spec) |
+| DEC-012 | 2026-11-17 | Abuse throttle keys on `cf-connecting-ip`, falling back to the **last** `x-forwarded-for` entry, hashed with a salt; never the first entry. A global circuit-breaker is a second layer | Empirical header test on the dev project (ARCHITECTURE §9): the first XFF entry is client-controlled; `cf-connecting-ip` is edge-set and spoof-rejected. The 256-bit token remains the real protection | Accepted (Team Lead, within approved ARCHITECTURE §5.5 design) |
 | DEC-008 | 2026-11-16 | Migration rollback uses forward-fix migrations | Supabase CLI has no down-migrations; DDL is transactional | Accepted (HA-002) |
 
 ## PRD §20 open decisions — recommendations only
@@ -25,8 +26,8 @@ Records technical and process decisions, plus recommendations for PRD §20 open 
 | 1 | Brand clearance | Run trademark, domain and app-store checks before launch; spend nothing until then | Release | Open |
 | 2 | Initial freelancer category | No build impact; product validation question | — | Open |
 | 3 | Auth method | Email + password via Supabase Auth with email confirmation on (no magic-link only: it adds email-deliverability dependence and friction on shared devices). Social login is LATER | **Phase 1** | Accepted (HA-002) |
-| 4 | Link expiry | 30 days from send; the freelancer can reissue; revocation always available. Not user-customisable in MVP | Phase 5 | Open |
-| 5 | Client name/email on decision page | Not required; optional free-text comment only (data minimisation) | Phase 5 | Open |
+| 4 | Link expiry | 30 days from send; the freelancer can reissue; revocation always available. Not user-customisable in MVP | Phase 5 | Accepted (HA-008): 30 days, reissue/revoke |
+| 5 | Client name/email on decision page | Not required; optional free-text comment only (data minimisation) | Phase 5 | Accepted (HA-008): not collected; optional comment only |
 | 6 | Clarification workflow | Terminal for the version; the freelancer sends a new version (ARCHITECTURE §4.4) | Phase 4/5 | **Accepted (HA-006): Option A** |
 | 7 | "Active" definitions | Active project = status `active`. Active change request = change order whose current version is `draft`, `pending` or `clarification_requested` | Phase 7 | Open |
 | 8 | Payment provider | Deferred; Phase 7 uses admin-set entitlements only (BILL-008) | Phase 7+ | Open |
