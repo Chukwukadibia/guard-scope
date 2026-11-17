@@ -121,7 +121,7 @@ The retest will re-run AC-12 and the D-1/D-2 checks.
 
 ## Retest 1 (commit dde2091)
 
-> Status: **CHUNKS A and B DONE.** Product code under test is now **`c43b082`** (D-3 / ISS-021 fix). Regression run #2 and the final acceptance decision: **PENDING (chunk C)**.
+> Status: **FINAL** (chunks A, B and C done). Product code under test: **`c43b082`**. Decision: **ACCEPTED**, see the end of this section.
 
 **Tester run mode:** separate general-purpose subagent (Tester Specialist), resumed after several container restarts; the retest is split into chunks, and the Team Lead commits after each. · **Commit tested:** product code `dde2091` (`feature/p4-change-orders`); the working tree is on WIP commit `0202607`, which holds only tester files. Product diff vs `0bc06fe`: `src/lib/domain/request.ts` (copy), `src/lib/domain/changeOrder.ts` (`headerVersion`, `versionCountLabel`), `src/features/changes/ChangeOrderPage.tsx`, two unit-test files. No `supabase/` change. · **Dates:** 2026-11-16 to 2026-11-17 · **Backend:** Supabase `guardscope-dev` (`eqozjuaaajstrewygqxr`).
 
@@ -135,9 +135,9 @@ The retest will re-run AC-12 and the D-1/D-2 checks.
 | Updated Phase 3 T-09 (`p3-classification.spec.ts`) | **PASS** at 375 and 1280 | `e2e-retest1-D1-D2.log` |
 | axe + overflow on affected pages, 375 and 1280 | **PASS**: 60 scans in total, 0 violations of any impact and 0 horizontal overflow. Pages: the proposal page (closed project, sent + hidden draft, and draft only), the project page and request page on completed/archived projects, and the request page on active/completed projects | `retest1-a11y.jsonl`, `axe/*-retest1-*.json` |
 | Security advisor | **PASS**: no new findings. 8 × `authenticated_security_definer_function_executable` WARN, all on RPCs listed in `docs/security/ADVISOR_NOTES.md`; 1 × leaked-password WARN (ISS-008); 0 ERROR | `retest1-supabase-advisors.log` |
-| AC-1 to AC-11, T-01 to T-11 | Unchanged from the first run: all PASS. The fix touched only display code; the pgTAP suites still pass. In the partial regression run 1 (below), every Phase 4 spec passed on both viewports except one §6 test on mobile, which timed out | full regression: **PENDING (chunk B/C)** |
-| AC-12 / T-12 Phase 1–4 regression | Run #1 on `c43b082` (chunk B): **236 passed, 0 failed, 34 skipped** (10.8 min). Run #2: **PENDING (chunk C)** | `e2e-run-retest1.log` |
-| ISS-020 flake stabilisation (full-suite proof, two runs) | Run #1: both formerly flaky tests passed in the full suite (P2 T-11 axe on desktop and mobile; T-16 empty states, all 4). Run #2: **PENDING (chunk C)** | `e2e-run-retest1.log`, `retest1-iss020-probe.jsonl` |
+| AC-1 to AC-11, T-01 to T-11 | All PASS. See the final table below | final table |
+| AC-12 / T-12 Phase 1–4 regression | Run #1 on `c43b082` (chunk B): **236 passed, 0 failed, 34 skipped** (10.8 min). Run #2 on `c43b082` (chunk C): **236 passed, 0 failed, 34 skipped** (11.1 min) | `e2e-run-retest1.log`, `e2e-run-retest1b.log` |
+| ISS-020 flake stabilisation (full-suite proof, two runs) | Run #1: both formerly flaky tests passed in the full suite (P2 T-11 axe on desktop and mobile; T-16 empty states, all 4). Run #2: both passed again (T-11 45.9 s desktop / 43.9 s mobile; T-16 4/4). **Verdict: RESOLVED** | `e2e-run-retest1.log`, `e2e-run-retest1b.log`, `retest1-iss020-probe.jsonl` |
 
 ### D-2 / ISS-018 verdict: FIXED
 - `classificationExplainer.additional` now reads "You marked this as outside the agreement. You can turn it into a change proposal for your client." No "available / coming soon / next release" wording is left in `src/`. A new unit test guards this.
@@ -177,16 +177,21 @@ Verified on **completed and archived** projects at both viewports (`p4-retest1.s
    - It waits for the async panel, which removes the earlier race.
    - It asserts exactly one change-proposal button, enabled, and no change-proposal link. It then **clicks it** and checks the navigation and the created row.
    - The money regex is unchanged and still applies to all of `<main>`, except the panel's fixed sentence "Turn this request into a priced and/or timed proposal…". That sentence is checked separately against the same regex with only the word "priced" removed.
+   - **Why this is not weaker:** the only assertion removed is "no change-proposal button". That assertion encoded the Phase 3 state, which the approved Phase 4 spec replaced (HA-007). It is replaced by a stronger one: the action exists exactly once and actually works (navigation plus a DB row). The exemption from the money check covers one literal, known sentence that contains no amount or currency, and that sentence is itself checked. Any other money text on the page still fails the test. Waiting for the panel makes the test stricter: before, it could pass by checking the page before the panel had rendered.
 2. **`tests/e2e/p2-a11y.spec.ts`** (ISS-020 F-1).
    - Before every axe scan, it waits for all finite CSS animations and transitions (`document.getAnimations()`) to finish, and it asserts that "Yes, confirm" is no longer `aria-busy` before the error-state scan. The axe tags and rules are unchanged.
    - `emulateMedia({ reducedMotion })` would not help, because the Button's `transition-colors` is not gated by `motion-reduce`.
+   - **Why this is not weaker:** the same axe rule set runs on the same states; only *when* it samples changes. It now samples the settled colours a user sees, not a 150 ms in-between frame. The extra `aria-busy` assertion adds a check. Infinite animations (spinners) are excluded from the wait only so the wait ends; they are still on the page during the scan.
    - **Evidence** (`retest1-iss020-probe.jsonl`, 8 repeats): at the old scan point, the button background was mid-fade (`oklab(…)`, 1 running transition) in **4/8** repeats. After the settle step it was the final brand-600 `rgb(31,111,104)` in **8/8**. This is a test-timing flake, not a product defect: the settled colour passes contrast.
 3. **`tests/e2e/settings-and-empty-states.spec.ts` T-16** (ISS-020 F-2).
    - Root cause: a check-then-act race. The old poll saw 0 active projects, then another worker created one before the page rendered.
    - The precondition is now checked before **and after** the page loads, and the page is reloaded only when another test's project appeared in that window.
    - If the page lists a project that existed before the check, the test fails, because that would be a product defect rather than a race. The empty-state assertions are unchanged.
-4. **`tests/e2e/p4-proposals.spec.ts` §6 UI test** (my own Phase 4 test, not a Phase 1–3 test): `test.setTimeout(90_000)`. It takes about 15 s unloaded (6/6 isolated passes, `e2e-retest1-S6-isolated.log`) and hit the 30 s default under full-suite load in run 1 (F-3 below). It is a timing change only; the assertions are unchanged.
-5. **New `tests/e2e/p4-retest1.spec.ts`**: D-1 (a), D-1 (b), D-2 and axe/overflow, on both viewports.
+   - The test timeout was raised from 180 s to 300 s, and the precondition wait from 120 s to 240 s, so a long-running Phase 4 test in the other worker cannot exhaust it.
+   - **Why this is not weaker:** every original assertion still runs on the final page: the h1, the empty-state h2, no buttons in `<main>`, no dead links, and the working "New project" link. A reload happens only when the DB shows that another test changed user A's data while the page loaded (a project created after the check). An empty state that is missing while no new project exists fails at once. The precondition check got stricter: the old poll checked once, before loading the page.
+4. **`tests/e2e/p4-proposals.spec.ts` §6 UI test** (my own Phase 4 test, not a Phase 1–3 test): `test.setTimeout(90_000)`. It takes about 15 s unloaded (6/6 isolated passes, `e2e-retest1-S6-isolated.log`) and hit the 30 s default under full-suite load in run 1 (F-3 below). It is a timing change only; the assertions are unchanged. **Why this is not weaker:** no assertion, locator or per-step expect timeout changed; the total budget is sized to the measured work (about 15 s unloaded, 24.9 s under load in run #1). A real hang still fails each step's 5 s `expect`.
+5. **New `tests/e2e/p4-retest1.spec.ts`**: D-1 (a), D-1 (b), D-2, D-3 (`expectRelatedPagesMatch`, chunk B) and axe/overflow, on both viewports. It is additive and changes no existing test.
+6. No Phase 1–3 assertion was removed except the obsolete "no change-proposal button" in T-09 (item 1). No pgTAP file was changed in this retest.
 
 ### Chunk B (product commit c43b082)
 **Fix reviewed** (`git diff 2210f9d c43b082`):
@@ -215,6 +220,58 @@ Verified on **completed and archived** projects at both viewports (`p4-retest1.s
 - The previous failures (T-09 on both viewports, F-1 P2 a11y desktop, F-2 T-16 mobile) all **passed**.
 - The single failure was **F-3**: `p4-proposals.spec.ts` §6 UI on mobile, a test timeout of 30 s. A pgTAP file ran against the same DB in parallel during this run (my error, since corrected), which may have added load. This led to change 4.
 - The full two-run regression is chunk B/C.
+
+### Chunk C: full regression run #2 (product commit c43b082)
+`npm run test:e2e -- --trace off --workers=2` on a cleaned DB: **236 passed, 0 failed, 34 skipped** (11.1 min; `e2e-run-retest1b.log`). The results are identical to run #1, with 0 failures in both runs.
+- `p2-a11y.spec.ts:33` T-11 passed on desktop (45.9 s) and mobile (43.9 s).
+- `settings-and-empty-states.spec.ts:135` T-16 passed for `/` and `/projects` on both viewports.
+- The updated T-09 passed on both viewports.
+- The §6 not-found test passed in 19.4 s (desktop) and 16.3 s (mobile).
+- The `p4-retest1` spec ran inside the suite on `c43b082`: 168 axe/overflow scans in `retest1-a11y.jsonl`, 0 violations and 0 overflow.
+
+### ISS-020 verdict: RESOLVED (test reliability; no product defect)
+- **F-1 (P2 confirm-panel contrast):** this was axe sampling the button mid-fade (proven: 4/8 mid-fade samples before the change, 8/8 settled after). The settled colours pass. It passed in both full runs on both viewports.
+- **F-2 (T-16 "No projects yet"):** this was a check-then-act race between workers. It passed in both full runs on both viewports, with the assertions unchanged.
+- **F-3 (§6 test timeout, found in this retest):** this was the test budget only. It passed in both full runs with the larger budget.
+
+### Final per-AC / per-T table (Retest 1, product commit c43b082)
+| Criterion | Result | Evidence |
+|---|---|---|
+| AC-1 Create from Additional only, pre-filled, no notes | **PASS** | pgTAP C1–C13 + dev 1–6 (rerun 125/125, 39/39); P4 E2E in runs #1/#2 |
+| AC-2 Draft edit/save, validation, server rejects invalid | **PASS** | pgTAP D1–D8; P4 E2E runs #1/#2 |
+| AC-3 Send: pending + server time; send rules | **PASS** | pgTAP S1–S11; P4 E2E runs #1/#2 |
+| AC-4 Sent versions immutable for every role | **PASS** | pgTAP I1–I4, T5, T7–T10 (96/96) |
+| AC-5 New version / supersede / ≤1 draft, ≤1 pending | **PASS** | pgTAP V1–V13; P4 E2E incl. concurrency spec, runs #1/#2 |
+| AC-6 Cancel/discard; all other transitions rejected | **PASS** | pgTAP T2–T4 (42 combinations), X1–X13, R1–R4 |
+| AC-7 History in order with versions | **PASS** | pgTAP H1–H9; P4 E2E runs #1/#2 |
+| AC-8 Read-only on completed/archived (incl. display: D-1, D-3) | **PASS** | pgTAP P1–P7; `p4-retest1` D-1 (a)/(b) and D-3 at 375 and 1280 |
+| AC-9 Isolation (B, anon) | **PASS** | pgTAP G1–G12, B1–B8, N1–N2; `p4-api`, §6 UI in runs #1/#2 |
+| AC-10 Currency on amounts, no paid/collected/earned | **PASS** | P4 E2E runs #1/#2; pgTAP H4 |
+| AC-11 axe 0 serious/critical, keyboard, no overflow at 375/1280 | **PASS** | `p4-a11y` in runs #1/#2; retest scans of affected pages (168 in total, 0 violations of any impact) |
+| AC-12 Phase 1–3 regression | **PASS** | pgTAP Phase 1–3 327/327; full E2E 236/0/34 twice; unit 145/145 |
+| T-01 to T-11 | **PASS** | as AC-1 to AC-11 |
+| T-12 | **PASS** | as AC-12 |
+| D-1 / ISS-019 | **FIXED** (`dde2091`) | `p4-retest1` D-1 (a)/(b) |
+| D-2 / ISS-018 | **FIXED** (`dde2091`) | T-09, `p4-retest1` D-2 |
+| D-3 / ISS-021 | **FIXED** (`c43b082`) | `p4-retest1` D-3, `retest1-D3.jsonl` |
+| ISS-020 flakes | **RESOLVED** | runs #1/#2, `retest1-iss020-probe.jsonl` |
+| Security advisor | **PASS**, no new findings | `retest1-supabase-advisors.log` (taken in chunk A; `c43b082` has no `supabase/` change) |
+
+Open defects: **none**. Observations O-9 and O-10 (copy and design notes, no defect) are left to the Team Lead.
+
+### Hygiene (chunk C)
+- After run #2, the Phase 1–3 evidence was restored from `dde2091`; `git diff --stat dde2091 -- docs/testing/phase{1,2,3}` is empty, and there are no untracked files there. The 80 first-run Phase 4 evidence files that the regression regenerated were restored from `HEAD`. Only `retest1*` files and `e2e-run-retest1b.log` are new or changed.
+- The DB was cleaned with the prescribed test-only SQL: only a@ and b@guardscope.test remain, with 0 projects, requests, change orders, versions and events, and null profile fields.
+- `src/` and `supabase/` were not modified. Nothing was committed by the tester.
+
+### Final acceptance decision (Retest 1)
+**ACCEPTED: Phase 4 (Change Orders) at product commit `c43b082`.**
+- All acceptance criteria AC-1 to AC-12 and test cases T-01 to T-12 pass.
+- D-1, D-2 and the new D-3 are fixed and independently verified on both viewports and on both closed states.
+- ISS-020 is resolved without weakening any test. The rationale for each test change is given above.
+- pgTAP: 491/491. Unit: 145/145. Full E2E across Phases 1–4: 236 passed, 0 failed in two consecutive runs.
+- The security advisor shows no new findings.
+- No exceptions are requested.
 
 ### Hygiene (chunk B)
 - After run #1, the Phase 1–3 evidence (176 files rewritten by the run) was restored again from `dde2091`; `git diff --stat dde2091 -- docs/testing/phase{1,2,3}` is empty.

@@ -1,0 +1,32 @@
+# Phase 4 — Change-Order Proposal & Versioning — Handoff
+
+- **Branch / commit:** `feature/p4-change-orders` (from `feature/p3-request-capture`). Product code accepted at `c43b082`.
+- **Migration** (dev): `20261116190000_change_orders.sql`.
+  - Tables: `change_orders` (one per request) and `change_order_versions`.
+  - Guard trigger: content is immutable after send; status-transition matrix; one draft and one pending per proposal.
+  - RPCs: `create_change_order`, `send_change_order_version`, `cancel_change_order_version`, `new_change_order_version`, `discard_change_order_draft`.
+  - Internal helper `_lock_change_order` (not callable from the API).
+  - All state changes are written to `activity_events` (entity `change_order`, with the version number).
+- **Contracts:** `src/lib/api/changeOrders.ts`; domain rules in `src/lib/domain/changeOrder.ts` (`validateProposalDraft/ForSend`, `headerVersion`, `headerStatus`, `versionCountLabel`, formatters).
+- **UI:**
+  - request page: "Create change proposal" (Additional requests on active projects), or a link to the existing proposal;
+  - proposal page: draft editor, client preview, send confirmation, sent versions, cancel, new version, discard, history;
+  - project page: proposals section.
+- **Transitions:**
+  - `draft → pending` on send;
+  - `pending → cancelled | superseded`;
+  - `pending → approved | declined | clarification_requested` is reserved for Phase 5 client decisions;
+  - all of these are terminal (OD-6 = HA-006).
+- **Tests:**
+  - unit 145;
+  - pgTAP 491 across 9 files, including 125 transition and immutability checks;
+  - concurrency races (create, send, new version, send-while-cancel) with no invariant breaks;
+  - full E2E regression across Phases 1–4: 236 passed / 0 failed, twice;
+  - axe 0 violations.
+- **Phase 5 hooks:**
+  - `send_change_order_version` must also create the approval link (token hash) in the same transaction;
+  - the decision RPC must lock the version, require `status='pending'` and that it is the current version, then set the client terminal status;
+  - only client-facing fields may be exposed publicly.
+- **Observations:**
+  - version numbers can be reused after a draft is discarded (only for never-sent drafts);
+  - the server accepts a proposed deadline of UTC yesterday (time-zone allowance, same as DEC-011).

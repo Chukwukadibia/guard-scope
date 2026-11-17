@@ -2,6 +2,10 @@
 
 All notable project changes, newest first. Feature-level detail lives in `features/<feature>/CHANGELOG.md`.
 
+## 2026-11-17 — Phase 4 (change-order proposals & versioning)
+- Change proposals from Additional requests: editable drafts, client preview, send (frozen, immutable versions), new versions supersede pending ones, cancel/discard, server-enforced transition matrix, history.
+- Independent testing: 2 fix cycles (D-1..D-3), plus ISS-017 (numerics, including a latent Phase 2 bug). Accepted.
+
 ## 2026-11-16 — Phase 3 (request capture & classification)
 - Quick request capture with private notes; freelancer-only classification with an append-only, write-ordered history (from → to); revision usage tracking against the confirmed allowance.
 - Independent testing: 1 fix cycle (D-1 Medium, D-2 High history ordering). Accepted.
