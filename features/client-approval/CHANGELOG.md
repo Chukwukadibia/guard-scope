@@ -1,0 +1,4 @@
+# Secure Client Approval — Changelog
+- 2026-11-17: Spec, plan and test plan (HA-008; OD-4 30 days, OD-5 no client identity). Client-IP header verified empirically (DEC-012); link issuance is its own RPC (DEC-013); token in memory only (DEC-014).
+- 2026-11-17: Migrations `20261117100000_client_approval` (approval_links, client_decisions, salted throttle tables, 4 RPCs, link revocation inside cancel/send) and `20261117101000_revoke_throttle_helpers` (two internal helpers were callable by API roles; found by developer test 77). Developer pgTAP 83/83.
+- 2026-11-17: Frontend: public page `/p` (fragment token read once and removed, in memory only; every link state; decision form with confirmation and idempotency key), freelancer link panel (shown once, copy, reissue, revoke), client decisions on the version card. 177 unit tests. Developer smoke: the token appears only in the RPC POST bodies.
