@@ -1,7 +1,7 @@
 -- pgTAP: Phase 5 secure client approval (TEST_PLAN T-01..T-13). Run: npx supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(115);
+select plan(120);
 
 insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
 values
@@ -161,13 +161,7 @@ set local role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
 select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'valid', 'global breaker: a source with no failures still works');
 select is(public.get_public_proposal(repeat('D', 43))->>'state', 'invalid', 'global breaker: its first failure is processed');
-select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'valid', 'global breaker (SEC-5-1): a NEW source''s failures are counted globally only, so no per-source row is created and it is not held back');
-reset role;
-insert into public.public_link_attempts (source_key, window_start, failures)
-  values (public._throttle_key(), date_bin('10 minutes', now(), timestamptz '2000-01-01'), 1);
-set local role anon;
-select set_config('request.jwt.claims', '{"role":"anon"}', true);
-select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'rate_limited', 'global breaker: a source that already failed before the breaker opened is held back');
+select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'rate_limited', 'global breaker: after a failure it is held back');
 reset role;
 delete from public.public_link_attempts;
 -- SEC-5-1: /64 keying, IPv4 unchanged, malformed values never raise
@@ -191,16 +185,28 @@ select public._throttle_record_failure(public._throttle_key());
 select public._throttle_record_failure(public._throttle_key());
 select is((select count(*)::int from public.public_link_attempts where window_start < now() - interval '1 day'), 0, 'SEC-5-1: further failure calls finish removing old rows');
 select is((select failures from public.public_link_attempts where source_key = public._throttle_key() and window_start = date_bin('10 minutes', now(), timestamptz '2000-01-01')), 3, 'SEC-5-1: current-window rows are kept and counted');
--- breaker open: no new per-source rows, global row still counts
+-- below 1000: the per-source cap of 20 still applies to a fresh source
 delete from public.public_link_attempts;
-insert into public.public_link_attempts (source_key, window_start, failures)
-  values ('\x00'::bytea, date_bin('10 minutes', now(), timestamptz '2000-01-01'), 1000),
-         (extensions.digest('known', 'sha256'), date_bin('10 minutes', now(), timestamptz '2000-01-01'), 1);
+insert into public.public_link_attempts (source_key, window_start, failures) values ('\x00'::bytea, date_bin('10 minutes', now(), timestamptz '2000-01-01'), 500);
+select public._throttle_record_failure(extensions.digest('fresh20', 'sha256')) from generate_series(1, 19);
+select ok(not public._throttle_blocked(extensions.digest('fresh20', 'sha256')), 'SEC-5-1: below the breaker a source with 19 failures is not blocked');
+select public._throttle_record_failure(extensions.digest('fresh20', 'sha256'));
+select ok(public._throttle_blocked(extensions.digest('fresh20', 'sha256')), 'SEC-5-1: the per-source cap of 20 still applies below the breaker');
+-- breaker open, below the hard cap: a fresh source still gets a row and is held back after its first miss
+delete from public.public_link_attempts;
+insert into public.public_link_attempts (source_key, window_start, failures) values ('\x00'::bytea, date_bin('10 minutes', now(), timestamptz '2000-01-01'), 1000);
+select ok(not public._throttle_blocked(extensions.digest('newcomer', 'sha256')), 'SEC-5-1: breaker open: a fresh source is not blocked before it fails');
 select public._throttle_record_failure(extensions.digest('newcomer', 'sha256'));
-select public._throttle_record_failure(extensions.digest('known', 'sha256'));
-select is((select count(*)::int from public.public_link_attempts), 2, 'SEC-5-1: no new per-source row is created once the breaker is open');
-select is((select failures from public.public_link_attempts where source_key = '\x00'::bytea), 1002, 'SEC-5-1: the global row keeps counting while the breaker is open');
-select is((select failures from public.public_link_attempts where source_key = extensions.digest('known', 'sha256')), 2, 'SEC-5-1: a source that already has a row keeps being counted');
+select is((select count(*)::int from public.public_link_attempts where source_key = extensions.digest('newcomer', 'sha256')), 1, 'SEC-5-1: breaker open below the hard cap: the fresh source gets a per-source row');
+select ok(public._throttle_blocked(extensions.digest('newcomer', 'sha256')), 'SEC-5-1: breaker open: the fresh source is blocked after its first miss');
+-- hard cap: lockdown (no new rows, every source blocked)
+delete from public.public_link_attempts;
+insert into public.public_link_attempts (source_key, window_start, failures) values ('\x00'::bytea, date_bin('10 minutes', now(), timestamptz '2000-01-01'), (select hard_cap from public._throttle_limits()));
+select public._throttle_record_failure(extensions.digest('latecomer', 'sha256'));
+select is((select count(*)::int from public.public_link_attempts), 1, 'SEC-5-1: at the hard cap no new per-source row is inserted');
+select is((select failures from public.public_link_attempts where source_key = '\x00'::bytea), (select hard_cap + 1 from public._throttle_limits()), 'SEC-5-1: at the hard cap the global row still counts');
+select ok(public._throttle_blocked(extensions.digest('latecomer', 'sha256')) and public._throttle_blocked(extensions.digest('never-seen', 'sha256')), 'SEC-5-1: at the hard cap every source is blocked for the rest of the window (documented lockdown trade-off)');
+select is((select hard_cap from public._throttle_limits()), 5000, 'SEC-5-1: hard cap is 5000 in _throttle_limits()');
 select set_config('request.headers', '', true);
 delete from public.public_link_attempts;
 -- SEC-5-8: raw-length pre-check, trim boundary (accept cases run in a rolled-back subtransaction so the link stays pending)
