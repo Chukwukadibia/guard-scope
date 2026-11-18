@@ -6,3 +6,7 @@
 {"project":"desktop","label":"static headers","data":{"hasNoStoreForP":false,"hasRobotsHeader":false,"referrerPolicyHeader":true,"csp":true,"swNetworkOnlySupabase":true}}
 {"project":"mobile","label":"leak audit","data":{"leaks":[],"requests":15,"rpcPosts":1,"referrerEmpty":true,"historyLength":4,"navigationTimingEntryContainsToken":true,"cacheEntryCount":12}}
 {"project":"mobile","label":"static headers","data":{"hasNoStoreForP":false,"hasRobotsHeader":false,"referrerPolicyHeader":true,"csp":true,"swNetworkOnlySupabase":true}}
+{"project":"desktop","label":"leak audit","data":{"leaks":[],"requests":14,"rpcPosts":1,"referrerEmpty":true,"historyLength":4,"navigationTimingEntryContainsToken":true,"cacheEntryCount":12}}
+{"project":"desktop","label":"static headers","data":{"hasNoStoreForP":true,"hasRobotsHeader":true,"referrerPolicyHeader":true,"csp":true,"swNetworkOnlySupabase":true,"browserName":"chromium"}}
+{"project":"mobile","label":"leak audit","data":{"leaks":[],"requests":14,"rpcPosts":1,"referrerEmpty":true,"historyLength":4,"navigationTimingEntryContainsToken":true,"cacheEntryCount":12}}
+{"project":"mobile","label":"static headers","data":{"hasNoStoreForP":true,"hasRobotsHeader":true,"referrerPolicyHeader":true,"csp":true,"swNetworkOnlySupabase":true,"browserName":"chromium"}}

@@ -318,6 +318,13 @@ async function decideFlow(
   await expect(pub.getByRole('heading', { name: 'Your response has been recorded' })).toBeVisible();
   const done = (await pub.locator('main').innerText()).replace(/\s+/g, ' ');
   log5('chunkB-decisions.jsonl', testInfo, `client confirmation text (${which})`, done);
+  if (which === 'clarification_requested') {
+    // F-6 / OD-6 A: the client is told the version is closed and that the sender has been told
+    expect(done).toContain('This version is now closed');
+    expect(done).toContain('The sender has been told');
+  } else {
+    expect(done).not.toContain('This version is now closed');
+  }
   await checkPublicState(pub, testInfo, `done-${which}`);
   // a freshly opened link shows the recorded response (reload of a recorded decision)
   await openLink(pub, linkUrl(f.tok));
@@ -329,6 +336,10 @@ async function decideFlow(
     clarification_requested: 'Asked a question',
   }[which];
   expect(decided).toContain(expectWord);
+  if (which === 'clarification_requested') {
+    expect(decided).toContain('This version is now closed');
+    expect(decided).toContain('The sender has been told');
+  }
   expect(decided, 'the comment is never echoed to the public page').not.toContain('Looks fine');
   await expect(pub.getByRole('button', { name: /Approve|Decline/ })).toHaveCount(0);
   await checkPublicState(pub, testInfo, `decided-${which}`);
@@ -678,7 +689,9 @@ test('T-04/AC-4 token leak audit: address bar, history, referrer, request URLs/h
   await ctx.close();
 });
 
-test('T-04 static response headers and PWA caching config (deployment-level; not served by vite preview)', async (_fixtures, testInfo) => {
+test('T-04 static response headers and PWA caching config (deployment-level; not served by vite preview)', async ({
+  browserName,
+}, testInfo) => {
   const headers = readFileSync('public/_headers', 'utf8');
   const dist = readFileSync('dist/_headers', 'utf8');
   expect(dist).toBe(headers);
@@ -687,6 +700,11 @@ test('T-04 static response headers and PWA caching config (deployment-level; not
   expect(headers).toMatch(/script-src 'self'(;|$)/);
   expect(headers, 'no third-party script/style hosts').not.toMatch(/script-src[^;]*https?:/);
   expect(headers).toMatch(/frame-ancestors 'none'/);
+  const pBlock = headers.split(/\n\s*\n/).find((b) => /^\/p\s*$/m.test(b)) ?? '';
+  expect(pBlock, '/p has X-Robots-Tag noindex').toMatch(/X-Robots-Tag:\s*noindex/i);
+  expect(pBlock, '/p has Cache-Control no-store').toMatch(/Cache-Control:\s*no-store/i);
+  const pStar = headers.split(/\n\s*\n/).find((b) => /^\/p\/\*\s*$/m.test(b)) ?? '';
+  expect(pStar, '/p/* has the same headers').toMatch(/no-store/i);
   const hasNoStore = /Cache-Control:.*no-store/i.test(headers);
   const hasRobotsHeader = /X-Robots-Tag/i.test(headers);
   const sw = readFileSync('dist/sw.js', 'utf8');
@@ -698,6 +716,7 @@ test('T-04 static response headers and PWA caching config (deployment-level; not
     referrerPolicyHeader: true,
     csp: true,
     swNetworkOnlySupabase: true,
+    browserName,
   });
 });
 
@@ -845,6 +864,15 @@ test('T-08/AC-1/AC-8 owner UI: link shown once (copy, expiry, once-only warning)
   )[1];
   await page.getByRole('button', { name: 'Cancel this proposal…' }).click();
   await page.getByRole('button', { name: /^Yes, cancel/ }).click();
+  // wait until the cancel has really completed (notice + badge + no link controls) before the client opens the link
+  await expect(page.getByText('Version 1 cancelled.')).toBeVisible();
+  await expect(page.getByRole('article', { name: 'Version 1', exact: true })).toContainText(
+    'Cancelled',
+  );
+  expect(
+    (await apiVersions(page, token, coId))[0].status,
+    'version is cancelled in the database',
+  ).toBe('cancelled');
   await openLink(a.page, `/p#${tok3}`);
   await expect(a.page.getByRole('heading', { name: 'This proposal was cancelled' })).toBeVisible();
   await a.ctx.close();
@@ -940,4 +968,62 @@ test('AC-12/T-12 owner UI a11y and overflow: link just issued, link status, deci
     (v) => v.impact === 'serious' || v.impact === 'critical',
   );
   expect(bad2).toEqual([]);
+});
+
+test('F-5 retest AC-4: stale-then-valid in the same tab, and hash change while a decision is shown', async ({
+  page,
+  browser,
+  sessionA,
+}, testInfo) => {
+  const token = tokenOf(sessionA);
+  const good = await sentWithLink(page, token, uniq4(testInfo, 'p5-hash-good'));
+  const other = await sentWithLink(page, token, uniq4(testInfo, 'p5-hash-other'));
+  const { ctx, page: pub } = await publicContext(browser, testInfo);
+  // 1. stale/invalid link first, then the real one pasted into the same tab
+  await pub.goto('/p#' + 'Z'.repeat(43));
+  await expect(pub.getByRole('heading', { name: "This link isn't available" })).toBeVisible();
+  await pub.goto(linkUrl(good.tok));
+  await expect(pub.getByRole('heading', { name: 'Your response' })).toBeVisible();
+  await expect(pub.getByRole('heading', { name: "This link isn't available" })).toHaveCount(0);
+  expect(pub.url().includes(good.tok), 'token removed from the address bar').toBe(false);
+  expect(new URL(pub.url()).hash).toBe('');
+  expect((await pub.locator('main').innerText()).includes('p5-hash-good')).toBe(true);
+  // 2. a decision is on screen, then another link replaces it: old state (confirmation / decision) is dropped
+  await pub.getByRole('button', { name: 'Approve' }).click();
+  await pub.getByRole('button', { name: 'Yes, approve' }).click();
+  await expect(pub.getByRole('heading', { name: 'Your response has been recorded' })).toBeVisible();
+  await pub.goto(linkUrl(other.tok));
+  await expect(pub.getByRole('heading', { name: 'Your response' })).toBeVisible();
+  await expect(pub.getByRole('heading', { name: 'Your response has been recorded' })).toHaveCount(
+    0,
+  );
+  const t = (await pub.locator('main').innerText()).replace(/\s+/g, ' ');
+  expect(
+    t.includes('p5-hash-other') && !t.includes('p5-hash-good'),
+    'old proposal dropped, new one shown',
+  ).toBe(true);
+  expect(pub.url().includes(other.tok)).toBe(false);
+  // no token anywhere after the second capture
+  const dump = await pub.evaluate(() =>
+    JSON.stringify([
+      location.href,
+      history.state,
+      document.referrer,
+      document.title,
+      Object.entries(localStorage),
+      Object.entries(sessionStorage),
+    ]),
+  );
+  expect(dump.includes(other.tok) || dump.includes(good.tok), 'token present in page state').toBe(
+    false,
+  );
+  // the first link's decision is untouched, the second link still undecided
+  const rows = await rest(
+    page,
+    token,
+    'GET',
+    `/rest/v1/client_decisions?select=version_id&version_id=in.(${good.v1Id},${other.v1Id})`,
+  );
+  expect((rows.body as { version_id: string }[]).map((r) => r.version_id)).toEqual([good.v1Id]);
+  await ctx.close();
 });

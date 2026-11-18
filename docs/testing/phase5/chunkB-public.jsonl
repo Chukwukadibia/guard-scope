@@ -15,3 +15,13 @@
 {"project":"mobile","label":"PWA offline reopen of a decided link","data":{"swReady":"active","text":"You're offline. Reconnect to continue. GuardScope We couldn't load this proposal Check your connection and try again. Your link is still valid. Try again"}}
 {"project":"desktop","label":"F-5 same-tab hash navigation","data":{"urlHasToken":true,"showsSecond":false,"showsFirst":true}}
 {"project":"mobile","label":"F-5 same-tab hash navigation","data":{"urlHasToken":true,"showsSecond":false,"showsFirst":true}}
+{"project":"mobile","label":"storage key names on the valid public page","data":{"storageKeys":[],"storageShape":[]}}
+{"project":"desktop","label":"storage key names on the valid public page","data":{"storageKeys":[],"storageShape":[]}}
+{"project":"mobile","label":"T-03 valid projection text","data":{"len":522}}
+{"project":"desktop","label":"T-03 valid projection text","data":{"len":524}}
+{"project":"mobile","label":"HTTP 429 rendering","data":"GuardScope Loading proposal…"}
+{"project":"desktop","label":"HTTP 429 rendering","data":"GuardScope Too many attempts Too many attempts, try again later."}
+{"project":"desktop","label":"PWA offline reopen of a decided link","data":{"swReady":"active","text":"You're offline. Reconnect to continue. GuardScope We couldn't load this proposal Check your connection and try again. Your link is still valid. Try again"}}
+{"project":"mobile","label":"PWA offline reopen of a decided link","data":{"swReady":"active","text":"You're offline. Reconnect to continue. GuardScope We couldn't load this proposal Check your connection and try again. Your link is still valid. Try again"}}
+{"project":"desktop","label":"F-5 same-tab hash navigation","data":{"urlHasToken":false,"showsSecond":true,"showsFirst":false}}
+{"project":"mobile","label":"F-5 same-tab hash navigation","data":{"urlHasToken":false,"showsSecond":true,"showsFirst":false}}
