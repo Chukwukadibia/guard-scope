@@ -1,7 +1,7 @@
 -- pgTAP: Phase 5 secure client approval (TEST_PLAN T-01..T-13). Run: npx supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(91);
+select plan(115);
 
 insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
 values
@@ -161,7 +161,67 @@ set local role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
 select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'valid', 'global breaker: a source with no failures still works');
 select is(public.get_public_proposal(repeat('D', 43))->>'state', 'invalid', 'global breaker: its first failure is processed');
-select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'rate_limited', 'global breaker: after a failure it is held back');
+select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'valid', 'global breaker (SEC-5-1): a NEW source''s failures are counted globally only, so no per-source row is created and it is not held back');
+reset role;
+insert into public.public_link_attempts (source_key, window_start, failures)
+  values (public._throttle_key(), date_bin('10 minutes', now(), timestamptz '2000-01-01'), 1);
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'rate_limited', 'global breaker: a source that already failed before the breaker opened is held back');
+reset role;
+delete from public.public_link_attempts;
+-- SEC-5-1: /64 keying, IPv4 unchanged, malformed values never raise
+create function pg_temp.kf(h text) returns text language plpgsql as $$ begin perform set_config('request.headers', h, true); return encode(public._throttle_key(), 'hex'); end $$;
+select is(pg_temp.kf('{"cf-connecting-ip":"2001:db8:1:2::1"}'), pg_temp.kf('{"cf-connecting-ip":"2001:db8:1:2:ffff:abcd:1234:9"}'), 'SEC-5-1: two IPv6 addresses in the same /64 share one bucket');
+select isnt(pg_temp.kf('{"cf-connecting-ip":"2001:db8:1:2::1"}'), pg_temp.kf('{"cf-connecting-ip":"2001:db8:1:3::1"}'), 'SEC-5-1: different /64 prefixes get different buckets');
+select is(pg_temp.kf('{"x-forwarded-for":"1.1.1.1, 2001:db8:1:2::1"}'), pg_temp.kf('{"cf-connecting-ip":"2001:db8:1:2::77"}'), 'SEC-5-1: the /64 rule applies to x-forwarded-for as well');
+select is(pg_temp.kf('{"cf-connecting-ip":"5.5.5.5"}'), encode(extensions.digest((select salt from public.public_link_config) || convert_to('5.5.5.5', 'utf8'), 'sha256'), 'hex'), 'SEC-5-1: IPv4 key is unchanged (salted hash of the full address)');
+select isnt(pg_temp.kf('{"cf-connecting-ip":"5.5.5.5"}'), pg_temp.kf('{"cf-connecting-ip":"5.5.5.6"}'), 'SEC-5-1: IPv4 addresses are not merged');
+select is(pg_temp.kf('{"cf-connecting-ip":"::ffff:5.5.5.5"}'), pg_temp.kf('{"cf-connecting-ip":"5.5.5.5"}'), 'SEC-5-1: IPv4-mapped IPv6 is keyed as the IPv4 address');
+select lives_ok($$select pg_temp.kf('{"cf-connecting-ip":"zz::::/999"}'), pg_temp.kf('{"cf-connecting-ip":"1.2.3.4:8080"}'), pg_temp.kf('{"cf-connecting-ip":"::ffff:999.1.1.1"}'), pg_temp.kf('{"x-forwarded-for":",,"}'), pg_temp.kf('{"cf-connecting-ip":"' || repeat('f', 5000) || '"}'), pg_temp.kf('[1'), pg_temp.kf('{"cf-connecting-ip":123}'), pg_temp.kf('null')$$, 'SEC-5-1: malformed address headers never raise');
+select is(pg_temp.kf('{"cf-connecting-ip":"not-an-ip"}'), encode(extensions.digest((select salt from public.public_link_config) || convert_to('not-an-ip', 'utf8'), 'sha256'), 'hex'), 'SEC-5-1: a non-address value falls back to the raw text key (as before)');
+select ok(exists (select 1 from pg_indexes where schemaname = 'public' and tablename = 'public_link_attempts' and indexdef ilike '%(window_start)%'), 'SEC-5-1: window_start index exists');
+-- cleanup: bounded batch, removes old rows, keeps fresh ones, deterministic
+select set_config('request.headers', '{"cf-connecting-ip":"4.4.4.4"}', true);
+insert into public.public_link_attempts (source_key, window_start, failures)
+  select extensions.digest(g::text, 'sha256'), now() - interval '3 days' - (g || ' minutes')::interval, 1 from generate_series(1, 120) g;
+select public._throttle_record_failure(public._throttle_key());
+select is((select count(*)::int from public.public_link_attempts where window_start < now() - interval '1 day'), 70, 'SEC-5-1: one failure call deletes at most a bounded batch (50) of old rows');
+select public._throttle_record_failure(public._throttle_key());
+select public._throttle_record_failure(public._throttle_key());
+select is((select count(*)::int from public.public_link_attempts where window_start < now() - interval '1 day'), 0, 'SEC-5-1: further failure calls finish removing old rows');
+select is((select failures from public.public_link_attempts where source_key = public._throttle_key() and window_start = date_bin('10 minutes', now(), timestamptz '2000-01-01')), 3, 'SEC-5-1: current-window rows are kept and counted');
+-- breaker open: no new per-source rows, global row still counts
+delete from public.public_link_attempts;
+insert into public.public_link_attempts (source_key, window_start, failures)
+  values ('\x00'::bytea, date_bin('10 minutes', now(), timestamptz '2000-01-01'), 1000),
+         (extensions.digest('known', 'sha256'), date_bin('10 minutes', now(), timestamptz '2000-01-01'), 1);
+select public._throttle_record_failure(extensions.digest('newcomer', 'sha256'));
+select public._throttle_record_failure(extensions.digest('known', 'sha256'));
+select is((select count(*)::int from public.public_link_attempts), 2, 'SEC-5-1: no new per-source row is created once the breaker is open');
+select is((select failures from public.public_link_attempts where source_key = '\x00'::bytea), 1002, 'SEC-5-1: the global row keeps counting while the breaker is open');
+select is((select failures from public.public_link_attempts where source_key = extensions.digest('known', 'sha256')), 2, 'SEC-5-1: a source that already has a row keeps being counted');
+select set_config('request.headers', '', true);
+delete from public.public_link_attempts;
+-- SEC-5-8: raw-length pre-check, trim boundary (accept cases run in a rolled-back subtransaction so the link stays pending)
+create function pg_temp.try_submit(t text, c text) returns text language plpgsql as $$
+declare r jsonb;
+begin
+  r := public.submit_public_decision(t, 'approved', c, gen_random_uuid());
+  raise exception 'R:%', coalesce(r->>'result', r->>'error');
+exception when others then
+  return case when sqlerrm like 'R:%' then substr(sqlerrm, 3) else sqlstate || ':' || sqlerrm end;
+end $$;
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(public.submit_public_decision(current_setting('t.tok4c'), 'approved', repeat('x', 8001), '88888888-8888-8888-8888-888888888881')->>'error', 'validation', 'SEC-5-8: a comment over the 8000-character raw bound is rejected');
+select is(public.submit_public_decision(current_setting('t.tok4c'), 'approved', repeat(' ', 8001), '88888888-8888-8888-8888-888888888882')->>'error', 'validation', 'SEC-5-8: an over-long whitespace-only comment is rejected before the trim');
+select is(public.submit_public_decision(current_setting('t.tok4c'), 'approved', repeat(' ', 100) || repeat('x', 2001) || repeat(E'\n', 100), '88888888-8888-8888-8888-888888888883')->>'error', 'validation', 'SEC-5-8: 2001 characters after trimming is still rejected');
+select is(public.submit_public_decision(current_setting('t.tok4c'), 'approved', repeat('x', 8001), '88888888-8888-8888-8888-888888888884')->>'error', 'validation', 'SEC-5-8: over-long comment is rejected the same way with a valid token');
+select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'valid', 'SEC-5-8: rejected submissions recorded nothing');
+select is(pg_temp.try_submit(current_setting('t.tok4c'), repeat(' ', 3000) || repeat('y', 2000) || repeat(E'\t', 3000)), 'recorded', 'SEC-5-8: a 2000-character comment with surrounding whitespace (within the raw bound) is accepted');
+select is(pg_temp.try_submit(current_setting('t.tok4c'), repeat('y', 8000)), 'validation', 'SEC-5-8: 8000 raw non-blank characters pass the pre-check and fail the 2000 rule');
+select is(pg_temp.try_submit(current_setting('t.tok4c'), repeat(E' \n', 4000)), 'recorded', 'SEC-5-8: exactly 8000 raw whitespace characters are accepted as an empty comment');
 reset role;
 delete from public.public_link_attempts;
 select set_config('request.headers', '', true);

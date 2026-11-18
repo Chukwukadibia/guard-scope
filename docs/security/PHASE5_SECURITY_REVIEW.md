@@ -61,6 +61,7 @@ No CRITICAL or HIGH findings.
 | SEC-5-12 | INFO | Bidi/control characters in the client comment |
 
 ### SEC-5-1 MEDIUM: throttle table growth and cleanup
+- **Status: FIXED** in migration `20261117103000_throttle_hardening` (IPv6 /64 keying, `window_start` index, bounded cleanup per failure call, no new per-source rows while the global breaker is open). ISS-027.
 - Description: `_throttle_record_failure` inserts one row per `(source_key, 10-min window)` per failure. The source key is the full address, so an attacker rotating IPv6 addresses in one /64 (free, effectively unlimited) creates a new row and never hits the 20/window per-source cap. Cleanup runs only with probability 1% inside a failure call, and `delete ... where window_start < now() - 1 day` cannot use an index (`window_start` is the second PK column, there is no other index), so on a large table it is a seq scan under `anon`'s 3 s statement timeout: it can time out, rolling back that failure record and returning a 500. At low traffic cleanup may never run, so hashed-IP rows can outlive the "1 day" intent.
 - Reproduction (not run, would write): send invalid 43-char tokens from many source addresses; every call adds ~100-150 bytes (row plus PK index). 100 req/s is roughly 1 GB/day.
 - Impact: storage exhaustion of the database (free tier 500 MB makes the project read-only), degradation of the cleanup path, and the per-source throttle is ineffective against a multi-address attacker. The global row is a single hot row updated on every failure (serialises failures only; valid requests do not touch it).
@@ -97,6 +98,7 @@ No CRITICAL or HIGH findings.
 - Fix: enable Always-HTTPS and HSTS at Cloudflare (or add the header), refuse to build/shows a link when `VITE_APP_URL` is non-https and not localhost, and add a production deploy checklist step: fetch `/p` and assert the headers.
 
 ### SEC-5-8 LOW: CPU amplification before validation
+- **Status: FIXED** (early length check) in migration `20261117103000_throttle_hardening`: raw comment length over 8000 characters is rejected before the trim regex. Counting validation errors toward the throttle is not implemented. ISS-028.
 - Description: in `submit_public_decision` the comment is trimmed with `regexp_replace(..., '^\s+|\s+$', ...)` before the length check, and validation failures are neither throttled nor counted. Measured live (anon, whitespace-heavy comment): 100 KB total 0.8 s, 1 MB total 1.5 s round trip including the upload. The regex is linear-ish (no catastrophic backtracking), but PostgREST accepts multi-MB bodies, so each call costs DB CPU up to the 3 s timeout, unthrottled.
 - Fix: reject `char_length(p_comment) > 4000` (or `octet_length`) before any regex, and count validation errors from anon toward the throttle (or add an early body-size check at the edge). A 1 MB `p_token` is cheap by comparison (length checked first; Tester measured 5 MB in 3.4 s mostly transport).
 
