@@ -1,0 +1,58 @@
+{
+  "fixture": {
+    "v1": "c9801d7f-49c9-4202-b443-1fa2069eb83f",
+    "projectId": "5c1fa81e-0a55-46c0-8f43-1924022143e1"
+  },
+  "edge": {
+    "empty": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 168
+    },
+    "short": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 319
+    },
+    "long44": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 350
+    },
+    "pad": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 330
+    },
+    "plus": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 164
+    },
+    "slash": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 315
+    },
+    "space_lead": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 200
+    },
+    "space_trail": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 312
+    },
+    "nl": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 352
+    },
+    "tab": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 320
+    }
+  }
+}

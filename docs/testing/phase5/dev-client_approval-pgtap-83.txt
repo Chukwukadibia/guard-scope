@@ -1,0 +1,6 @@
+Developer file tests/db/client_approval.test.sql executed by Tester at ee35044 via scripts/pgtap-wrap.py + Supabase execute_sql (ends in ROLLBACK)
+Result: 1..83, ok 1 .. ok 83, 0 failures (83/83).
+Critical review notes:
+- Test 22/37/34 etc exercise state precedence via the 'st <> valid' path; the unique_violation race fallback ('decided' after insert) is not reachable from pgTAP single session (covered by live concurrency).
+- Test 8 (no token in events) only checks activity_events and one token; tester file widens to every public table and 200 tokens.
+- Test 16 injects only 7 failures; fine. No test of non-latest pending, draft links, column-level privileges, service_role immutability, token whitespace/unicode/long input, comment boundaries, key reuse across links, or issue on every status (gaps filled by tests/db/client_approval_tester.test.sql).

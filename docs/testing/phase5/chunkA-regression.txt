@@ -1,0 +1,8 @@
+Phase 1-4 pgTAP regression at ee35044 (code identical at HEAD 92f2ea7: no supabase/ or src/ changes), run via pgtap-wrap + execute_sql, each ends in ROLLBACK. DB emptied of a@/b@ fixtures first (older files assume an empty DB).
+change_orders.test.sql        39/39 PASS
+change_orders_tester.test.sql 125/125 PASS (send/cancel redefinition regression)
+event_ordering.test.sql       11/11 PASS
+profiles_rls.test.sql         12/12 PASS
+profiles_rls_tester.test.sql  21/22: not ok 3 'no password-like columns in public' (have 1 want 0): approval_links.token_hash matches '%hash%'. Test-heuristic false positive introduced by Phase 5 (F-4).
+projects_scope.test.sql       32/32 PASS
+NOT RUN: requests.test, requests_tester, projects_scope_tester (budget)

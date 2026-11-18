@@ -1,0 +1,12 @@
+scenario=edge1 started 2026-11-17T08:38:06.660Z
+edge empty: http 200 state=invalid code=- 168ms
+edge short: http 200 state=invalid code=- 319ms
+edge long44: http 200 state=invalid code=- 350ms
+edge pad: http 200 state=invalid code=- 330ms
+edge plus: http 200 state=invalid code=- 164ms
+edge slash: http 200 state=invalid code=- 315ms
+edge space_lead: http 200 state=invalid code=- 200ms
+edge space_trail: http 200 state=invalid code=- 312ms
+edge nl: http 200 state=invalid code=- 352ms
+edge tab: http 200 state=invalid code=- 320ms
+final state of fixture link: valid

@@ -1,0 +1,20 @@
+{
+  "fixture": {
+    "v1": "eea1a9a6-7eac-4842-bf3a-6cde305b1a42",
+    "projectId": "e17ceea3-dd98-4a60-91f2-bd9f1708a5fb"
+  },
+  "randomTokens": {
+    "invalid": 40,
+    "limited": 80,
+    "firstLimited": 41
+  },
+  "validAfterBurst": {
+    "rate_limited": 16
+  },
+  "decisionAfterBurst": {
+    "rate_limited": 6
+  },
+  "afterWindow": {
+    "valid": 16
+  }
+}

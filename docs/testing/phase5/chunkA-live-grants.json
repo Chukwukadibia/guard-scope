@@ -1,0 +1,328 @@
+{
+  "fixture": {
+    "v1": "e7d6aae4-d67c-44db-88d9-5e3591b34255",
+    "projectId": "41a56f81-ed11-4e55-9047-003281ba3d4a",
+    "coId": "e323edd9-c48d-4c36-b4af-f1aeea0db0b3",
+    "requestId": "25f852d5-6dfd-4754-a7ef-b16693e90cd5"
+  },
+  "anonRpc": {
+    "issue_approval_link": {
+      "status": 401,
+      "code": "42501"
+    },
+    "revoke_approval_link": {
+      "status": 401,
+      "code": "42501"
+    },
+    "classify_request": {
+      "status": 401,
+      "code": "42501"
+    },
+    "create_change_order": {
+      "status": 401,
+      "code": "42501"
+    },
+    "send_change_order_version": {
+      "status": 401,
+      "code": "42501"
+    },
+    "cancel_change_order_version": {
+      "status": 401,
+      "code": "42501"
+    },
+    "new_change_order_version": {
+      "status": 401,
+      "code": "42501"
+    },
+    "discard_change_order_draft": {
+      "status": 401,
+      "code": "42501"
+    },
+    "confirm_scope": {
+      "status": 401,
+      "code": "42501"
+    },
+    "delete_my_account": {
+      "status": 401,
+      "code": "42501"
+    },
+    "_throttle_key": {
+      "status": 401,
+      "code": "42501"
+    },
+    "_throttle_limits": {
+      "status": 401,
+      "code": "42501"
+    },
+    "_throttle_blocked": {
+      "status": 401,
+      "code": "42501"
+    },
+    "_throttle_record_failure": {
+      "status": 401,
+      "code": "42501"
+    },
+    "_link_state": {
+      "status": 401,
+      "code": "42501"
+    },
+    "_lock_change_order": {
+      "status": 401,
+      "code": "42501"
+    },
+    "approval_links_guard": {
+      "status": 404,
+      "code": "PGRST202"
+    },
+    "client_decisions_guard": {
+      "status": 404,
+      "code": "PGRST202"
+    }
+  },
+  "authRpcInternal": {
+    "_throttle_key": {
+      "status": 403,
+      "code": "42501"
+    },
+    "_throttle_limits": {
+      "status": 403,
+      "code": "42501"
+    },
+    "_throttle_blocked": {
+      "status": 403,
+      "code": "42501"
+    },
+    "_throttle_record_failure": {
+      "status": 403,
+      "code": "42501"
+    },
+    "_link_state": {
+      "status": 403,
+      "code": "42501"
+    },
+    "_lock_change_order": {
+      "status": 403,
+      "code": "42501"
+    },
+    "approval_links_guard": {
+      "status": 404,
+      "code": "PGRST202"
+    },
+    "client_decisions_guard": {
+      "status": 404,
+      "code": "PGRST202"
+    }
+  },
+  "writes": {
+    "anon.approval_links": {
+      "post": [
+        401,
+        "42501"
+      ],
+      "patch": [
+        401,
+        "42501"
+      ],
+      "del": [
+        401,
+        "42501"
+      ]
+    },
+    "anon.client_decisions": {
+      "post": [
+        401,
+        "42501"
+      ],
+      "patch": [
+        401,
+        "42501"
+      ],
+      "del": [
+        401,
+        "42501"
+      ]
+    },
+    "anon.public_link_attempts": {
+      "post": [
+        401,
+        "42501"
+      ],
+      "patch": [
+        401,
+        "42501"
+      ],
+      "del": [
+        401,
+        "42501"
+      ]
+    },
+    "anon.public_link_config": {
+      "post": [
+        401,
+        "42501"
+      ],
+      "patch": [
+        401,
+        "42501"
+      ],
+      "del": [
+        401,
+        "42501"
+      ]
+    },
+    "anon.change_order_versions": {
+      "post": [
+        401,
+        "42501"
+      ],
+      "patch": [
+        401,
+        "42501"
+      ],
+      "del": [
+        401,
+        "42501"
+      ]
+    },
+    "A-owner.approval_links": {
+      "post": [
+        403,
+        "42501"
+      ],
+      "patch": [
+        403,
+        "42501"
+      ],
+      "del": [
+        403,
+        "42501"
+      ]
+    },
+    "A-owner.client_decisions": {
+      "post": [
+        403,
+        "42501"
+      ],
+      "patch": [
+        403,
+        "42501"
+      ],
+      "del": [
+        403,
+        "42501"
+      ]
+    },
+    "A-owner.public_link_attempts": {
+      "post": [
+        403,
+        "42501"
+      ],
+      "patch": [
+        403,
+        "42501"
+      ],
+      "del": [
+        403,
+        "42501"
+      ]
+    },
+    "A-owner.public_link_config": {
+      "post": [
+        403,
+        "42501"
+      ],
+      "patch": [
+        403,
+        "42501"
+      ],
+      "del": [
+        403,
+        "42501"
+      ]
+    },
+    "A-owner.change_order_versions": {
+      "post": [
+        403,
+        "42501"
+      ],
+      "patch": [
+        403,
+        "42501"
+      ],
+      "del": [
+        403,
+        "42501"
+      ]
+    },
+    "B.approval_links": {
+      "post": [
+        403,
+        "42501"
+      ],
+      "patch": [
+        403,
+        "42501"
+      ],
+      "del": [
+        403,
+        "42501"
+      ]
+    },
+    "B.client_decisions": {
+      "post": [
+        403,
+        "42501"
+      ],
+      "patch": [
+        403,
+        "42501"
+      ],
+      "del": [
+        403,
+        "42501"
+      ]
+    },
+    "B.public_link_attempts": {
+      "post": [
+        403,
+        "42501"
+      ],
+      "patch": [
+        403,
+        "42501"
+      ],
+      "del": [
+        403,
+        "42501"
+      ]
+    },
+    "B.public_link_config": {
+      "post": [
+        403,
+        "42501"
+      ],
+      "patch": [
+        403,
+        "42501"
+      ],
+      "del": [
+        403,
+        "42501"
+      ]
+    },
+    "B.change_order_versions": {
+      "post": [
+        403,
+        "42501"
+      ],
+      "patch": [
+        403,
+        "42501"
+      ],
+      "del": [
+        403,
+        "42501"
+      ]
+    }
+  }
+}

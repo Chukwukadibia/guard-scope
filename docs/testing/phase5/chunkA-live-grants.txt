@@ -1,0 +1,43 @@
+scenario=grants started 2026-11-17T08:37:43.433Z
+anon  rpc/issue_approval_link: 401 42501 permission denied for function issue_approval_link
+anon  rpc/revoke_approval_link: 401 42501 permission denied for function revoke_approval_link
+anon  rpc/classify_request: 401 42501 permission denied for function classify_request
+anon  rpc/create_change_order: 401 42501 permission denied for function create_change_order
+anon  rpc/send_change_order_version: 401 42501 permission denied for function send_change_order_version
+anon  rpc/cancel_change_order_version: 401 42501 permission denied for function cancel_change_order_version
+anon  rpc/new_change_order_version: 401 42501 permission denied for function new_change_order_version
+anon  rpc/discard_change_order_draft: 401 42501 permission denied for function discard_change_order_draft
+anon  rpc/confirm_scope: 401 42501 permission denied for function confirm_scope
+anon  rpc/delete_my_account: 401 42501 permission denied for function delete_my_account
+anon  rpc/_throttle_key: 401 42501 permission denied for function _throttle_key
+anon  rpc/_throttle_limits: 401 42501 permission denied for function _throttle_limits
+anon  rpc/_throttle_blocked: 401 42501 permission denied for function _throttle_blocked
+anon  rpc/_throttle_record_failure: 401 42501 permission denied for function _throttle_record_failure
+anon  rpc/_link_state: 401 42501 permission denied for function _link_state
+anon  rpc/_lock_change_order: 401 42501 permission denied for function _lock_change_order
+anon  rpc/approval_links_guard: 404 PGRST202 Could not find the function public.approval_links_guard with
+anon  rpc/client_decisions_guard: 404 PGRST202 Could not find the function public.client_decisions_guard wi
+authd rpc/_throttle_key: 403 42501
+authd rpc/_throttle_limits: 403 42501
+authd rpc/_throttle_blocked: 403 42501
+authd rpc/_throttle_record_failure: 403 42501
+authd rpc/_link_state: 403 42501
+authd rpc/_lock_change_order: 403 42501
+authd rpc/approval_links_guard: 404 PGRST202
+authd rpc/client_decisions_guard: 404 PGRST202
+anon approval_links: POST 401/42501 PATCH 401/42501 DELETE 401/42501
+anon client_decisions: POST 401/42501 PATCH 401/42501 DELETE 401/42501
+anon public_link_attempts: POST 401/42501 PATCH 401/42501 DELETE 401/42501
+anon public_link_config: POST 401/42501 PATCH 401/42501 DELETE 401/42501
+anon change_order_versions: POST 401/42501 PATCH 401/42501 DELETE 401/42501
+A-owner approval_links: POST 403/42501 PATCH 403/42501 DELETE 403/42501
+A-owner client_decisions: POST 403/42501 PATCH 403/42501 DELETE 403/42501
+A-owner public_link_attempts: POST 403/42501 PATCH 403/42501 DELETE 403/42501
+A-owner public_link_config: POST 403/42501 PATCH 403/42501 DELETE 403/42501
+A-owner change_order_versions: POST 403/42501 PATCH 403/42501 DELETE 403/42501
+B approval_links: POST 403/42501 PATCH 403/42501 DELETE 403/42501
+B client_decisions: POST 403/42501 PATCH 403/42501 DELETE 403/42501
+B public_link_attempts: POST 403/42501 PATCH 403/42501 DELETE 403/42501
+B public_link_config: POST 403/42501 PATCH 403/42501 DELETE 403/42501
+B change_order_versions: POST 403/42501 PATCH 403/42501 DELETE 403/42501
+fixture link state after all attempts: valid

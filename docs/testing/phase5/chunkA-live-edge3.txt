@@ -1,0 +1,13 @@
+scenario=edge3 started 2026-11-17T08:39:14.131Z
+edge 1MB token: http 200 state=invalid code=- 1056ms
+edge 5MB token: http 200 state=invalid code=- 3355ms
+1MB comment submit: http 200 {"error": "validation"} 1412ms
+malformed badjson: http 400 code=PGRST102 state=- msg=Empty or invalid json
+malformed array: http 400 code=PGRST102 state=- msg=All object keys must match
+malformed missing: http 404 code=PGRST202 state=- msg=Could not find the function public.get_public_proposal without parameters in the
+malformed numeric: http 200 code=- state=invalid msg=
+malformed object: http 200 code=- state=invalid msg=
+malformed textplain: http 404 code=PGRST202 state=- msg=Could not find the function public.get_public_proposal in the schema cache
+malformed nulbody: http 400 code=22P05 state=- msg=unsupported Unicode escape sequence
+any 5xx in malformed set: false
+final state of fixture link: valid

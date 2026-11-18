@@ -1,0 +1,16 @@
+{
+  "fixture": {
+    "v1": "a9cde22c-b36c-496f-8226-52bb2c600f51",
+    "projectId": "56b186a7-a9b2-435c-8537-418de05a2352"
+  },
+  "expiry": {
+    "finalState": "expired",
+    "decision": {
+      "error": "expired"
+    }
+  },
+  "readAfter": {
+    "state": "expired",
+    "freelancer_name": null
+  }
+}

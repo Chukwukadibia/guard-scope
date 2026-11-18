@@ -1,0 +1,8 @@
+scenario=throttle started 2026-11-17T08:47:09.861Z
+120 random well-formed tokens: invalid = 40 rate_limited = 80 first rate_limited at attempt 41
+VALID token reads right after the burst (sources rotate): {"rate_limited":16}
+decision attempts right after the burst: {"rate_limited":6}
+now (UTC) 2026-11-17T08:47:36.018Z
+waiting until window boundary 2026-11-17T08:50:00.000Z plus 3s
+after rollover, valid token reads: {"valid":16}
+a fresh failure after rollover is processed -> invalid

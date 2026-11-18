@@ -1,0 +1,60 @@
+scenario=surface started 2026-11-17T08:37:05.889Z
+issue via REST RPC as owner: expires_at 2026-12-17T08:37:08.753575+00:00 token length 43 base64url true
+expiry days from now 30.000
+owner GET approval_links_cols: 200 code=- rows=1 rawTokenInBody=false
+owner GET approval_links_star: 403 code=42501 rows=- rawTokenInBody=false
+owner GET approval_links_hash: 403 code=42501 rows=- rawTokenInBody=false
+owner GET decisions_star: 403 code=42501 rows=- rawTokenInBody=false
+owner GET decisions_key: 403 code=42501 rows=- rawTokenInBody=false
+owner GET activity_events: 200 code=- rows=5 rawTokenInBody=false
+owner GET versions: 200 code=- rows=1 rawTokenInBody=false
+owner GET projects: 200 code=- rows=1 rawTokenInBody=false
+owner-visible events: ["request.created","request.classified","change_order.created","change_order.sent","change_order.link_issued"]
+raw token in any response header of issue RPC: false
+old link after reissue -> "valid"
+error responses leak raw token: 400:false 404:false 404:false 404:false 400:false 403:false
+error codes: 22P02 PGRST202 PGRST202 PGRST202 22P02 42501
+anon GET rpc/get_public_proposal (random token): 405 25006
+anon GET rpc/submit_public_decision: 405 25006
+anon GET rpc/issue_approval_link: 401 42501
+anon GET submit with a VALID token -> 405 state after: valid
+anon GET approval_links: 401 code=42501 rows=-
+anon GET client_decisions: 401 code=42501 rows=-
+anon GET public_link_attempts: 401 code=42501 rows=-
+anon GET public_link_config: 401 code=42501 rows=-
+anon GET change_order_versions: 401 code=42501 rows=-
+anon GET change_orders: 401 code=42501 rows=-
+anon GET activity_events: 401 code=42501 rows=-
+anon GET requests: 401 code=42501 rows=-
+anon GET projects: 401 code=42501 rows=-
+anon POST/PATCH/DELETE approval_links: 401/401/401 codes 42501,42501,42501
+anon POST/PATCH/DELETE client_decisions: 401/400/401 codes 42501,PGRST204,42501
+anon POST/PATCH/DELETE public_link_attempts: 400/400/400 codes PGRST204,PGRST204,42703
+anon POST/PATCH/DELETE public_link_config: 400/400/400 codes PGRST204,PGRST204,42703
+anon POST/PATCH/DELETE change_order_versions: 400/400/400 codes PGRST204,PGRST204,42703
+B GET approval_links: 403 code=42501 rows=-
+B GET client_decisions: 403 code=42501 rows=-
+B GET public_link_attempts: 403 code=42501 rows=-
+B GET public_link_config: 403 code=42501 rows=-
+B GET change_order_versions: 200 code=- rows=0
+B GET change_orders: 200 code=- rows=0
+B GET activity_events: 200 code=- rows=0
+B GET requests: 200 code=- rows=0
+B GET projects: 200 code=- rows=0
+B POST/PATCH/DELETE approval_links: 403/403/403 codes 42501,42501,42501
+B POST/PATCH/DELETE client_decisions: 403/400/403 codes 42501,PGRST204,42501
+B POST/PATCH/DELETE public_link_attempts: 400/400/400 codes PGRST204,PGRST204,42703
+B POST/PATCH/DELETE public_link_config: 400/400/400 codes PGRST204,PGRST204,42703
+B POST/PATCH/DELETE change_order_versions: 400/400/400 codes PGRST204,PGRST204,42703
+owner A POST client_decisions: 403 42501
+B issue on A version: 400 not_found | B revoke: 400 not_found
+A link still valid after B attempts -> valid
+anon POST rpc/issue_approval_link: 404 PGRST202 Could not find the function public.issue_approval_link(p_classificatio
+anon POST rpc/revoke_approval_link: 404 PGRST202 Could not find the function public.revoke_approval_link(p_classificati
+anon POST rpc/_throttle_key: 404 PGRST202 Could not find the function public._throttle_key(p_classification, p_p
+anon POST rpc/_throttle_blocked: 404 PGRST202 Could not find the function public._throttle_blocked(p_classification,
+anon POST rpc/_link_state: 404 PGRST202 Could not find the function public._link_state(p_classification, p_p_k
+anon POST rpc/classify_request: 404 PGRST202 Could not find the function public.classify_request(p_classification, 
+anon POST rpc/send_change_order_version: 404 PGRST202 Could not find the function public.send_change_order_version(p_classif
+anon POST rpc/delete_my_account: 404 PGRST202 Could not find the function public.delete_my_account(p_classification,
+final state of fixture link: valid

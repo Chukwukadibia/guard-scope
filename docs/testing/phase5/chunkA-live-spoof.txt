@@ -1,0 +1,11 @@
+scenario=spoof started 2026-11-17T08:39:25.241Z
+xff-single: invalid,invalid,invalid
+xff-two: invalid,invalid,invalid
+cf-spoof: ,,
+xri-spoof: invalid,invalid,invalid
+tci-spoof: invalid,invalid,invalid
+fwd-spoof: invalid,invalid,invalid
+xff-trailing-comma: invalid,invalid,invalid
+xff-and-cf: ,,
+none: invalid,invalid,invalid
+candidate values to check in SQL: 203.0.113.7 .8 .9(198.51.100.9) .50 .51 .52 .53 .54 .55 .56 .57

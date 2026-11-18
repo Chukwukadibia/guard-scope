@@ -1,0 +1,10 @@
+Tester file tests/db/client_approval_tester.test.sql, executed at ee35044 via pgtap-wrap + execute_sql (ROLLBACK).
+Run 1 result: 157 planned, 151 ok, 6 not ok ("Looks like you failed 6 tests of 157"). (The TAP rows come back in heap order, not numeric order; numbering of "ok 156" appearing early is a harmless artefact of string_agg without ORDER BY in scripts/pgtap-wrap.py.)
+
+not ok 11 - SPEC BR-2: pending, not the latest version, and revoked -> superseded   have: revoked   want: superseded   (FINDING F-3, LOW)
+not ok 12 - SPEC BR-2: pending, not the latest version, and expired -> superseded    have: expired   want: superseded   (FINDING F-3, LOW)
+not ok 27 - SPEC CO-008: v1 still current PENDING while owner only has unsent draft v2 -> link should stay valid   have: superseded want: valid  (FINDING F-1, MEDIUM)
+not ok 30 - SPEC CO-008: client can still decide pending version while unsent draft exists   have: NULL (error=superseded) want: recorded  (FINDING F-1, MEDIUM)
+not ok 70 - security definer functions pin empty search_path : TEST BUG (proconfig::text has escaped quotes). Fixed to 'search_path=""' = any(proconfig); verified standalone: all 6 functions prosecdef=true and search_path="" (see run 2 note).
+not ok 109 - whitespace-only comment stored as NULL   have: E'\t\n \n' (tab/newline retained) want: NULL  (FINDING F-2, LOW: btrim() trims spaces only)
+All other 151 assertions passed (see assertion names in the file).

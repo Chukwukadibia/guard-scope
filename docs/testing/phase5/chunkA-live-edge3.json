@@ -1,0 +1,48 @@
+{
+  "fixture": {
+    "v1": "367cc421-0a03-471a-b995-8b42987dace6",
+    "projectId": "078f1532-b7d8-43c6-9ddc-346bc41b74cd"
+  },
+  "edge": {
+    "1MB": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 1056
+    },
+    "5MB": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 3355
+    }
+  },
+  "malformed": {
+    "badjson": {
+      "status": 400,
+      "code": "PGRST102"
+    },
+    "array": {
+      "status": 400,
+      "code": "PGRST102"
+    },
+    "missing": {
+      "status": 404,
+      "code": "PGRST202"
+    },
+    "numeric": {
+      "status": 200,
+      "state": "invalid"
+    },
+    "object": {
+      "status": 200,
+      "state": "invalid"
+    },
+    "textplain": {
+      "status": 404,
+      "code": "PGRST202"
+    },
+    "nulbody": {
+      "status": 400,
+      "code": "22P05"
+    }
+  }
+}

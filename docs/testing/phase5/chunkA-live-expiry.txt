@@ -1,0 +1,6 @@
+scenario=expiry started 2026-11-17T08:46:28.065Z
+fixture ready; waiting for SQL-side expiry change (harness sets expires_at = now()+15s), then call "expiry-check"
+state now valid
+state turned expired after 22 s
+decision after expiry -> 200 {"error":"expired"}
+read after expiry -> {"state":"expired","freelancer_name":null}

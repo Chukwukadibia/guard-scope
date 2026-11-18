@@ -1,0 +1,14 @@
+scenario=concurrency started 2026-11-17T08:40:33.173Z
+{"round":1,"v1":"e5fb2c93-dcb8-4fbe-872c-d591940c8f9d","recorded":1,"already":3,"decided":20,"other":0,"winnerDecision":"approved","winnerKeyIdx":0,"maxMs":784,"alreadyReturnsOriginal":true}
+{"round":2,"v1":"5b14d11e-6d40-41eb-9b72-f64eb6bce80a","recorded":1,"already":3,"decided":20,"other":0,"winnerDecision":"approved","winnerKeyIdx":0,"maxMs":389,"alreadyReturnsOriginal":true}
+{"round":3,"v1":"c1d05f0f-e381-4725-a13d-1bc052b6e9dc","recorded":1,"already":3,"decided":20,"other":0,"winnerDecision":"declined","winnerKeyIdx":4,"maxMs":366,"alreadyReturnsOriginal":true}
+{"round":4,"v1":"ffbc940f-5972-4481-9a48-0d0a1c1216d1","recorded":1,"already":0,"decided":23,"other":0,"winnerDecision":"approved","winnerKeyIdx":-1,"maxMs":367,"alreadyReturnsOriginal":true}
+{"round":5,"v1":"c6f19bbc-cb45-49ed-a62e-03bb0851349e","recorded":1,"already":0,"decided":23,"other":0,"winnerDecision":"approved","winnerKeyIdx":-1,"maxMs":367,"alreadyReturnsOriginal":true}
+{"round":6,"v1":"abd95372-a6e0-4fe7-9bbc-a75c00533bba","recorded":1,"already":3,"decided":20,"other":0,"winnerDecision":"clarification_requested","winnerKeyIdx":2,"maxMs":348,"alreadyReturnsOriginal":true}
+{"round":7,"v1":"7a60c3d9-7342-4d74-9d9e-6a175062fcf2","recorded":1,"already":3,"decided":20,"other":0,"winnerDecision":"approved","winnerKeyIdx":0,"maxMs":348,"alreadyReturnsOriginal":true}
+{"round":8,"v1":"c5026a76-8562-474a-90b4-846209ea8059","recorded":1,"already":0,"decided":23,"other":0,"winnerDecision":"clarification_requested","winnerKeyIdx":-1,"maxMs":2310,"alreadyReturnsOriginal":true}
+{"round":9,"v1":"f5faf2eb-f931-43bb-a537-3d3d0a9df144","recorded":1,"already":3,"decided":20,"other":0,"winnerDecision":"declined","winnerKeyIdx":4,"maxMs":357,"alreadyReturnsOriginal":true}
+{"round":10,"v1":"db886102-2137-4602-ba1f-41614d2a4860","recorded":1,"already":3,"decided":20,"other":0,"winnerDecision":"clarification_requested","winnerKeyIdx":2,"maxMs":344,"alreadyReturnsOriginal":true}
+rounds with exactly one recorded: 10 / 10
+rounds with any 5xx / unexpected response: 0
+DB verification (SQL): all 10 rounds: decisions=1, version.status = decision, client events=1, mismatched events=0

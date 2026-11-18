@@ -1,0 +1,49 @@
+{
+  "spoof": {
+    "xff-single": [
+      "invalid",
+      "invalid",
+      "invalid"
+    ],
+    "xff-two": [
+      "invalid",
+      "invalid",
+      "invalid"
+    ],
+    "cf-spoof": [
+      null,
+      null,
+      null
+    ],
+    "xri-spoof": [
+      "invalid",
+      "invalid",
+      "invalid"
+    ],
+    "tci-spoof": [
+      "invalid",
+      "invalid",
+      "invalid"
+    ],
+    "fwd-spoof": [
+      "invalid",
+      "invalid",
+      "invalid"
+    ],
+    "xff-trailing-comma": [
+      "invalid",
+      "invalid",
+      "invalid"
+    ],
+    "xff-and-cf": [
+      null,
+      null,
+      null
+    ],
+    "none": [
+      "invalid",
+      "invalid",
+      "invalid"
+    ]
+  }
+}

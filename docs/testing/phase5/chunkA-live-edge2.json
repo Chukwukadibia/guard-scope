@@ -1,0 +1,53 @@
+{
+  "fixture": {
+    "v1": "b3e18f2f-3fe1-4a0a-b6d9-f743ab2065c2",
+    "projectId": "092526cf-71b9-4d09-9f32-ef957d1c882f"
+  },
+  "edge": {
+    "nbsp": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 135
+    },
+    "zwsp": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 363
+    },
+    "cyrillic": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 165
+    },
+    "emoji": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 385
+    },
+    "upper": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 330
+    },
+    "lower": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 354
+    },
+    "sqli": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 130
+    },
+    "percent": {
+      "status": 200,
+      "state": "invalid",
+      "ms": 183
+    },
+    "nul": {
+      "status": 400,
+      "state": "22P05",
+      "ms": 183
+    }
+  }
+}

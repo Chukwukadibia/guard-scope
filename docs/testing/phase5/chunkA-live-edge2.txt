@@ -1,0 +1,11 @@
+scenario=edge2 started 2026-11-17T08:38:13.687Z
+edge nbsp: http 200 state=invalid code=- 135ms
+edge zwsp: http 200 state=invalid code=- 363ms
+edge cyrillic: http 200 state=invalid code=- 165ms
+edge emoji: http 200 state=invalid code=- 385ms
+edge upper: http 200 state=invalid code=- 330ms
+edge lower: http 200 state=invalid code=- 354ms
+edge sqli: http 200 state=invalid code=- 130ms
+edge percent: http 200 state=invalid code=- 183ms
+edge nul: http 400 state=- code=22P05 183ms
+final state of fixture link: valid

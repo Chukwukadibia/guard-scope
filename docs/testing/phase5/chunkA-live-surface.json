@@ -1,0 +1,317 @@
+{
+  "fixture": {
+    "projectId": "f07115ee-6678-4197-b87f-46819d9d88e5",
+    "v1": "6ab8299f-2d70-4b7b-9f4c-01be2125d79c",
+    "coId": "56a5e31c-6e14-4b18-a662-50522a2050c2"
+  },
+  "expiryDays": 29.99999914351852,
+  "ownerReads": {
+    "approval_links_cols": {
+      "status": 200,
+      "leaked": false,
+      "rows": 1
+    },
+    "approval_links_star": {
+      "status": 403,
+      "leaked": false,
+      "code": "42501",
+      "rows": null
+    },
+    "approval_links_hash": {
+      "status": 403,
+      "leaked": false,
+      "code": "42501",
+      "rows": null
+    },
+    "decisions_star": {
+      "status": 403,
+      "leaked": false,
+      "code": "42501",
+      "rows": null
+    },
+    "decisions_key": {
+      "status": 403,
+      "leaked": false,
+      "code": "42501",
+      "rows": null
+    },
+    "activity_events": {
+      "status": 200,
+      "leaked": false,
+      "rows": 5
+    },
+    "versions": {
+      "status": 200,
+      "leaked": false,
+      "rows": 1
+    },
+    "projects": {
+      "status": 200,
+      "leaked": false,
+      "rows": 1
+    }
+  },
+  "headerLeak": false,
+  "errorLeaks": [
+    {
+      "status": 400,
+      "code": "22P02",
+      "leaked": false
+    },
+    {
+      "status": 404,
+      "code": "PGRST202",
+      "leaked": false
+    },
+    {
+      "status": 404,
+      "code": "PGRST202",
+      "leaked": false
+    },
+    {
+      "status": 404,
+      "code": "PGRST202",
+      "leaked": false
+    },
+    {
+      "status": 400,
+      "code": "22P02",
+      "leaked": false
+    },
+    {
+      "status": 403,
+      "code": "42501",
+      "leaked": false
+    }
+  ],
+  "anonGet": {
+    "get_public_proposal": 405,
+    "submit": 405,
+    "issue": 401
+  },
+  "getValidStatus": 405,
+  "directAccess": {
+    "anon.approval_links": {
+      "status": 401,
+      "code": "42501",
+      "rows": null
+    },
+    "anon.client_decisions": {
+      "status": 401,
+      "code": "42501",
+      "rows": null
+    },
+    "anon.public_link_attempts": {
+      "status": 401,
+      "code": "42501",
+      "rows": null
+    },
+    "anon.public_link_config": {
+      "status": 401,
+      "code": "42501",
+      "rows": null
+    },
+    "anon.change_order_versions": {
+      "status": 401,
+      "code": "42501",
+      "rows": null
+    },
+    "anon.change_orders": {
+      "status": 401,
+      "code": "42501",
+      "rows": null
+    },
+    "anon.activity_events": {
+      "status": 401,
+      "code": "42501",
+      "rows": null
+    },
+    "anon.requests": {
+      "status": 401,
+      "code": "42501",
+      "rows": null
+    },
+    "anon.projects": {
+      "status": 401,
+      "code": "42501",
+      "rows": null
+    },
+    "anon.write.approval_links": {
+      "post": 401,
+      "patch": 401,
+      "del": 401,
+      "codes": [
+        "42501",
+        "42501",
+        "42501"
+      ]
+    },
+    "anon.write.client_decisions": {
+      "post": 401,
+      "patch": 400,
+      "del": 401,
+      "codes": [
+        "42501",
+        "PGRST204",
+        "42501"
+      ]
+    },
+    "anon.write.public_link_attempts": {
+      "post": 400,
+      "patch": 400,
+      "del": 400,
+      "codes": [
+        "PGRST204",
+        "PGRST204",
+        "42703"
+      ]
+    },
+    "anon.write.public_link_config": {
+      "post": 400,
+      "patch": 400,
+      "del": 400,
+      "codes": [
+        "PGRST204",
+        "PGRST204",
+        "42703"
+      ]
+    },
+    "anon.write.change_order_versions": {
+      "post": 400,
+      "patch": 400,
+      "del": 400,
+      "codes": [
+        "PGRST204",
+        "PGRST204",
+        "42703"
+      ]
+    },
+    "B.approval_links": {
+      "status": 403,
+      "code": "42501",
+      "rows": null
+    },
+    "B.client_decisions": {
+      "status": 403,
+      "code": "42501",
+      "rows": null
+    },
+    "B.public_link_attempts": {
+      "status": 403,
+      "code": "42501",
+      "rows": null
+    },
+    "B.public_link_config": {
+      "status": 403,
+      "code": "42501",
+      "rows": null
+    },
+    "B.change_order_versions": {
+      "status": 200,
+      "rows": 0
+    },
+    "B.change_orders": {
+      "status": 200,
+      "rows": 0
+    },
+    "B.activity_events": {
+      "status": 200,
+      "rows": 0
+    },
+    "B.requests": {
+      "status": 200,
+      "rows": 0
+    },
+    "B.projects": {
+      "status": 200,
+      "rows": 0
+    },
+    "B.write.approval_links": {
+      "post": 403,
+      "patch": 403,
+      "del": 403,
+      "codes": [
+        "42501",
+        "42501",
+        "42501"
+      ]
+    },
+    "B.write.client_decisions": {
+      "post": 403,
+      "patch": 400,
+      "del": 403,
+      "codes": [
+        "42501",
+        "PGRST204",
+        "42501"
+      ]
+    },
+    "B.write.public_link_attempts": {
+      "post": 400,
+      "patch": 400,
+      "del": 400,
+      "codes": [
+        "PGRST204",
+        "PGRST204",
+        "42703"
+      ]
+    },
+    "B.write.public_link_config": {
+      "post": 400,
+      "patch": 400,
+      "del": 400,
+      "codes": [
+        "PGRST204",
+        "PGRST204",
+        "42703"
+      ]
+    },
+    "B.write.change_order_versions": {
+      "post": 400,
+      "patch": 400,
+      "del": 400,
+      "codes": [
+        "PGRST204",
+        "PGRST204",
+        "42703"
+      ]
+    },
+    "anon.rpc.issue_approval_link": {
+      "status": 404,
+      "code": "PGRST202"
+    },
+    "anon.rpc.revoke_approval_link": {
+      "status": 404,
+      "code": "PGRST202"
+    },
+    "anon.rpc._throttle_key": {
+      "status": 404,
+      "code": "PGRST202"
+    },
+    "anon.rpc._throttle_blocked": {
+      "status": 404,
+      "code": "PGRST202"
+    },
+    "anon.rpc._link_state": {
+      "status": 404,
+      "code": "PGRST202"
+    },
+    "anon.rpc.classify_request": {
+      "status": 404,
+      "code": "PGRST202"
+    },
+    "anon.rpc.send_change_order_version": {
+      "status": 404,
+      "code": "PGRST202"
+    },
+    "anon.rpc.delete_my_account": {
+      "status": 404,
+      "code": "PGRST202"
+    }
+  },
+  "ownerWriteDecision": 403,
+  "bCross": {
+    "issue": "not_found",
+    "revoke": "not_found"
+  }
+}
