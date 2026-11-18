@@ -1,0 +1,6 @@
+scenario=retest started 2026-11-18T08:56:48.521Z
+draft v2 created: 200
+F-1 live: state of v1 link while an unsent draft v2 exists -> valid
+F-3 live: revoked link with a draft present -> revoked (draft does not make v1 non-latest, so revoked is correct)
+F-1 live: decision while draft exists -> {"result":"recorded","decision":"approved","decided_at":"2026-11-18T08:56:53.65561+00:00"}
+F-2 live: stored comment for tab/newline-only input -> [{"comment":null,"decision":"approved"}]

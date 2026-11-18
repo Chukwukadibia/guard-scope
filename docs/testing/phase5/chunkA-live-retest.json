@@ -1,0 +1,18 @@
+{
+  "fixture": {
+    "v1": "815cfe98-75de-47ec-873f-63305450afe3",
+    "projectId": "9deae4c4-a821-4224-a7d7-6dda59309e55",
+    "coId": "e6181a14-0dd8-447d-abed-a8bad5c4985b"
+  },
+  "retest": {
+    "st1": "valid",
+    "st2": "revoked",
+    "decision": "recorded",
+    "comment": [
+      {
+        "comment": null,
+        "decision": "approved"
+      }
+    ]
+  }
+}

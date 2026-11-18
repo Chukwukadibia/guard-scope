@@ -225,8 +225,9 @@ test('T-03/T-05/T-06/T-07/T-10 UI: preview, send confirmation, v2 supersedes v1,
   // T-03 send-time rules in the UI
   await d.getByRole('button', { name: 'Send version 1…' }).click();
   await expect(page.getByRole('group', { name: 'Send version 1?' })).toBeVisible();
+  // Phase 5 copy (was: "Secure approval links ... next release.")
   await expect(page.getByRole('group', { name: 'Send version 1?' })).toContainText(
-    'Secure approval links for your client arrive in the next release.',
+    'After sending, you get a private link to share with your client.',
   );
   await page.getByRole('button', { name: 'Yes, send version 1' }).click();
   await expect(page.getByText('Describe the extra work before sending.').first()).toBeVisible();
@@ -265,12 +266,14 @@ test('T-03/T-05/T-06/T-07/T-10 UI: preview, send confirmation, v2 supersedes v1,
   await expect(page.getByText('Version 1 sent. Its content is now fixed.')).toBeVisible();
   const v1Card = versionCard(page, 1);
   await expect(v1Card).toContainText('Sent, waiting for the client');
-  await expect(v1Card).toContainText(
-    'Secure approval links for your client arrive in the next release.',
-  );
+  // Phase 5 copy (was: "Secure approval links ... next release.")
+  await expect(v1Card).toContainText('Waiting for the client. Share the link below yourself');
   await expect(v1Card).toContainText('+GBP 400.00');
   await expect(page.getByLabel('Title', { exact: true })).toHaveCount(0);
-  await expectNoDeadLinkButtons(page);
+  // Phase 5: after sending, the link actions are REAL (a link was just issued), so the "no dead link
+  // buttons" check no longer applies here; it still applies to the draft state (T-01) above.
+  await expect(page.getByRole('group', { name: 'Link for version 1' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Copy link' })).toBeVisible();
   await expectNoMoneyClaims(page);
   await expectAmountsHaveCurrency(page);
   const v1Text = await v1Card.locator('dl').innerText();
@@ -338,9 +341,11 @@ test('T-03/T-05/T-06/T-07/T-10 UI: preview, send confirmation, v2 supersedes v1,
   expect(items).toEqual([
     expect.stringMatching(/^Change proposal created from request/),
     'Version 1 sent',
+    'Approval link issued for version 1', // Phase 5: sending issues the link
     'Draft version 2 created from version 1',
     'Version 1 superseded by version 2',
     'Version 2 sent',
+    'Approval link issued for version 2', // Phase 5
     'Version 2 cancelled before the client decided',
     'Draft version 3 created from version 2',
     'Draft version 3 discarded',

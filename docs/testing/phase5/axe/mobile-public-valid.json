@@ -1,0 +1,13 @@
+{
+  "violations": [
+    {
+      "id": "page-has-heading-one",
+      "impact": "moderate",
+      "help": "Page should contain a level-one heading",
+      "nodes": [
+        "html"
+      ]
+    }
+  ],
+  "passes": 30
+}

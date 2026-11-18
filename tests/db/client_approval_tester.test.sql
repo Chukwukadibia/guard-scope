@@ -21,7 +21,8 @@ create function pg_temp.mkv(n int, st text, rev boolean, exp boolean, proj uuid)
   select id, extensions.digest(pg_temp.tk(n), 'sha256'), case when exp then now() - interval '1 second' else now() + interval '1 day' end, case when rev then now() - interval '1 hour' end from v
   returning version_id $$;
 create function pg_temp.vid(n int) returns uuid language sql stable security definer as $$ select l.version_id from public.approval_links l where l.token_hash = extensions.digest(pg_temp.tk(n), 'sha256') $$;
-create function pg_temp.try(q text) returns text language plpgsql as $$ begin execute q; return 'ok'; exception when others then return sqlstate || ':' || sqlerrm; end $$;
+-- try(): runs q in a subtransaction; success is rolled back so the probe has no side effects ('ok'); failure returns 'SQLSTATE:message'.
+create function pg_temp.try(q text) returns text language plpgsql as $$ begin execute q; raise exception 'TRY_ROLLBACK'; exception when others then if sqlerrm = 'TRY_ROLLBACK' then return 'ok'; end if; return sqlstate || ':' || sqlerrm; end $$;
 create function pg_temp.try_issue(v uuid) returns text language plpgsql as $$ begin perform public.issue_approval_link(v); return 'ok'; exception when others then return sqlerrm; end $$;
 create function pg_temp.try_revoke(v uuid) returns text language plpgsql as $$ begin return public.revoke_approval_link(v)::text; exception when others then return sqlerrm; end $$;
 create function pg_temp.keys(j jsonb) returns text language sql immutable as $$ select coalesce(string_agg(k, ',' order by k collate "C"), '') from jsonb_object_keys(j) k $$;
@@ -259,7 +260,7 @@ select ok((select bool_and(pg_temp.try(q) = 'P0001:approval_link_immutable') fro
   'update public.approval_links set id = gen_random_uuid()', 'update public.approval_links set version_id = gen_random_uuid()', 'update public.approval_links set token_hash = extensions.digest(''x'', ''sha256'')',
   'update public.approval_links set expires_at = expires_at + interval ''1 day''', 'update public.approval_links set created_at = created_at - interval ''1 day''',
   'update public.approval_links set revoked_at = null where revoked_at is not null', 'update public.approval_links set revoked_at = now() + interval ''1 day'' where revoked_at is not null', 'delete from public.approval_links']) q), 'superuser: every approval_links column is immutable, a revoked link can neither be revived nor re-dated, and links cannot be deleted');
-select is(pg_temp.try('update public.approval_links set revoked_at = now() where revoked_at is null and id = (select id from public.approval_links where revoked_at is null limit 1)'), 'ok', 'the only permitted link change: null -> revoked_at');
+select is(pg_temp.try('update public.approval_links set revoked_at = now() where revoked_at is null and token_hash = extensions.digest(pg_temp.tk(12), ''sha256'')'), 'ok', 'the only permitted link change: null -> revoked_at');
 select is(pg_temp.try('update public.change_order_versions set status = ''pending'' where status = ''approved'''), 'P0001:invalid_transition', 'a decided version cannot be reopened, even by a privileged role');
 
 -- ===================== token edge cases (all must be invalid, no crash) =====================

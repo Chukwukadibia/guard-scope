@@ -16,7 +16,8 @@ values
 -- Schema / static checks
 select is((select count(*)::int from public.profiles where id = 'aaaaaaaa-0000-0000-0000-00000000000a' and display_name is null and default_currency is null), 1, 'T-07/BR-4: new profile created by trigger with empty name and currency');
 select is((select count(*)::int from pg_tables where schemaname = 'public' and not rowsecurity), 0, '§5.1: RLS enabled on every public table');
-select is((select count(*)::int from information_schema.columns where table_schema = 'public' and (column_name ilike '%password%' or column_name ilike '%passwd%' or column_name ilike '%pwd%' or column_name ilike '%hash%' or column_name ilike '%secret%')), 0, 'T-10/AC-7: no password-like columns in public');
+select is((select count(*)::int from information_schema.columns where table_schema = 'public' and (column_name ilike '%password%' or column_name ilike '%passwd%' or column_name ilike '%pwd%' or column_name ilike '%hash%' or column_name ilike '%secret%')
+           and not (table_name = 'approval_links' and column_name = 'token_hash')), 0, 'T-10/AC-7: no password-like columns in public (only the Phase 5 approval_links.token_hash, a SHA-256 of a random link token, is allow-listed)');
 select ok((select prosecdef and proconfig @> array['search_path=""'] from pg_proc where oid = 'public.handle_new_user()'::regprocedure), 'security definer handle_new_user pins search_path to empty');
 select ok(not has_function_privilege('anon', 'public.set_updated_at()', 'execute'), 'anon cannot execute set_updated_at');
 select ok(not has_table_privilege('anon', 'public.profiles', 'select,insert,update,delete'), 'anon has no table privileges on profiles');

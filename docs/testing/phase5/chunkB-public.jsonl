@@ -1,0 +1,17 @@
+{"project":"desktop","label":"PWA offline reopen of a decided link","data":{"swReady":"active","text":"You're offline. Reconnect to continue. GuardScope Success: Your response has been recorded. Your response has been recorded Approved · 18 Nov 2026, 09:04 UTC You approved this proposal. Recorded for version 1 of “Req P4T p5-pwa desktop hz94ej” (P4T p5-pwa desktop hz94ej). You can close this page. No"}}
+{"project":"desktop","label":"storage key names on the valid public page","data":["local:sb-eqozjuaaajstrewygqxr-auth-token","local:guardscope.hadSession"]}
+{"project":"desktop","label":"storage key names on the valid public page","data":{"storageKeys":["local:sb-eqozjuaaajstrewygqxr-auth-token","local:guardscope.hadSession"],"storageShape":[["sb-eqozjuaaajstrewygqxr-auth-token",1827,"{\"access_token\":\"<long>.<long>.<long>\",\"token_type\":\"bearer\",\"expires_in\":3600,\""],["guardscope.hadSession",1,"1"]]}}
+{"project":"desktop","label":"storage key names on the valid public page","data":{"storageKeys":[],"storageShape":[]}}
+{"project":"desktop","label":"T-03 valid projection text","data":{"len":524}}
+{"project":"desktop","label":"HTTP 429 rendering","data":"GuardScope We couldn't load this proposal Check your connection and try again. Your link is still valid. Try again"}
+{"project":"desktop","label":"PWA offline reopen of a decided link","data":{"swReady":"active","text":"You're offline. Reconnect to continue. GuardScope We couldn't load this proposal Check your connection and try again. Your link is still valid. Try again"}}
+{"project":"desktop","label":"storage key names on the valid public page","data":{"storageKeys":[],"storageShape":[]}}
+{"project":"mobile","label":"storage key names on the valid public page","data":{"storageKeys":[],"storageShape":[]}}
+{"project":"desktop","label":"T-03 valid projection text","data":{"len":524}}
+{"project":"mobile","label":"T-03 valid projection text","data":{"len":522}}
+{"project":"desktop","label":"HTTP 429 rendering","data":"GuardScope We couldn't load this proposal Check your connection and try again. Your link is still valid. Try again"}
+{"project":"mobile","label":"HTTP 429 rendering","data":"GuardScope We couldn't load this proposal Check your connection and try again. Your link is still valid. Try again"}
+{"project":"desktop","label":"PWA offline reopen of a decided link","data":{"swReady":"active","text":"You're offline. Reconnect to continue. GuardScope We couldn't load this proposal Check your connection and try again. Your link is still valid. Try again"}}
+{"project":"mobile","label":"PWA offline reopen of a decided link","data":{"swReady":"active","text":"You're offline. Reconnect to continue. GuardScope We couldn't load this proposal Check your connection and try again. Your link is still valid. Try again"}}
+{"project":"desktop","label":"F-5 same-tab hash navigation","data":{"urlHasToken":true,"showsSecond":false,"showsFirst":true}}
+{"project":"mobile","label":"F-5 same-tab hash navigation","data":{"urlHasToken":true,"showsSecond":false,"showsFirst":true}}

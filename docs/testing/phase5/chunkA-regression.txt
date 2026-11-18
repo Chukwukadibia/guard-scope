@@ -6,3 +6,8 @@ profiles_rls.test.sql         12/12 PASS
 profiles_rls_tester.test.sql  21/22: not ok 3 'no password-like columns in public' (have 1 want 0): approval_links.token_hash matches '%hash%'. Test-heuristic false positive introduced by Phase 5 (F-4).
 projects_scope.test.sql       32/32 PASS
 NOT RUN: requests.test, requests_tester, projects_scope_tester (budget)
+
+== Retest after fixes (commit 78b5182, migration 20261117102000_link_state_fixes) ==
+client_approval_tester.test.sql: 157/157 PASS (F-1, F-2, F-3 fixed: #11,#12,#27,#30,#109 now pass).
+Debug agent's 4 failures (#83,#124,#125,#137) root cause = TEST FAULT, mine: helper pg_temp.try() did not roll back a successful statement, and assertion #78 revoked an ARBITRARY active link (`limit 1`, unordered). Which link that was depended on heap order, which the migration's table rewrites changed, so later assertions that rely on specific lab links (tk(1) valid, etc.) failed. Fix (test only): try() now always rolls back ('TRY_ROLLBACK' pattern as in Phase 4's try_sql) and #78 targets a dedicated lab link (tk(12)) by hash. Not a product bug.
+profiles_rls_tester #3 (F-4): heuristic now excludes only approval_links.token_hash; every other %password%/%passwd%/%pwd%/%hash%/%secret% column in public (incl. on profiles) still fails the test.
