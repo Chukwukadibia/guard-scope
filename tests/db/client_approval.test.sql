@@ -1,7 +1,7 @@
 -- pgTAP: Phase 5 secure client approval (TEST_PLAN T-01..T-13). Run: npx supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(83);
+select plan(91);
 
 insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
 values
@@ -196,6 +196,34 @@ select is((select status from public.change_order_versions where id = current_se
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-0000000000a5","role":"authenticated"}', true);
 select lives_ok($$select public.new_change_order_version(current_setting('t.co')::uuid)$$, 'after a clarification the freelancer can send a new version (OD-6)');
+
+-- ===================== regression: link-state fixes (Tester F-1, F-2, F-3) =====================
+-- A draft revision of a pending version must not supersede its live link (CO-008: only a SENT newer version does).
+insert into public.requests (project_id, title, description) values (current_setting('t.proj')::uuid, 'Draft rev', 'Regression request');
+select public.classify_request((select id from public.requests where title = 'Draft rev'), 'additional');
+select set_config('t.co2', (public.create_change_order((select id from public.requests where title = 'Draft rev')))::text, true);
+update public.change_order_versions set description = 'Regression', price_impact = 100 where change_order_id = current_setting('t.co2')::uuid and version_no = 1;
+select public.send_change_order_version((select id from public.change_order_versions where change_order_id = current_setting('t.co2')::uuid and version_no = 1));
+select set_config('t.tokF', (public.issue_approval_link((select id from public.change_order_versions where change_order_id = current_setting('t.co2')::uuid and version_no = 1)))->>'token', true);
+select public.new_change_order_version(current_setting('t.co2')::uuid);
+reset role;
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(public.get_public_proposal(current_setting('t.tokF'))->>'state', 'valid', 'F-1: a draft v2 does not supersede the pending v1 link');
+select is(public.submit_public_decision(current_setting('t.tokF'), 'declined', E' \t\r\n ', 'aaaaaaaa-1111-1111-1111-aaaaaaaaaaaa')->>'result', 'recorded', 'F-1/F-2: decision is accepted despite a draft v2, with a tab/newline-only comment');
+select is(public.submit_public_decision(current_setting('t.tokF'), 'declined', repeat('x', 2001), 'bbbbbbbb-1111-1111-1111-bbbbbbbbbbbb')->>'error', 'validation', 'F-2: a 2001-character comment is still rejected');
+reset role;
+select ok((select d.comment is null from public.client_decisions d join public.change_order_versions v on v.id = d.version_id where v.change_order_id = current_setting('t.co2')::uuid)
+      and (select (metadata->>'has_comment')::boolean = false from public.activity_events where event_type = 'change_order.declined' and entity_id = current_setting('t.co2')::uuid), 'F-2: whitespace-only comment stored as null and has_comment is false');
+-- F-3 / BR-2 precedence in the helper itself (a pending, not-latest version is superseded even if revoked or expired).
+select is(public._link_state('pending', now(), now() + interval '1 day', 1, 2), 'superseded', 'F-3: pending, revoked, not latest is superseded');
+select is(public._link_state('pending', null, now() - interval '1 day', 1, 2), 'superseded', 'F-3: pending, expired, not latest is superseded');
+select ok(public._link_state('approved', now(), now() - interval '1 day', 1, 2) = 'decided'
+      and public._link_state('cancelled', now(), now() - interval '1 day', 1, 2) = 'cancelled'
+      and public._link_state('draft', null, now() + interval '1 day', 2, 2) = 'invalid', 'F-3: decided, cancelled and invalid keep their precedence');
+select is(public._link_state('pending', now(), now() + interval '1 day', 2, 2), 'revoked', 'F-3: the latest pending version that is revoked still reports revoked');
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-0000000000a5","role":"authenticated"}', true);
 
 -- ===================== T-10 access control =====================
 select throws_ok($$insert into public.client_decisions (version_id, link_id, decision, idempotency_key) select version_id, id, 'approved', gen_random_uuid() from public.approval_links limit 1$$, '42501', null, 'owner cannot write decisions');
