@@ -1,0 +1,12 @@
+[1/304] [desktop] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /sign-in: summary lists linked errors, takes focus, link focuses the field
+[4/304] [desktop] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /register: summary lists linked errors, takes focus, link focuses the field
+[6/304] [desktop] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /forgot-password: summary lists linked errors, takes focus, link focuses the field
+[8/304] [desktop] › tests/e2e/debug-d1-d2-regression.spec.ts:37:5 › D-1 §6 error summary on failed submit › settings › 121-char name: summary links to the name field; nothing is sent
+[161/304] [mobile] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /sign-in: summary lists linked errors, takes focus, link focuses the field
+[162/304] [mobile] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /register: summary lists linked errors, takes focus, link focuses the field
+[163/304] [mobile] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /forgot-password: summary lists linked errors, takes focus, link focuses the field
+[164/304] [mobile] › tests/e2e/debug-d1-d2-regression.spec.ts:37:5 › D-1 §6 error summary on failed submit › settings › 121-char name: summary links to the name field; nothing is sent
+    Error: expect(locator).toBeVisible() failed
+  2 failed
+  34 skipped
+  268 passed (14.9m)

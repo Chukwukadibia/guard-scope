@@ -1,0 +1,11 @@
+[2/304] [desktop] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /sign-in: summary lists linked errors, takes focus, link focuses the field
+[4/304] [desktop] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /register: summary lists linked errors, takes focus, link focuses the field
+[6/304] [desktop] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /forgot-password: summary lists linked errors, takes focus, link focuses the field
+[8/304] [desktop] › tests/e2e/debug-d1-d2-regression.spec.ts:37:5 › D-1 §6 error summary on failed submit › settings › 121-char name: summary links to the name field; nothing is sent
+[161/304] [mobile] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /sign-in: summary lists linked errors, takes focus, link focuses the field
+[162/304] [mobile] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /register: summary lists linked errors, takes focus, link focuses the field
+[163/304] [mobile] › tests/e2e/debug-d1-d2-regression.spec.ts:16:5 › D-1 §6 error summary on failed submit › /forgot-password: summary lists linked errors, takes focus, link focuses the field
+[164/304] [mobile] › tests/e2e/debug-d1-d2-regression.spec.ts:37:5 › D-1 §6 error summary on failed submit › settings › 121-char name: summary links to the name field; nothing is sent
+  34 skipped
+  270 passed (14.2m)
+pass 1 at HEAD b285c17, npm run check passed first; 304 tests (desktop+mobile) p1..p5

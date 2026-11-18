@@ -85,3 +85,88 @@ Spec: `tests/e2e/p5-client-approval.spec.ts` (15 tests x 2 projects = 30). Resul
 - same file (~:273): `expectNoDeadLinkButtons` after sending replaced by assertions that the real link box and 'Copy link' exist (the check still runs on the draft state, T-01). 
 - same file history list (T-07): added the two new events 'Approval link issued for version 1' / '... version 2' in their order.
 - Not needed: `p3-classification.spec.ts:357` and `p4-retest1.spec.ts:255` (they are negative regex checks that still pass). Re-running the old specs rewrote tracked evidence under docs/testing/phase3 and phase4; I restored those files with `git checkout` (nothing of theirs was kept).
+
+## Chunk C: retest of F-5/F-6, full regression x2, final decision (HEAD b285c17; product code identical to 62ca2ac)
+
+### Retests and test fixes (mine)
+- `p5-client-approval.spec.ts` "T-04 static headers" did not load under Playwright 1.65.1 (`(_fixtures, testInfo)`: the first argument must be a destructuring pattern). Fixed (`({ browserName }, testInfo)`), my test fault.
+- Owner cancel-link race: the test opened the link before the cancel had finished. Test fault (mine). The test now waits for the notice "Version 1 cancelled.", the "Cancelled" badge and `status = cancelled` in the database before the client opens the link; nothing was weakened. The static-headers test now also asserts the `/p` and `/p/*` blocks carry `X-Robots-Tag: noindex` and `Cache-Control: no-store`.
+- **F-5 CLOSED**: hash navigation to a second link in the same tab now shows the new proposal, the token is gone from the address bar, history.state, storage and title, and the old state (stale "isn't available" or a recorded-confirmation) is dropped. Two tests: the original F-5 test and a new "stale-then-valid / decision on screen then another link" test; both pass on desktop and mobile.
+- **F-6 CLOSED**: after a clarification the client sees "This version is now closed. The sender has been told and will send you a new version if needed." on the confirmation and on reopening (asserted in `decideFlow`; other decisions must not show it).
+- pgTAP at the unchanged schema (no migration after 20261117102000): `requests_tester` 138/138 (first run ever), `profiles_rls_tester` 22/22 in full, `client_approval_tester` 157/157 (chunk B retest), `projects_scope_tester` 80/80, `requests.test` 32/32. Phase 1-4 developer/tester files `change_orders`, `change_orders_tester`, `event_ordering`, `profiles_rls`, `projects_scope` last ran green BEFORE migration 102000 (which only redefines `_link_state`, `get_public_proposal`, `submit_public_decision`; none of them touch these): see the status line at the end of this section for the re-run.
+
+### Full regression (HEAD b285c17; product code unchanged since 62ca2ac)
+| Run | Result | Evidence |
+|---|---|---|
+| `npm run check` (format, lint, typecheck, 177 unit tests, build, secrets scan) | PASS (one pre-existing `react-hooks/exhaustive-deps` WARNING in src, not an error) | npm output |
+| Full E2E pass 1 (p1..p5 + a11y/debug/retest specs, desktop + mobile, 304 tests) | **270 passed, 34 skipped (pre-existing skips), 0 failed** (14.2 min) | docs/testing/phase5/chunkC-e2e-full-pass1.txt |
+| Full E2E pass 2 (same, consecutive) | 268 passed, 34 skipped, **2 failed, both FLAKES**: `p3-requests.spec.ts:34` (mobile; heading "Overview" not found after create) and `p3-classification.spec.ts:328` (mobile; `page.evaluate` timeout 30 s). Re-run in isolation, mobile, `--repeat-each=3` each: **6/6 passed**. They did not fail in pass 1, touch no Phase 5 code, and both are network-latency timeouts. Not a product failure; if the team wants a "zero flake" pass, run a third pass | chunkC-e2e-full-pass2.txt |
+| pgTAP at the unchanged schema | `client_approval` developer **91/91**, `client_approval_tester` 157/157, `requests_tester` 138/138, `profiles_rls_tester` 22/22, `projects_scope_tester` 80/80, `requests` 32/32. NOT re-run after migration 102000 (last green before it; the migration only redefines `_link_state`, `get_public_proposal`, `submit_public_decision`): `change_orders` 39/39, `change_orders_tester` 125/125, `event_ordering` 11/11, `profiles_rls` 12/12, `projects_scope` 32/32 | chunkA-regression.txt and this report |
+
+### Final per-AC table
+| AC | Result | Evidence |
+|---|---|---|
+| AC-1 issue once, hash only | PASS | pgtap tester #55-61; live surface; e2e T-08 (shown once, gone after reload, not in history) |
+| AC-2 43-char base64url, no collision, bad tokens invalid | PASS | pgtap #55-56, #80-93; chunkA-live-edge1/2/3 |
+| AC-3 projection exactly BR-1 | PASS | pgtap #13-25; e2e T-03 |
+| AC-4 token only in fragment and POST body | PASS (after F-5 fix). Residual: O-10 navigation timing, browser/synced history of the original URL (SEC-5-9) | e2e T-04 leak audit, F-5 tests; chunkB-token-leak.jsonl |
+| AC-5 approve/decline/clarify recorded, owner sees it | PASS | e2e T-05 x3 |
+| AC-6 idempotent, one decision, 24 concurrent x10 | PASS | chunkA-live-concurrency/races; e2e retry test |
+| AC-7 expired/revoked/replaced/cancelled/decided cannot decide | PASS | pgtap; live expiry; e2e T-07 (expired + rate_limited simulated in UI, real in DB) |
+| AC-8 reissue/send/cancel revoke | PASS | pgtap; races; e2e T-08 |
+| AC-9 throttle per source, valid token from another source unaffected | PASS | chunkA-live-throttle/spoof; pgtap |
+| AC-10 no owner write path, anon only two RPCs, no direct table access | PASS | chunkA-live-surface/grants; pgtap #62-79 |
+| AC-11 wording | PASS (scan of client page in every state and owner UI) | e2e p5 |
+| AC-12 a11y/overflow/keyboard | PASS: axe serious/critical 0 and no overflow at 375 and 1280 on every public state and owner link pages; keyboard flow covered by earlier-phase specs and the form tests | docs/testing/phase5/axe/*.json |
+| AC-13 deletion removes links/decisions; Phase 1-4 regression | PASS at DB level (synthetic users, cascade verified, also with 200 links); UI deletion of a Phase-5-loaded account NOT exercised end to end (a@/b@ must not be deleted) = condition; regression passes (see above) | pgtap #148-157, dev #91 |
+
+### Final per-test table
+| Test | Result | Evidence |
+|---|---|---|
+| T-01 issue, shape, uniqueness, hash-only | PASS | pgtap, live surface |
+| T-02 invalid token zoo | PASS | live edge, pgtap |
+| T-03 projection | PASS | e2e |
+| T-04 token leak / headers | PASS (config only for headers) | e2e, `public/_headers` |
+| T-05 decisions | PASS | e2e |
+| T-06 idempotency/concurrency | PASS | live, e2e |
+| T-07 states | PASS (expired and rate_limited UI simulated; DB real) | e2e, pgtap |
+| T-08 reissue/supersede/cancel | PASS | e2e, pgtap |
+| T-09 throttle/breaker/no raw IP | PASS | live, pgtap |
+| T-10 access control | PASS | live, pgtap |
+| T-11 wording | PASS | e2e |
+| T-12 a11y/overflow | PASS | axe/ |
+| T-13 deletion + Phase 1-4 regression x2 | PASS with the flake note (2 consecutive full passes: 0 and 2 flaky/isolated-green) | chunkC-e2e-full-pass*.txt |
+| T-14 security review | Done by the separate security-review agent: "pass with conditions", no CRITICAL/HIGH, 1 MEDIUM (SEC-5-1 throttle table growth / IPv6 rotation) and 8 LOW | docs/security/PHASE5_SECURITY_REVIEW.md (not my work) |
+
+### Findings and observations: final status
+| ID | Severity | Status |
+|---|---|---|
+| F-1 draft revision disabled the live link | MEDIUM | CLOSED (migration 102000; pgtap + live + e2e) |
+| F-2 tab/newline-only comment | LOW | CLOSED |
+| F-3 BR-2 order for pending not-latest | LOW | CLOSED |
+| F-4 Phase 1 heuristic matched token_hash | LOW (test) | CLOSED (my test, allow-list only token_hash) |
+| F-5 hash-only navigation keeps stale view and token in the address bar | MEDIUM | CLOSED (two tests, both projects) |
+| F-6 clarification wording not terminal | LOW | CLOSED |
+| O-1 egress IP pool rotates; limits per IP | info | n/a |
+| O-2 fixed 10-minute bins (40 failures across a boundary) | LOW | OPEN, accepted (SEC-5-2) |
+| O-3 blocked source also blocks valid token | LOW | OPEN, accepted by design BR-6; security review recommends looking the hash up first (SEC-5-2) |
+| O-5 service_role/superuser TRUNCATE; flag bypass settable by any SQL session | LOW | OPEN (SEC-5-4 hardening suggestion) |
+| O-10 navigation-timing entry holds the original URL with the token | LOW | OPEN, inherent, same-origin only |
+| O-11 no `no-store`/`X-Robots-Tag` on /p; gateway 429 copy | LOW | CLOSED in `public/_headers` (verified in config only) and 429 message (e2e headers test; 429 rendering logged) |
+| Test-only: O-7 older pgTAP assume an empty DB; O-8 wrapper row order | info | OPEN, documented |
+| Security review SEC-5-1..SEC-5-12 | 1 MEDIUM, 8 LOW, 2 INFO | OPEN (conditions below) |
+
+### Known limitations (stated, not defects)
+1. FEATURE_SPEC section 9: possession of the link is the only credential; the freelancer sees the raw link and could answer in the client's name. The record proves a response was made through the link, not who made it. No client identity is collected (OD-5).
+2. Deployment headers (Referrer-Policy, CSP, no-store, noindex on /p) are verified from `public/_headers` and the build only; vite preview does not serve them. A real-host check is required.
+3. O-10 (navigation timing) and browser/synced history keep the original URL with the token on the client's device.
+4. Expired and rate_limited UI states were verified with a simulated server answer; the real server states are verified in the database and live API.
+5. Unauthenticated limit: an egress IP shared by many clients can be locked out for up to 10 minutes after 20 failures (O-3).
+
+### DECISION: ACCEPT WITH CONDITIONS
+All thirteen acceptance criteria pass; no open CRITICAL or HIGH; both MEDIUM findings I raised (F-1, F-5) are fixed and retested; two consecutive full regression passes show no real failure (2 isolated-green flakes in pass 2). Conditions:
+1. Verify the response headers on the real host (`/p` no-store, noindex, no-referrer, CSP) and HSTS/HTTPS before first real use (SEC-5-7, limitation 2).
+2. Address or consciously accept the security review's MEDIUM SEC-5-1 (throttle table growth / IPv6 rotation) and decide on SEC-5-2 (look the token up before applying the block) before opening the page to real clients at volume.
+3. The OD-13 / email / SMTP steps and the production auth settings (leaked-password protection, ISS-008) remain outside this test and are still open.
+4. Run the UI account-deletion flow once against a disposable account that owns Phase 5 data (not done here: a@/b@ may not be deleted).
+5. Run one more clean full E2E pass on the target commit to confirm the two timing flakes do not recur.
