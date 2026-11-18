@@ -38,7 +38,7 @@ export function clientResponseText(decision: ClientDecision): string {
     case 'declined':
       return 'You declined this proposal.';
     case 'clarification_requested':
-      return 'You asked a question. The sender will reply separately.';
+      return 'You asked a question. This version is now closed. The sender has been told and will send you a new version if needed.';
   }
 }
 

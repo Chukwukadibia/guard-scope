@@ -55,14 +55,19 @@ const submitErrors = new Set([
   'validation',
 ]);
 
+/** A gateway 429 can come back as a non-JSON body; the HTTP status is only on the response, not the error. */
+function withStatus(error: object, status: number): object {
+  return status === 429 ? { ...error, status: 429 } : error;
+}
+
 /**
  * Transport and server failures throw ApiError ('network' / 'unknown' / 'rate_limited'); they are never
  * mapped to a link state, so a flaky connection cannot be mistaken for an invalid link. The token only
  * travels in the POST body of supabase.rpc and is never logged.
  */
 export async function getPublicProposal(token: string): Promise<PublicProposalResult> {
-  const { data, error } = await supabase.rpc('get_public_proposal', { p_token: token });
-  if (error) throw toApiError(error);
+  const { data, error, status } = await supabase.rpc('get_public_proposal', { p_token: token });
+  if (error) throw toApiError(withStatus(error, status));
   const r = data as { state?: unknown } | null;
   if (!r || typeof r.state !== 'string' || !states.has(r.state)) throw new ApiError('unknown');
   return r as PublicProposalResult;
@@ -74,13 +79,13 @@ export async function submitPublicDecision(
   comment: string,
   idempotencyKey: string,
 ): Promise<SubmitResult> {
-  const { data, error } = await supabase.rpc('submit_public_decision', {
+  const { data, error, status } = await supabase.rpc('submit_public_decision', {
     p_token: token,
     p_decision: decision,
     p_comment: comment.trim() === '' ? null : comment,
     p_idempotency_key: idempotencyKey,
   });
-  if (error) throw toApiError(error);
+  if (error) throw toApiError(withStatus(error, status));
   const r = data as { result?: unknown; error?: unknown } | null;
   if (r && (r.result === 'recorded' || r.result === 'already_recorded')) {
     return r as SubmitResult;

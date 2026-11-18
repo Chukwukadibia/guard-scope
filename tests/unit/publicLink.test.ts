@@ -96,7 +96,10 @@ describe('public copy', () => {
     expect(unavailableCopy('rate_limited', null).body).toContain('try again later');
   });
   it('never presents a clarification as an approval', () => {
-    expect(clientResponseText('clarification_requested')).toContain('sender will reply separately');
+    expect(clientResponseText('clarification_requested')).toContain('This version is now closed');
+    expect(clientResponseText('clarification_requested')).toContain('will send you a new version');
+    for (const d of decisions)
+      expect(clientResponseText(d)).not.toMatch(/legally binding|signed|contract|e-signature/i);
     expect(clientResponseText('clarification_requested')).not.toMatch(/approv/i);
     expect(confirmationText('approved', 3)).toContain('not a payment');
   });

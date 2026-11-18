@@ -28,9 +28,12 @@ import { PublicDecisionForm } from './PublicDecisionForm';
 import { PublicProposalDetails } from './PublicProposalDetails';
 
 /**
- * The token lives in memory only. It is captured from the URL fragment once and the fragment is removed
+ * The token lives in memory only. It is captured from the URL fragment and the fragment is removed
  * from the address bar before any network request (AC-4). The module variable survives React's
  * StrictMode double mount; it is never written to storage, the title, a URL or the console.
+ * A later hash-only navigation (another link pasted into the same tab) fires `hashchange`: the outer
+ * component captures the new fragment and remounts the inner page (new key), which drops all previous
+ * state (decision, comment, confirm step) and ignores answers to requests made for the old token.
  */
 let capturedToken: string | null = null;
 function captureToken(): string | null {
@@ -71,8 +74,23 @@ function Shell({ children }: { children: React.ReactNode }) {
 }
 
 export function PublicProposalPage() {
+  const [link, setLink] = useState(() => ({ token: captureToken(), gen: 0 }));
+  useEffect(() => {
+    function onHashChange() {
+      if (!window.location.hash) return; // our own cleanup or navigation to a bare /p: keep the view
+      const next = captureToken();
+      setLink((l) => ({ token: next, gen: l.gen + 1 }));
+    }
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+  return <PublicProposalView key={link.gen} token={link.token} />;
+}
+
+function PublicProposalView({ token }: { token: string | null }) {
   const online = useOnline();
-  const [token] = useState(captureToken);
+  // Bumped on unmount and on every new load; an answer for an older request is ignored.
+  const requestId = useRef(0);
   const [view, setView] = useState<View>(
     token ? { kind: 'loading' } : { kind: 'result', data: { state: 'invalid' } },
   );
@@ -89,10 +107,13 @@ export function PublicProposalPage() {
 
   const load = useCallback(async () => {
     if (!token) return;
+    const id = ++requestId.current;
     setView({ kind: 'loading' });
     try {
-      setView({ kind: 'result', data: await getPublicProposal(token) });
+      const data = await getPublicProposal(token);
+      if (id === requestId.current) setView({ kind: 'result', data });
     } catch (e) {
+      if (id !== requestId.current) return;
       const code = toApiError(e).code;
       setView(
         code === 'rate_limited'
@@ -104,6 +125,9 @@ export function PublicProposalPage() {
 
   useEffect(() => {
     void load();
+    return () => {
+      requestId.current++;
+    };
   }, [load]);
 
   /** Returns a field-level message for the comment, or null when the page moved on. */
@@ -114,8 +138,10 @@ export function PublicProposalPage() {
   ): Promise<{ error: string } | null> {
     if (!token) return null;
     attempt.current = attemptFor(attempt.current, decision, comment, () => crypto.randomUUID());
+    const id = requestId.current;
     try {
       const r = await submitPublicDecision(token, decision, comment, attempt.current.key);
+      if (id !== requestId.current) return null; // the page moved to another link meanwhile
       attempt.current = null; // definitive server answer: the next attempt gets a new key
       if ('result' in r) {
         setView({
@@ -134,6 +160,7 @@ export function PublicProposalPage() {
       setView({ kind: 'result', data: { state: r.error } });
       return null;
     } catch (e) {
+      if (id !== requestId.current) return null;
       // Transport/server failure: keep the same idempotency key so a retry cannot duplicate.
       return {
         error:
