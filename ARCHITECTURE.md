@@ -111,9 +111,11 @@ Error codes are stable strings that map to safe UI messages. Raw database errors
 
 ```text
 BEGIN
-  reject unless token ~ '^[A-Za-z0-9_-]{43}$'; h := extensions.digest(token, 'sha256'); throttle check (§5.5)
+  validate decision/comment (raw comment length <= 8000 first); if token !~ '^[A-Za-z0-9_-]{43}$' → miss path
+  h := extensions.digest(token, 'sha256')   -- token first (DEC-015): a found token is never throttled
+  miss path: if _throttle_blocked(source) → RETURN {error:'rate_limited'} (not recorded) else record failure, RETURN {error:'invalid'}
   SELECT link, version FROM approval_links JOIN change_order_versions … WHERE token_hash = h FOR UPDATE OF version
-  not found                         → record failure, RETURN {error:'invalid'} (no exception, so the failure row commits)
+  not found                         → miss path above (no exception, so the failure row commits)
   existing decision with same (link, idempotency_key) → return already_recorded (idempotent retry)
   link.revoked_at not null          → revoked
   link.expires_at < now()           → expired
@@ -176,7 +178,7 @@ UI shows mapped messages. Functions `raise exception using errcode = 'P0001', me
 
 ### 5.5 Abuse controls
 
-**Primary control: 256-bit tokens make guessing infeasible.** As a secondary, best-effort control, the public RPCs record failed lookups per source key and return `rate_limited` after 20 failures in 10 minutes. Client-supplied headers such as `x-forwarded-for` can be spoofed, so the source key must come from a header set by the platform edge (VERIFY which header Supabase exposes to PostgREST and whether clients can override it). If no trustworthy header exists, the fallback is a **global** failure circuit-breaker: above N failures/minute all public lookups slow down. The throttle is never relied on for confidentiality. Supabase Auth has its own built-in rate limits (VERIFY current values).
+**Primary control: 256-bit tokens make guessing infeasible.** As a secondary, best-effort control, the public RPCs look the token up first and always serve a found token (DEC-015); only failed lookups are recorded per source key (IPv6 grouped by /64) and return `rate_limited` after 20 failures in 10 minutes. A global breaker (1000) holds back sources that already failed, and a hard cap (5000 failures per window) blocks every further failed lookup until the window ends; both affect misses only. Client-supplied headers such as `x-forwarded-for` can be spoofed, so the source key must come from a header set by the platform edge (VERIFY which header Supabase exposes to PostgREST and whether clients can override it). If no trustworthy header exists, the fallback is a **global** failure circuit-breaker: above N failures/minute all public lookups slow down. The throttle is never relied on for confidentiality. Supabase Auth has its own built-in rate limits (VERIFY current values).
 
 ### 5.6 PWA caching
 

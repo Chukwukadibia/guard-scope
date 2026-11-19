@@ -1,7 +1,7 @@
 -- pgTAP: Phase 5 secure client approval (TEST_PLAN T-01..T-13). Run: npx supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(120);
+select plan(136);
 
 insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
 values
@@ -132,13 +132,22 @@ select set_config('t.tok4c', (public.issue_approval_link(current_setting('t.v4')
 reset role;
 
 -- ===================== T-09 throttle =====================
+create function pg_temp.try_submit(t text, c text) returns text language plpgsql as $$
+declare r jsonb;
+begin
+  r := public.submit_public_decision(t, 'approved', c, gen_random_uuid());
+  raise exception 'R:%', coalesce(r->>'result', r->>'error');
+exception when others then
+  return case when sqlerrm like 'R:%' then substr(sqlerrm, 3) else sqlstate || ':' || sqlerrm end;
+end $$;
 set local role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
 select set_config('request.headers', '{"cf-connecting-ip":"9.9.9.9"}', true);
 select is((select count(*)::int from generate_series(1, 20) g where public.get_public_proposal(repeat('C', 43))->>'state' = 'invalid'), 20, 'first 20 failures from one source are processed');
 select is(public.get_public_proposal(repeat('C', 43))->>'state', 'rate_limited', 'the 21st attempt is rate limited');
-select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'rate_limited', 'a blocked source cannot probe even a valid token');
-select is(public.submit_public_decision(current_setting('t.tok4c'), 'approved', null, '77777777-7777-7777-7777-777777777777')->>'error', 'rate_limited', 'a blocked source cannot decide');
+select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'valid', 'DEC-015: a blocked source is still served a correct token');
+select is(pg_temp.try_submit(current_setting('t.tok4c'), null), 'recorded', 'DEC-015: a blocked source can still decide with a correct token (rolled back here)');
+select is(public.submit_public_decision(repeat('C', 43), 'approved', null, '77777777-7777-7777-7777-777777777777')->>'error', 'rate_limited', 'a blocked source gets rate_limited for a missed token on submit');
 select set_config('request.headers', '{"cf-connecting-ip":"8.8.8.8"}', true);
 select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'valid', 'a different source is unaffected');
 reset role;
@@ -161,7 +170,8 @@ set local role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
 select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'valid', 'global breaker: a source with no failures still works');
 select is(public.get_public_proposal(repeat('D', 43))->>'state', 'invalid', 'global breaker: its first failure is processed');
-select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'rate_limited', 'global breaker: after a failure it is held back');
+select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'valid', 'DEC-015: global breaker open, source already failed: a correct token is still served');
+select is(public.get_public_proposal(repeat('D', 43))->>'state', 'rate_limited', 'global breaker: after a failure the source is held back for misses');
 reset role;
 delete from public.public_link_attempts;
 -- SEC-5-1: /64 keying, IPv4 unchanged, malformed values never raise
@@ -207,17 +217,40 @@ select is((select count(*)::int from public.public_link_attempts), 1, 'SEC-5-1: 
 select is((select failures from public.public_link_attempts where source_key = '\x00'::bytea), (select hard_cap + 1 from public._throttle_limits()), 'SEC-5-1: at the hard cap the global row still counts');
 select ok(public._throttle_blocked(extensions.digest('latecomer', 'sha256')) and public._throttle_blocked(extensions.digest('never-seen', 'sha256')), 'SEC-5-1: at the hard cap every source is blocked for the rest of the window (documented lockdown trade-off)');
 select is((select hard_cap from public._throttle_limits()), 5000, 'SEC-5-1: hard cap is 5000 in _throttle_limits()');
+-- DEC-015: a found token is never throttled; misses are, and a blocked miss is not recorded
+delete from public.public_link_attempts;
+select set_config('request.headers', '{"cf-connecting-ip":"3.3.3.3"}', true);
+insert into public.public_link_attempts (source_key, window_start, failures) values (public._throttle_key(), date_bin('10 minutes', now(), timestamptz '2000-01-01'), 20);
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'valid', 'DEC-015: per-source block: get serves a correct token');
+select is(pg_temp.try_submit(current_setting('t.tok4c'), 'ok'), 'recorded', 'DEC-015: per-source block: submit records a decision for a correct token');
+select is(public.get_public_proposal(repeat('E', 43))->>'state', 'rate_limited', 'DEC-015: per-source block: a missed token on get is rate_limited');
+select is(public.submit_public_decision(repeat('E', 43), 'approved', null, gen_random_uuid())->>'error', 'rate_limited', 'DEC-015: per-source block: a missed token on submit is rate_limited');
+reset role;
+select is((select failures from public.public_link_attempts where source_key = public._throttle_key()), 20, 'DEC-015: blocked misses are not recorded (source count unchanged)');
+delete from public.public_link_attempts;
+insert into public.public_link_attempts (source_key, window_start, failures) values ('\x00'::bytea, date_bin('10 minutes', now(), timestamptz '2000-01-01'), 1000), (public._throttle_key(), date_bin('10 minutes', now(), timestamptz '2000-01-01'), 1);
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'valid', 'DEC-015: breaker open: get serves a correct token to a source that already failed');
+select is(pg_temp.try_submit(current_setting('t.tok4c'), 'ok'), 'recorded', 'DEC-015: breaker open: submit records a decision for a correct token');
+select is(public.get_public_proposal(repeat('E', 43))->>'state', 'rate_limited', 'DEC-015: breaker open: a miss from that source is rate_limited');
+reset role;
+select is((select failures from public.public_link_attempts where source_key = '\x00'::bytea), 1000, 'DEC-015: breaker open: the blocked miss was not counted');
+delete from public.public_link_attempts;
+insert into public.public_link_attempts (source_key, window_start, failures) values ('\x00'::bytea, date_bin('10 minutes', now(), timestamptz '2000-01-01'), (select hard_cap from public._throttle_limits()));
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(public.get_public_proposal(current_setting('t.tok4c'))->>'state', 'valid', 'DEC-015: hard cap: get serves a correct token to a fresh source');
+select is(pg_temp.try_submit(current_setting('t.tok4c'), 'ok'), 'recorded', 'DEC-015: hard cap: submit records a decision for a correct token');
+select is(public.get_public_proposal(repeat('E', 43))->>'state', 'rate_limited', 'DEC-015: hard cap: a miss from any source is rate_limited (lockdown covers misses only)');
+select is(public.submit_public_decision(repeat('E', 43), 'approved', null, gen_random_uuid())->>'error', 'rate_limited', 'DEC-015: hard cap: a missed token on submit is rate_limited');
+reset role;
+select is((select count(*)::int from public.public_link_attempts) * 10000 + (select failures from public.public_link_attempts where source_key = '\x00'::bytea), 15000, 'DEC-015: hard cap: no rows added and the global count unchanged by blocked misses');
 select set_config('request.headers', '', true);
 delete from public.public_link_attempts;
 -- SEC-5-8: raw-length pre-check, trim boundary (accept cases run in a rolled-back subtransaction so the link stays pending)
-create function pg_temp.try_submit(t text, c text) returns text language plpgsql as $$
-declare r jsonb;
-begin
-  r := public.submit_public_decision(t, 'approved', c, gen_random_uuid());
-  raise exception 'R:%', coalesce(r->>'result', r->>'error');
-exception when others then
-  return case when sqlerrm like 'R:%' then substr(sqlerrm, 3) else sqlstate || ':' || sqlerrm end;
-end $$;
 set local role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
 select is(public.submit_public_decision(current_setting('t.tok4c'), 'approved', repeat('x', 8001), '88888888-8888-8888-8888-888888888881')->>'error', 'validation', 'SEC-5-8: a comment over the 8000-character raw bound is rejected');

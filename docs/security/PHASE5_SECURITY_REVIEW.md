@@ -68,6 +68,7 @@ No CRITICAL or HIGH findings.
 - Fix: key IPv6 on the /64 (and IPv4 on the full address); add `create index on public_link_attempts (window_start)`; run cleanup on a schedule (pg_cron) or deterministically; once the global breaker is open, stop inserting new per-source rows (count only in the global row); consider a hard row cap.
 
 ### SEC-5-2 LOW: throttle semantics against legitimate clients
+- **Status: FIXED** in migration `20261119100000_token_first_throttle` (HA-009 / DEC-015): the token is looked up first, a correct token is always served, and the per-source, breaker and hard-cap blocks apply only to failed lookups. ISS-029.
 - Description: `_throttle_blocked` runs before any token check, so a blocked source gets `rate_limited` even for a correct token (Tester O-3 confirmed live). The global breaker (1000 failures per 10 min) blocks every source that has at least one failure in the window; 1000 failures is trivial with address rotation. Fixed 10-minute bins allow 40 failures across a boundary.
 - Reproduction: from the same NAT/CGNAT or office egress as a client, send 20 invalid tokens; the client's valid link shows "Too many attempts" for up to 10 minutes. The breaker needs about 1000 failures in a window and then affects any user who had one earlier typo.
 - Impact: availability of approvals for a targeted client; no confidentiality or integrity impact.
