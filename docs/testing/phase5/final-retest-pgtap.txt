@@ -1,0 +1,17 @@
+Final retest at 7b9cd92 (migrations 20261117103000_throttle_hardening + 20261117104000_throttle_breaker_cap applied to dev; verified in the catalog:
+_throttle_limits = 20/1000/10 min/hard_cap 5000, _throttle_key uses set_masklen(/64), record_failure honours hard_cap, submit has the 8000 raw check,
+index public_link_attempts_window_start_idx present).
+
+tests/db/client_approval_tester.test.sql (206 assertions, incl. new S1-S49 for SEC-5-1 / SEC-5-8): 206/206 PASS (pgtap-wrap + execute_sql, ROLLBACK).
+  S1-S9  key derivation: same /64 -> same key; other /64 differs; case/spelling normalised; ::ffff dotted and hex = IPv4; IPv4 full address;
+         XFF last entry grouped; 20 malformed/odd header values never raise; unparseable shapes -> shared 'unknown' key.
+  S10-S17 per-source 20 still applies to host rotation inside a /64 and to the ::ffff spelling of a blocked IPv4; neighbours unaffected; one row per /64 or IPv4.
+  S18-S23 breaker open (1000..4999): failed source held back even with a valid token; fresh valid source works; fresh failure processed once then held; row written.
+  S24-S31 hard cap: failure at 4999 processed + row; at >= 5000 every source blocked (lookup and submit, incl. fresh valid token); record_failure writes no rows,
+          only the global counter; blocked submit records nothing; lockdown does not carry into the next window.
+  S32-S36 cleanup: exactly 50 rows older than 1 day per call, drains the backlog, keeps younger rows, also runs at the hard cap; window_start index exists.
+  S37-S47 comments: raw > 8000 rejected (also whitespace-only and 1 MB); 2001 after trim rejected; 2000 + 6000 spaces accepted and stored as 2000;
+          8000 whitespace accepted as NULL; 20 worst-case 8000-char comments < 2 s; validation writes no throttle rows.
+  S48-S49 odd request.headers shapes through get_public_proposal / submit_public_decision never raise.
+Extra probe: NBSP and EM SPACE-only comments now trim to NULL (\s is Unicode-aware here); zero-width space is kept (not whitespace).
+tests/db/client_approval.test.sql (developer, now 120 incl. 29 SEC-5-1/SEC-5-8 assertions): 120/120 PASS at 048deb3 (schema = 7b9cd92).

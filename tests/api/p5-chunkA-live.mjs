@@ -564,6 +564,41 @@ if (scenario === 'retest') {
   save('chunkA-live-retest.txt');
 }
 
+if (scenario === 'final') {
+  // Final retest live sanity (SEC-5-1 migrations): the throttle still trips at 20 per source, and a valid token works
+  // again from a clean source (the harness deletes public_link_attempts while this waits).
+  const f = await mkPending(A, 'final');
+  results.fixture = { v1: f.v1, projectId: f.projectId };
+  const seq = [];
+  for (let i = 1; i <= 90; i++) {
+    const st = (await pub(randTok())).json?.state;
+    seq.push(st);
+    if (seq.filter((x) => x === 'rate_limited').length >= 5) break;
+  }
+  results.firstLimited = seq.indexOf('rate_limited') + 1;
+  results.invalidBeforeBlocked = seq.filter((x) => x === 'invalid').length;
+  say(
+    'first rate_limited at attempt',
+    results.firstLimited,
+    '; invalid processed:',
+    results.invalidBeforeBlocked,
+  );
+  const blockedRead = (await pub(f.tok)).json?.state;
+  say('valid token from the (now blocked) egress ->', blockedRead);
+  say('READY_FOR_CLEANUP');
+  save('final-retest-live.txt');
+  const t0 = Date.now();
+  let st = blockedRead;
+  while (Date.now() - t0 < 180000) {
+    await new Promise((r) => setTimeout(r, 3000));
+    st = (await pub(f.tok)).json?.state;
+    if (st === 'valid') break;
+  }
+  say('after the harness cleared the throttle rows, valid token ->', st);
+  results.afterClean = st;
+  save('final-retest-live.txt');
+}
+
 if (scenario === 'concurrency') {
   const ROUNDS = 10,
     N = 24;

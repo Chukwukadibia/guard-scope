@@ -1,0 +1,9 @@
+{
+  "fixture": {
+    "v1": "8f26a17a-8589-460c-9a51-be0380a5a993",
+    "projectId": "d14357fa-8216-4104-acdb-1f568140b303"
+  },
+  "firstLimited": 41,
+  "invalidBeforeBlocked": 40,
+  "afterClean": "valid"
+}

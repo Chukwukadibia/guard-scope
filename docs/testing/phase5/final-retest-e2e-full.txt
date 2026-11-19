@@ -1,0 +1,4 @@
+  1 failed
+  36 skipped
+  269 passed (14.6m)
+Isolated re-run of the one failure (p5-client-approval.spec.ts:927 mobile, 'Link for version 1' not visible within 5 s after send): --repeat-each=3 on desktop+mobile: 6/6 passed -> flake under full-suite load.

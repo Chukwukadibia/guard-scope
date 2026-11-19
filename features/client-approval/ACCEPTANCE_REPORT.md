@@ -170,3 +170,43 @@ All thirteen acceptance criteria pass; no open CRITICAL or HIGH; both MEDIUM fin
 3. The OD-13 / email / SMTP steps and the production auth settings (leaked-password protection, ISS-008) remain outside this test and are still open.
 4. Run the UI account-deletion flow once against a disposable account that owns Phase 5 data (not done here: a@/b@ may not be deleted).
 5. Run one more clean full E2E pass on the target commit to confirm the two timing flakes do not recur.
+
+## Final retest (schema 7b9cd92 = migrations 20261117103000_throttle_hardening + 20261117104000_throttle_breaker_cap; HEAD 048deb3 adds docs only)
+
+### SEC-5-1 / SEC-5-8 retest (independent)
+| Item | Result | Evidence |
+|---|---|---|
+| My new pgTAP section S1-S49 appended to `tests/db/client_approval_tester.test.sql` (file now 206 assertions) | **206/206 PASS** | docs/testing/phase5/final-retest-pgtap.txt |
+| /64 grouping, case/spelling normalisation, `::ffff:` dotted and hex = IPv4, IPv4 full address, XFF last entry grouped, 20 malformed/odd header values never raise | PASS (S1-S9, S48-S49) | same |
+| Per-source 20 still applies, also to host rotation inside one /64 and to the `::ffff:` spelling of a blocked IPv4; neighbours unaffected; one row per /64 or IPv4 | PASS (S10-S17) | same |
+| Breaker open (1000-4999): failed source held back (even with a valid token); fresh valid source works; fresh failure processed once, row written, then held | PASS (S18-S23) | same |
+| Hard cap: failure at 4999 processed; at >= 5000 every source blocked for lookup and submit, incl. a fresh source with a valid token; no new rows, global still counted; lockdown ends with the window | PASS (S24-S31) | same |
+| Cleanup: exactly 50 rows older than a day per failure call, drains the backlog, keeps younger rows, also runs at the cap; `window_start` index present | PASS (S32-S36) | same |
+| SEC-5-8: raw > 8000 rejected (incl. whitespace-only, 1 MB); 2001 after trim rejected; 2000 + 6000 spaces accepted and stored as 2000; 8000 whitespace accepted as NULL; 20 worst-case 8000-char comments < 2 s; no throttle rows from validation | PASS (S37-S47) | same |
+| Developer `client_approval.test.sql` (now 120, incl. 29 SEC-5-1/5-8 assertions) | **120/120 PASS** | same |
+| Live REST sanity (anon key, real egress) | PASS: 40 random tokens processed, then `rate_limited` (two egress IPv4 addresses, each exactly 20 failures in the DB); a valid token from the blocked egress is `rate_limited`; after the throttle rows were cleared the same valid token is `valid` | docs/testing/phase5/final-retest-live.txt |
+| Extra probes | NBSP / EM SPACE-only comments now trim to NULL; zero-width space kept (not whitespace). No exception path found | final-retest-pgtap.txt |
+
+### New finding
+- **F-7 (MEDIUM, availability / design) Hard-cap lockdown is a cheap global switch-off of the client page.** Once the global counter reaches 5000 in a window, `_throttle_blocked` returns true for EVERY source, including clients holding a valid token (S25/S26). Reaching it needs about 50 sources x 20 failures (to 1000), then one failure per fresh source (the breaker holds a source back after its first miss): roughly 4,050 distinct IPv4 addresses or IPv6 /64s per 10-minute window. An attacker with a single IPv6 /48 (65,536 /64s, cheap at hosting providers) can repeat this every window and keep every client from viewing or answering proposals indefinitely. Before migration 104000 a fresh legitimate source was never blocked by the breaker. The developer documents the lockdown as a trade-off and points to SEC-5-2. Expected: a correct (found) token is never blocked by abuse it did not cause, e.g. look the hash up first and apply the block only to misses (SEC-5-2), or make the cap stop row writes without blocking hits. No data exposure; severity MEDIUM because the core client flow can be denied cheaply and remotely.
+
+### Account deletion with Phase 5 data (condition 4 of the previous decision)
+PASS. A throwaway confirmed user was created by SQL with a locally computed bcrypt hash (the Phase 2 T-10 method; the password was derived in the shell from a secret already on disk, passed to Playwright through the environment only, never written or printed). New spec `tests/e2e/p5-account-deletion.spec.ts` (desktop): two sent proposals with links, a client approval WITH a comment from a no-session context, 3 failed public lookups, then deletion through Settings. Afterwards: the old access token reads nothing, both client links show "This link isn't available"; SQL: users, identities, sessions, refresh tokens, profile, projects 0; client_decisions 0 (comment gone). Throttle rows are keyed by a salted hash of the source address, not by account, so they remain until the >1-day cleanup (by design, no personal link). Evidence: docs/testing/phase5/final-retest-deletion.txt.
+
+### Regression in this retest
+| Run | Result | Evidence |
+|---|---|---|
+| `npm run check` | PASS (177 unit tests, build, secrets scan; one pre-existing lint warning in src) | npm output |
+| One full E2E pass (p1..p5, desktop + mobile, 306 tests incl. the new deletion spec, skipped without its env) | 269 passed, 36 skipped, **1 failed = flake**: `p5-client-approval.spec.ts:927` (mobile), the issued-link box was not visible within 5 s after sending under full-suite load. Isolated, `--repeat-each=3` on both projects: **6/6 passed** | docs/testing/phase5/final-retest-e2e-full.txt |
+| pgTAP re-run in this retest | `client_approval` (developer) 120/120, `client_approval_tester` 206/206 | final-retest-pgtap.txt |
+| pgTAP NOT re-run in this retest (BLOCKED: context budget of this session) | Phase 1-4 files: `change_orders` 39, `change_orders_tester` 125, `event_ordering` 11, `profiles_rls` 12, `profiles_rls_tester` 22, `projects_scope` 32, `projects_scope_tester` 80, `requests` 32, `requests_tester` 138. Last green on 2026-11-17/18. The two new migrations touch only `_throttle_key`, `_throttle_limits`, `_throttle_blocked`, `_throttle_record_failure`, `submit_public_decision` and an index on `public_link_attempts`; none of these files reads or calls them. Their E2E counterparts passed in the full run above | chunkA-regression.txt, this report |
+
+### FINAL DECISION (final retest): ACCEPT WITH CONDITIONS
+All AC-1..AC-13 pass. Findings F-1..F-6 are closed; SEC-5-1 and SEC-5-8 are fixed and independently retested (206/206 + 120/120, live sanity green). No open CRITICAL or HIGH. One new MEDIUM (F-7) is open. Conditions:
+1. **F-7 / SEC-5-2**: decide before real use whether the hard-cap lockdown may block clients holding a valid token. Recommended fix: look the token up first and apply the block only to misses, so the cap cannot be used to switch the page off for everyone. If accepted as is, record it as an accepted risk (HA entry).
+2. Verify the deployment headers on the real host (`/p` no-store and noindex, Referrer-Policy, CSP, HSTS); they are verified from `public/_headers` and the build only.
+3. The OD-13 SMTP/email steps and ISS-008 (leaked-password protection) remain open outside this phase.
+4. Re-run the nine Phase 1-4 pgTAP files listed above once (not run in this session; they do not touch the changed objects).
+Known limitations (unchanged): the freelancer holds the link and could answer in the client's name (spec section 9); O-10 navigation timing / browser history keeps the original URL; expired and rate_limited UI states were simulated at the network layer (real states verified in DB and API); throttle rows are per source address and outlive an account deletion until the 1-day cleanup.
+
+Cleanup after the final retest: a@ and b@ have 0 projects and null profile fields; `public_link_attempts` empty; the throwaway user is deleted (by the UI test); auth.users contains only a@ and b@. Earlier-phase evidence files rewritten by the E2E run were restored with `git checkout`.

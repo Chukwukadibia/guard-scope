@@ -3,7 +3,7 @@
 -- NOTE: assertions that encode the SPEC where the implementation deviates are intentionally left failing (see ACCEPTANCE_REPORT).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(157);
+select plan(206);
 
 insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
 values
@@ -404,6 +404,115 @@ select set_config('request.headers', '{"cf-connecting-ip":"2.8.8.8"}', true);
 select is(public.get_public_proposal(pg_temp.tk(2))->>'state', 'revoked', 'global breaker does not affect a source with no failures');
 reset role;
 select ok((select bool_and(octet_length(source_key) in (1, 32) and failures > 0) from public.public_link_attempts), 'throttle rows: hash keys only');
+delete from public.public_link_attempts;
+select set_config('request.headers', '', true);
+
+-- ===================== SEC-5-1 / SEC-5-8 retest (migrations 20261117103000 + 20261117104000) =====================
+create function pg_temp.rnd() returns text language sql volatile security definer as $$ select translate(rtrim(encode(extensions.gen_random_bytes(32), 'base64'), '='), '+/', '-_') $$;
+create function pg_temp.st_as(h text, tok text) returns text language plpgsql as $$ begin perform set_config('request.headers', h, true); return public.get_public_proposal(tok)->>'state'; end $$;
+create function pg_temp.sub_as(h text, tok text, d text, c text) returns text language plpgsql as $$ declare r jsonb; begin perform set_config('request.headers', h, true); r := public.submit_public_decision(tok, d, c, gen_random_uuid()); return coalesce(r->>'result', r->>'error'); end $$;
+create function pg_temp.cf(ip text) returns text language sql immutable as $$ select json_build_object('cf-connecting-ip', ip)::text $$;
+create function pg_temp.win() returns timestamptz language sql stable as $$ select date_bin('10 minutes', now(), timestamptz '2000-01-01') $$;
+create function pg_temp.k(h text) returns bytea language sql as $$ select decode(pg_temp.key_for(h), 'hex') $$;
+select pg_temp.mkv(95, 'pending', false, false, current_setting('t.projA')::uuid);
+select pg_temp.mkv(96, 'pending', false, false, current_setting('t.projA')::uuid);
+select pg_temp.mkv(97, 'pending', false, false, current_setting('t.projA')::uuid);
+delete from public.public_link_attempts;
+-- key derivation
+select is(pg_temp.key_for(pg_temp.cf('2001:db8:1:2::1')), pg_temp.key_for(pg_temp.cf('2001:db8:1:2:ffff:ffff:ffff:ffff')), 'S1 IPv6: two hosts in the same /64 share one key');
+select isnt(pg_temp.key_for(pg_temp.cf('2001:db8:1:2::1')), pg_temp.key_for(pg_temp.cf('2001:db8:1:3::1')), 'S2 IPv6: a different /64 gets a different key');
+select is(pg_temp.key_for(pg_temp.cf('2001:DB8:0001:0002:0:0:0:9')), pg_temp.key_for(pg_temp.cf('2001:db8:1:2::1')), 'S3 IPv6 spelling and case variants normalise to the same /64');
+select is(pg_temp.key_for(pg_temp.cf('::ffff:1.2.3.4')), pg_temp.key_for(pg_temp.cf('1.2.3.4')), 'S4 IPv4-mapped IPv6 (dotted) shares the IPv4 key');
+select is(pg_temp.key_for(pg_temp.cf('::ffff:102:304')), pg_temp.key_for(pg_temp.cf('1.2.3.4')), 'S5 IPv4-mapped IPv6 (hex) shares the IPv4 key');
+select isnt(pg_temp.key_for(pg_temp.cf('1.2.3.4')), pg_temp.key_for(pg_temp.cf('1.2.3.5')), 'S6 IPv4 keeps the full address');
+select is(pg_temp.key_for('{"x-forwarded-for":"9.9.9.9, 2001:db8:1:2::77"}'), pg_temp.key_for(pg_temp.cf('2001:db8:1:2::1')), 'S7 the last x-forwarded-for entry is grouped on /64 too');
+select ok((select bool_and(pg_temp.key_for(x) ~ '^[0-9a-f]{64}$') from unnest(array[pg_temp.cf('999.1.1.1'), pg_temp.cf('fe80::1%eth0'), pg_temp.cf('[2001:db8::1]'), pg_temp.cf(repeat('a', 5000)), pg_temp.cf('1.2.3.4/8'), pg_temp.cf('::'), pg_temp.cf('0.0.0.0'), pg_temp.cf('2001:db8::/0'), pg_temp.cf(''), pg_temp.cf(' '), '{"cf-connecting-ip": {"a": 1}}', '{"x-forwarded-for": ["a", "b"]}', '{"x-forwarded-for": ",,,"}', '[1,2]', '"scalar"', '123', 'null', '{"cf-connecting-ip": null}', '', 'not json']) x), 'S8 malformed or odd header values never raise and always yield a key');
+select is(pg_temp.key_for('"scalar"'), pg_temp.key_for(''), 'S9 unparseable header shapes fall back to the shared unknown key');
+-- per-source limit still applies, also against host rotation inside a /64 and IPv4-mapped spelling
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is((select count(*)::int from generate_series(1, 20) g where pg_temp.st_as(pg_temp.cf('2001:db8:aa:1::' || to_hex(g)), pg_temp.rnd()) = 'invalid'), 20, 'S10 20 failures from 20 different hosts of one /64 are processed');
+select is(pg_temp.st_as(pg_temp.cf('2001:db8:aa:1::ffff'), pg_temp.rnd()), 'rate_limited', 'S11 the 21st host of the same /64 is rate limited (rotation inside a /64 cannot dodge the limit)');
+select is(pg_temp.st_as(pg_temp.cf('2001:db8:aa:2::1'), pg_temp.tk(95)), 'valid', 'S12 a neighbouring /64 is unaffected');
+select is((select count(*)::int from generate_series(1, 20) g where pg_temp.st_as(pg_temp.cf('10.20.30.40'), pg_temp.rnd()) = 'invalid'), 20, 'S13 20 failures from one IPv4 are processed');
+select is(pg_temp.st_as(pg_temp.cf('::ffff:10.20.30.40'), pg_temp.tk(95)), 'rate_limited', 'S14 the IPv4-mapped spelling of a blocked IPv4 is blocked too');
+select is(pg_temp.st_as(pg_temp.cf('10.20.30.41'), pg_temp.tk(95)), 'valid', 'S15 the next IPv4 address is unaffected');
+reset role;
+select is((select count(*)::int from public.public_link_attempts where window_start = pg_temp.win() and source_key <> '\x00'), 2, 'S16 one row per /64 and per IPv4 (blocked and valid calls write no rows)');
+select is((select failures from public.public_link_attempts where window_start = pg_temp.win() and source_key = '\x00'), 40, 'S17 global row counts the 40 processed failures');
+-- breaker open (1000 <= global < 5000)
+delete from public.public_link_attempts;
+insert into public.public_link_attempts (source_key, window_start, failures) values ('\x00', pg_temp.win(), 1500), (pg_temp.k(pg_temp.cf('198.51.100.1')), pg_temp.win(), 1);
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(pg_temp.st_as(pg_temp.cf('198.51.100.1'), pg_temp.tk(95)), 'rate_limited', 'S18 breaker open: a source that already failed is held back, even with a valid token');
+select is(pg_temp.st_as(pg_temp.cf('198.51.100.2'), pg_temp.tk(95)), 'valid', 'S19 breaker open: a fresh source with a valid token still works');
+select is(pg_temp.st_as(pg_temp.cf('198.51.100.3'), pg_temp.rnd()), 'invalid', 'S20 breaker open: a fresh source''s first failure is processed');
+select is(pg_temp.st_as(pg_temp.cf('198.51.100.3'), pg_temp.tk(95)), 'rate_limited', 'S21 breaker open: after that failure the source is held back');
+reset role;
+select is((select failures from public.public_link_attempts where window_start = pg_temp.win() and source_key = pg_temp.k(pg_temp.cf('198.51.100.3'))), 1, 'S22 below the hard cap the fresh source still gets its own row');
+select is((select failures from public.public_link_attempts where window_start = pg_temp.win() and source_key = '\x00'), 1501, 'S23 global row incremented');
+-- hard cap (global >= 5000)
+update public.public_link_attempts set failures = 4999 where source_key = '\x00' and window_start = pg_temp.win();
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(pg_temp.st_as(pg_temp.cf('198.51.100.9'), pg_temp.rnd()), 'invalid', 'S24 at 4999 a fresh failure is still processed');
+select is(pg_temp.st_as(pg_temp.cf('198.51.100.10'), pg_temp.tk(95)), 'rate_limited', 'S25 at the hard cap EVERY source is blocked, even a fresh one with a valid token (documented lockdown)');
+select is(pg_temp.sub_as(pg_temp.cf('198.51.100.11'), pg_temp.tk(96), 'approved', null), 'rate_limited', 'S26 at the hard cap submit is blocked too');
+reset role;
+select is((select failures from public.public_link_attempts where window_start = pg_temp.win() and source_key = pg_temp.k(pg_temp.cf('198.51.100.9'))), 1, 'S27 the failure at 4999 wrote its per-source row');
+select set_config('t.rows_at_cap', (select count(*)::text from public.public_link_attempts), true);
+select public._throttle_record_failure(pg_temp.k(pg_temp.cf('198.51.100.12')));
+select public._throttle_record_failure(pg_temp.k(pg_temp.cf('2001:db8:bb::1')));
+select is((select count(*)::text from public.public_link_attempts), current_setting('t.rows_at_cap'), 'S28 above the hard cap no new row is written');
+select is((select failures from public.public_link_attempts where window_start = pg_temp.win() and source_key = '\x00'), 5002, 'S29 above the hard cap failures are still counted globally');
+select ok((select count(*) = 0 from public.client_decisions where version_id = pg_temp.vid(96)), 'S30 the blocked submit recorded nothing');
+-- the lockdown is per window
+delete from public.public_link_attempts;
+insert into public.public_link_attempts (source_key, window_start, failures) values ('\x00', pg_temp.win() - interval '10 minutes', 9000);
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(pg_temp.st_as(pg_temp.cf('198.51.100.13'), pg_temp.tk(95)), 'valid', 'S31 a hard-cap lockdown from the previous window does not carry over');
+reset role;
+-- bounded cleanup
+delete from public.public_link_attempts;
+insert into public.public_link_attempts (source_key, window_start, failures) select extensions.digest('old' || g, 'sha256'), now() - interval '2 days', 1 from generate_series(1, 120) g;
+insert into public.public_link_attempts (source_key, window_start, failures) select extensions.digest('recent' || g, 'sha256'), pg_temp.win() - interval '2 hours', 1 from generate_series(1, 10) g;
+select public._throttle_record_failure(pg_temp.k(pg_temp.cf('192.0.2.1')));
+select is((select count(*)::int from public.public_link_attempts where window_start < now() - interval '1 day'), 70, 'S32 one failure call removes exactly 50 rows older than a day');
+select public._throttle_record_failure(pg_temp.k(pg_temp.cf('192.0.2.1')));
+select public._throttle_record_failure(pg_temp.k(pg_temp.cf('192.0.2.1')));
+select is((select count(*)::int from public.public_link_attempts where window_start < now() - interval '1 day'), 0, 'S33 repeated calls drain the backlog');
+select is((select count(*)::int from public.public_link_attempts where window_start = pg_temp.win() - interval '2 hours'), 10, 'S34 rows younger than a day are kept');
+insert into public.public_link_attempts (source_key, window_start, failures) select extensions.digest('old2' || g, 'sha256'), now() - interval '3 days', 1 from generate_series(1, 60) g;
+update public.public_link_attempts set failures = 5000 where source_key = '\x00' and window_start = pg_temp.win();
+select public._throttle_record_failure(pg_temp.k(pg_temp.cf('192.0.2.2')));
+select is((select count(*)::int from public.public_link_attempts where window_start < now() - interval '1 day'), 10, 'S35 cleanup also runs while the hard cap is reached');
+select ok(exists (select 1 from pg_indexes where schemaname = 'public' and tablename = 'public_link_attempts' and indexdef ~ '\(window_start\)'), 'S36 an index on window_start supports the cleanup');
+-- SEC-5-8 comment bounds
+delete from public.public_link_attempts;
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(pg_temp.sub_as(pg_temp.cf('203.0.113.1'), pg_temp.tk(96), 'approved', repeat(' ', 8001)), 'validation', 'S37 a raw comment over 8000 characters is rejected, even whitespace only');
+select is(pg_temp.sub_as(pg_temp.cf('203.0.113.1'), pg_temp.tk(96), 'approved', repeat('x', 8001)), 'validation', 'S38 8001 non-space characters rejected');
+select is(pg_temp.sub_as(pg_temp.cf('203.0.113.1'), pg_temp.tk(96), 'approved', E'\t\n' || repeat('y', 2001)), 'validation', 'S39 2001 characters after the trim rejected');
+select is(pg_temp.sub_as(pg_temp.cf('203.0.113.1'), pg_temp.tk(96), 'approved', repeat('x', 2000) || repeat(' ', 6000)), 'recorded', 'S40 2000 characters + 6000 spaces (8000 raw) accepted');
+select is(pg_temp.sub_as(pg_temp.cf('203.0.113.1'), pg_temp.tk(97), 'approved', E'\r\n\t' || repeat(' ', 7997)), 'recorded', 'S41 exactly 8000 whitespace characters accepted as no comment');
+select set_config('t.t1', clock_timestamp()::text, true);
+select is((select count(*)::int from generate_series(1, 20) g where pg_temp.sub_as(pg_temp.cf('203.0.113.2'), repeat('a', 43), 'bogus', repeat(' ', 7999) || 'x') = 'validation'), 20, 'S42 worst-case whitespace comments return validation');
+select ok(clock_timestamp() - current_setting('t.t1')::timestamptz < interval '2 seconds', 'S43 20 worst-case 8000-character comments take under 2 s in total (no regex blow-up)');
+select is((select count(*)::int from generate_series(1, 5) g where pg_temp.sub_as(pg_temp.cf('203.0.113.3'), repeat('a', 43), 'approved', repeat('z', 1000000)) = 'validation'), 5, 'S44 1 MB comments are rejected by the cheap raw check');
+reset role;
+select is((select length(comment) from public.client_decisions where version_id = pg_temp.vid(96)), 2000, 'S45 the accepted comment is stored trimmed to 2000 characters');
+select is((select comment from public.client_decisions where version_id = pg_temp.vid(97)), null, 'S46 the 8000-whitespace comment is stored as NULL');
+select is((select count(*)::int from public.public_link_attempts), 0, 'S47 validation errors write no throttle rows');
+-- no exception paths through the public RPCs with odd headers
+delete from public.public_link_attempts;
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select ok((select bool_and(pg_temp.st_as(h, pg_temp.rnd()) in ('invalid', 'rate_limited')) from unnest(array['{"cf-connecting-ip": {"a": 1}}', '{"x-forwarded-for": ["a", "b"]}', '[1,2]', '"scalar"', '123', 'null', 'not json', '', pg_temp.cf(repeat('b', 100000)), pg_temp.cf('fe80::1%eth0')]) h), 'S48 lookups with odd header shapes never raise');
+select ok((select bool_and(pg_temp.sub_as(h, pg_temp.rnd(), 'approved', null) in ('invalid', 'rate_limited')) from unnest(array['"scalar"', '[1]', pg_temp.cf('::ffff:1.2.3.4')]) h), 'S49 submits with odd header shapes never raise');
+reset role;
 delete from public.public_link_attempts;
 select set_config('request.headers', '', true);
 

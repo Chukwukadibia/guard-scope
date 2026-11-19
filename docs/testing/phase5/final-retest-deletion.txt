@@ -1,0 +1,10 @@
+{"uid":"5d5d5d5d-0000-4000-8000-00000000005d","projects":["de552e66-99e6-487d-a326-0b2811eba524","3fe6c17b-9e15-4b3a-a257-362bdf5c2898"],"cos":["93669f17-e924-4523-9acc-ca5916cc1919","3c148a4d-146c-4270-825f-f51873dc7f0e"],"versions":["25d00e6d-025e-4c9d-adf1-de5518ce452e","c8c07ed0-7fed-4aeb-abca-d041f3ec7ca1"],"throttleCalls":["invalid","invalid","invalid"]}
+# Throwaway user p5-delete-throwaway@guardscope.test (id 5d5d5d5d-0000-4000-8000-00000000005d) created via SQL with a bcrypt hash
+# computed locally (same method as Phase 2 T-10; password derived in the shell from a secret already on disk, passed to Playwright via env only,
+# never written to a file or printed). Seeded through the API/UI: 2 sent proposals with links, one client decision WITH a comment
+# (approved through the public page), 3 failed public lookups from the same browser.
+# e2e: tests/e2e/p5-account-deletion.spec.ts (desktop) 1 passed: UI deletion, old token reads nothing, both client links show "isn't available".
+# SQL after deletion: users=0 identities=0 sessions=0 refresh_tokens=0 profiles=0 projects=0; client_decisions global=0 (comment rows 0);
+# the only remaining link/version/change order/5 events belong to a@'s live-test fixture "P5T final" (removed by the final cleanup).
+# Throttle rows (2 rows, 5 failures) remain by design: they are keyed by a salted hash of the source IP, not by account,
+# and hold no personal link to the deleted user; they expire with the window cleanup (> 1 day).

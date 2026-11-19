@@ -1,0 +1,6 @@
+scenario=final started 2026-11-19T14:01:03.798Z
+first rate_limited at attempt 41 ; invalid processed: 40
+valid token from the (now blocked) egress -> rate_limited
+READY_FOR_CLEANUP
+after the harness cleared the throttle rows, valid token -> valid
+DB after the burst: global 40, two egress-IP keys at exactly 20 each (two IPv4 egress addresses); harness then deleted public_link_attempts.
