@@ -44,7 +44,7 @@ The freelancer needs the client to see exactly one proposal version and answer i
 - **BR-3:** One decision per version (database unique constraint). Retry with the same idempotency key returns the original result; a different key after a decision returns "already decided".
 - **BR-4:** Approving does not mean payment (PRD §7.4). The page and the freelancer view say "approved" for the proposal and never "paid", "collected" or "earned".
 - **BR-5:** Clarification is terminal for that version (HA-006). The freelancer answers outside the app and sends a new version, which needs a new link. The UI never counts clarification as approval.
-- **BR-6:** Failed lookups are throttled per source (key: `cf-connecting-ip`, else the last `x-forwarded-for` entry, hashed with a salt; DEC-012): over 20 failures in 10 minutes → `rate_limited` before the token is even checked. A global failure breaker is a second layer. A valid token never counts as a failure.
+- **BR-6:** (Amended by HA-009 / DEC-015.) The token is looked up first; a correct token is always served. Failed lookups are throttled per source (key: `cf-connecting-ip`, else the last `x-forwarded-for` entry, hashed with a salt, IPv6 grouped by /64; DEC-012): over 20 failures in 10 minutes → `rate_limited` for that source's further failed lookups. A global failure breaker and a hard cap are second layers and also apply only to failed lookups. A valid token never counts as a failure and is never blocked.
 - **BR-7:** Links can only be issued for a pending version on an **active** project, by its owner. Cancel and supersede revoke the link atomically. Account deletion removes links and decisions.
 - **BR-8:** Comments are untrusted text: rendered as text only, never as HTML.
 
